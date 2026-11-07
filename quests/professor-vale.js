@@ -107,6 +107,64 @@
       codeword: 'Vanessa’s code word for the Semtex: ring Lenny on the garden-shed number and ask for a garden shed clearance. Never say Semtex on the phone.'
     },
     deduction: { needs: ['rule', 'debate', 'allison', 'car_bay'], text: 'You put it together: the day after the Cofnas lecture, his car, bay fourteen, and Allison Kent knows exactly where he’ll be. Day {A}.' },
+    // Places you can go (7 November 2026, the showcase for INTERACTIVE_PLAN.md): each is a short set piece of
+    // cut-scenes, quick-time events and mini games (the host's runBeats). What happens decides what you learn.
+    visits: {
+      office: {
+        label: 'Go to Founders’ Hall',
+        desc: 'Scope out the corridor, then try his office. Once a day.',
+        beats: [
+          { scene: [
+            { image: 'assets/quests/professor/visit-hall.png', stand: 'room', caption: 'Founders’ Hall, second floor. A long corridor of closed doors, notice boards and a copier that never stops.' },
+            { image: 'assets/quests/professor/visit-door.png', stand: 'room', caption: 'Professor Vale’s door. A brass plate, a card reader, and a sticky note that says Back soon. It does not say how soon.' }
+          ] },
+          { mini: 'spotit', key: 'watch', title: 'WHO IS WATCHING?', crowd: ['🧑‍🎓', '👩‍🎓', '👨‍🎓', '🧑‍💼', '👩‍💼', '🧑‍🏫'], odd: '🕵️', peek: true, image: 'assets/quests/professor/visit-hall.png', caption: 'Somebody in this corridor keeps glancing at his door. Catch them at it, and tap them before they notice you.' },
+          { scene: [ { image: 'assets/quests/professor/visit-lorraine.png', stand: 'room', caption: 'Lorraine from the department office has left her keycard on the copier. She has gone for more paper.' } ] },
+          { mini: 'cardswipe', key: 'card', cardLabel: 'FOUNDERS’ HALL STAFF', image: 'assets/quests/professor/visit-door.png', caption: 'Lorraine’s card. Swipe it through his reader before she comes back.' },
+          { when: c => c.results.card !== 'miss', then: [
+            { qte: 'hold', key: 'door', labels: ['EASE IT OPEN'], image: 'assets/quests/professor/visit-door.png', caption: 'The door sticks. Ease it open. Too fast and it bangs the filing cabinet.' },
+            { scene: [ { image: 'assets/quests/professor/visit-office.png', stand: 'room', caption: 'His office. Books to the ceiling, a framed photo with Camille Paglia, and a desk buried in paper.' } ] },
+            { mini: 'spotit', key: 'desk', title: 'SEARCH THE DESK', crowd: ['📄', '📃', '📑', '🗒️', '📰', '📜'], odd: '📓', image: 'assets/quests/professor/visit-office.png', caption: 'Somewhere under the complaints is the thing that matters. Find it.' }
+          ], else: [
+            { scene: [ { image: 'assets/quests/professor/visit-lorraine.png', stand: 'room', caption: 'The reader beeps red twice. Lorraine is back. She takes her card and looks at you for a long time.' } ] }
+          ] }
+        ]
+      },
+      lot: {
+        label: 'Scope out the faculty parking lot',
+        desc: 'Where does he park, and who else is looking? Once a day.',
+        beats: [
+          { scene: [
+            { image: 'assets/quests/professor/visit-lot.png', stand: 'room', caption: 'The faculty parking lot. Rows of bays with names painted on them, a security booth, and one barrier at the exit.' }
+          ] },
+          { mini: 'spotit', key: 'car', title: 'WHICH ONE IS HIS?', crowd: ['🚗', '🚕', '🛻', '🚘'], odd: '🚙', image: 'assets/quests/professor/visit-lot.png', caption: 'Find Vale’s car. It is the one that looks like it reads.' },
+          { qte: 'swipe', key: 'cart', dirs: ['left', 'right'], image: 'assets/quests/professor/visit-lot.png', caption: 'A security cart comes round the corner. Get out of its way.' },
+          { mini: 'rewire', key: 'barrier', image: 'assets/quests/professor/visit-barrier.png', caption: 'The exit barrier is stuck down and the booth is empty. Rewire the panel and get out.' },
+          { scene: [ { image: 'assets/quests/professor/visit-barrier.png', stand: 'room', caption: 'The barrier lifts. You walk out like you work here.' } ] }
+        ]
+      },
+      vale: {
+        label: 'Go and see Professor Vale',
+        desc: 'His office hours. He might talk to you. Once.',
+        beats: [
+          { scene: [
+            { image: 'assets/quests/professor/visit-hours.png', stand: 'room', caption: 'Office hours. A queue of two students and a man with a petition. Vale waves you in first, because you are not either of those.' }
+          ] },
+          { ask: { key: 'talk', questions: [
+            { image: 'assets/quests/professor/visit-hours.png', ask: 'Vale: So. You are the one who keeps asking about my car. Why?', answers: [
+              { label: 'Because things happen to you the day after your guests.', tag: 'sharp', reply: 'He stops smiling. Go on.' },
+              { label: 'I like cars.', tag: 'dodge', reply: 'Nobody likes my car. It is a very sensible car.' },
+              { label: 'Someone wants you hurt.', tag: 'sharp', reply: 'Someone always wants me hurt. It is how I know the lectures are working.' }] },
+            { image: 'assets/quests/professor/visit-hours.png', ask: 'Vale: My brakes, then my house. Do you think that is a pattern, or a coincidence?', answers: [
+              { label: 'A pattern. Paglia, then your brakes. Houellebecq, then the fire.', tag: 'sharp', reply: 'He writes something down. That is more than the police said.' },
+              { label: 'A coincidence. Probably.', tag: 'dodge', reply: 'Probably. I love that word. It has kept me alive this long.' },
+              { label: 'I think your diary is leaking.', tag: 'sharp', reply: 'He looks at the door to the next office for a second too long.' }] }
+          ] }, key: 'talk' },
+          { qte: 'tap', key: 'shake', label: 'SHAKE', image: 'assets/quests/professor/visit-hours.png', caption: 'He stands and offers his hand. Take it before it gets awkward.' },
+          { scene: [ { image: 'assets/quests/professor/visit-hours.png', stand: 'room', caption: 'He writes his number on the back of a lecture flyer. If you are right, ring me. If you are wrong, also ring me. I get bored.' } ] }
+        ]
+      }
+    },
     // When the case has stalled for days, Rosa rings and gives you the next piece (4 November 2026).
     help: {
       caller: 'Rosa Gutierrez',
@@ -1369,6 +1427,7 @@
     }
     function roomAction(s, id, day) {
       if (s.ending) return no(L.over);
+      if (String(id).startsWith('visit:')) return visitStart(s, String(id).slice(6), day); // a place to go
       const a = roomActions(s).find(x => x.id === id);
       if (!a || !a.enabled) return no(L.unavailable);
       if (id === 'walk_away') { s.stage = 'withdrawn'; return ok(s, L.walkAway); }
@@ -1405,6 +1464,50 @@
       return null;
     }
 
+    // ----- places to go (7 November 2026) -----
+    function visitActions(s, day) {
+      if (s.ending || s.stage !== 'open') return [];
+      const V = D.visits, out = [];
+      out.push({ id: 'visit:office', label: V.office.label, desc: V.office.desc, enabled: !usedToday(s, 'visit_office', day) });
+      out.push({ id: 'visit:lot', label: V.lot.label, desc: V.lot.desc, enabled: !usedToday(s, 'visit_lot', day) });
+      if (has(s, 'debate') || s.valeTalk1 || s.numbers.vale) out.push({ id: 'visit:vale', label: V.vale.label, desc: V.vale.desc, enabled: !s.valeVisited });
+      return out.map(a => Object.assign({ confirm: false }, a));
+    }
+    function visitStart(s, id, day) {
+      const a = visitActions(s, day).find(x => x.id === 'visit:' + id);
+      if (!a || !a.enabled) return no(L.unavailable);
+      s.daily['visit_' + id] = day;
+      return { ok: true, visit: { id, beats: D.visits[id].beats } };
+    }
+    // What the set piece taught you. results: what each beat gave (perfect, ok or miss; ask: {tags}).
+    function visitResult(s, id, r, day) {
+      r = r || {};
+      const got = k => r[k] && r[k] !== 'miss';
+      if (id === 'office') {
+        if (!got('watch')) risk(s, 6, day);   // they saw you
+        if (!got('card')) { risk(s, 4, day); return ok(s, 'Lorraine took her card back. You did not get in. Try another day.'); }
+        if (got('desk')) {
+          if (!has(s, 'allison')) { learn(s, 'allison'); return ok(s, 'Under the complaints: his diary, every page in someone else’s handwriting. Allison Kent, his research assistant, keeps it.'); }
+          if (!has(s, 'debate')) { learn(s, 'debate'); return ok(s, 'Under the complaints: a poster proof. Nathan Cofnas, Founders’ Hall, Day {T}.'); }
+          if (!has(s, 'diary_leak')) { learn(s, 'diary_leak'); return ok(s, 'A note in the margin of his diary, not in his hand: copy to V. Someone is passing it on.'); }
+          return ok(s, 'Nothing new on the desk. Just complaints, and one very good review of himself.');
+        }
+        return ok(s, 'You hear footsteps and leave with nothing.');
+      }
+      if (id === 'lot') {
+        if (!got('cart') || !got('barrier')) risk(s, 5, day);   // security wrote your face down
+        if (got('car') && !has(s, 'car_bay')) { learn(s, 'car_bay'); return ok(s, 'His name is painted on bay fourteen. The day after anything public, the car sits right there.'); }
+        return ok(s, got('car') ? 'Bay fourteen. You already knew. It looks very exposed from here.' : 'You could not tell which car was his. Every bay looks the same at this hour.');
+      }
+      if (id === 'vale') {
+        s.valeVisited = true; giveNumber(s, 'vale');
+        const sharp = (r.talk && r.talk.tags || []).filter(t => t === 'sharp').length;
+        if (sharp >= 1) { learn(s, 'car_story'); learn(s, 'fire_story'); }
+        if (sharp >= 2 && !has(s, 'diary_leak')) learn(s, 'diary_leak');
+        return ok(s, sharp ? 'Vale gave you his number, and the dates: Paglia then his brakes, Houellebecq then the fire.' : 'Vale gave you his number. He did not take you very seriously.');
+      }
+      return no(L.unavailable);
+    }
     // ----- workbench -----
     function workbenchConfig(s) {
       const W = D.workbench;
@@ -1505,6 +1608,7 @@
         inventory: s.stage === 'backrow' ? ITEMS.map(i => ({ id: i, label: D.workbench.items[i].label, status: s.inv[i], image: D.workbench.items[i].image })) : [],
         device: s.device,
         actions: roomActions(s),
+        visits: visitActions(s, day),
         hint: hintFor(s),
         campus: isProtect(s) || s.stage === 'withdrawn' ? D.university.word[campusTier(s)] : null,
         log: s.log.slice(-5),
@@ -1516,7 +1620,7 @@
       fresh, normalize, newDay, onNewsRead, newsFor,
       hingeTopics, chooseHinge, dateTopicFor, askOnDate,
       contactForNumber, knownLines, lineTopics, chooseLine,
-      roomActions, roomAction, workbenchConfig, assembleResult, wireNeeded, wireFromFriend,
+      roomActions, roomAction, visitActions, visitResult, workbenchConfig, assembleResult, wireNeeded, wireFromFriend,
       caseFile, endingInfo, helpLead, helpGive,
       onHeard, valeDue, valeRang, valeOpening, valeCallChoices, valeCallChoose, valeMissed, serviceGreeting,
       fakeDue, fakeRang, fakeOpening, fakeCallChoices, fakeCallChoose, fakeMissed,
@@ -1561,6 +1665,7 @@
       if (!r) return r;
       if (r.text) { lastText = r.text; if (host.status) host.status(r.text); }
       if (r.workbench) openWorkbench(r.workbench);
+      if (r.visit && host.runBeats) { const v = r.visit; host.runBeats(v.beats, {}, ctx => after(E.visitResult(state(), v.id, ctx.results, day()))); }
       const s = state();
       if (s.ending) finishWithEnding(E.endingInfo(s));
       if (host.save) host.save();
@@ -1587,6 +1692,7 @@
       if (v.voicemails.length && !(host.elsewhere && host.elsewhere.voicemails)) h += `<h4>Voicemail</h4>${v.voicemails.map(m => `<div class="pv-vm"><b>Day ${m.day} · ${esc(m.from)}</b><br>${esc(m.text)}</div>`).join('')}`;
       if (v.numbers.length && !(host.elsewhere && host.elsewhere.numbers)) h += `<h4>Numbers</h4>${v.numbers.map(n => `<p class="contact-entry"><b>${esc(n.name)}</b><br><button class="notes-call" data-note-dial="${esc(n.number)}">${esc(n.number)} ☎</button></p>`).join('')}`;
       if (v.inventory.length) h += `<h4>On your desk</h4><div class="pv-inv">${v.inventory.map(i => `<div class="pv-item pv-${esc(i.status)}"><img src="${esc(asset(i.image))}" alt="" onerror="this.remove()"><span>${esc(i.label)}</span><small>${esc({ none: 'need', ordered: 'arriving', have: 'here' }[i.status])}</small></div>`).join('')}<div class="pv-item"><span>Device</span><small>${esc({ none: 'not built', assembled: 'on your desk', waiting: 'on the doorstep', collected: 'with Allison', detonated: 'gone' }[v.device])}</small></div></div>`;
+      if (v.visits && v.visits.length && host.runBeats) h += `<h4>Places to go</h4>${v.visits.map(a => btn(a.id, a.label, a.desc, a.enabled, false)).join('')}`;
       if (v.actions.length) h += `<h4>In your room</h4>${v.actions.map(a => btn(a.id, a.label, a.desc, a.enabled, a.confirm)).join('')}`;
       if (v.people.length) h += `<h4>People</h4><ul class="pv-list">${v.people.map(p => `<li><b>${esc(p.name)}</b>: ${esc(p.role)}</li>`).join('')}</ul>`;
       if (v.facts.length) h += `<h4>What you know</h4><ul class="pv-list">${v.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
