@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="a6c3aef47e">
+<html lang="en" data-build="41de9a97ef">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -211,6 +211,15 @@
     .settings-back { margin: 0 0 6px; border: 0; background: none; color: #3d6a96; font: bold 12px Tahoma,sans-serif; cursor: pointer; padding: 2px 0; }
     /* Settings laid out like a game's menu (7 November 2026): New Game on top as a big card, then Display, Help and Extras
        as grouped rows; the tour and the tutorials have their own page. */
+    /* Sound on or off, at the very top of Settings (7 November 2026). Icons: Lucide volume-2 and volume-x (lucide.dev), ISC License, Copyright (c) Lucide Contributors 2022; portions Copyright (c) Cole Bemis 2013-2022 (Feather, MIT). */
+    .settings-sound { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 8px; padding: 9px 12px; border: 1px solid #1d3047; border-radius: 10px; background: linear-gradient(160deg,#5b86b6,#29436a); color: #fff; font: bold 14px Tahoma,sans-serif; text-align: left; box-shadow: 0 2px 6px #1a2a4455, inset 0 1px 0 #ffffff4d; }
+    .settings-sound svg { width: 22px; height: 22px; flex: none; }
+    .settings-sound .snd-switch { margin-left: auto; width: 40px; height: 22px; border-radius: 11px; background: #7fd18b; position: relative; flex: none; box-shadow: inset 0 1px 2px #0004; }
+    .settings-sound .snd-switch::after { content: ''; position: absolute; top: 2px; left: 20px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px #0006; }
+    .settings-sound.off { background: linear-gradient(160deg,#9aa3ad,#5d6670); }
+    .settings-sound.off .snd-switch { background: #c9ced4; }
+    .settings-sound.off .snd-switch::after { left: 2px; }
+    .settings-sound:active { transform: translateY(1px); }
     .settings-newgame { display: flex; align-items: center; gap: 10px; width: 100%; margin: 2px 0 4px; padding: 12px; border: 1px solid #1d3047; border-radius: 10px; background: linear-gradient(160deg,#5b86b6,#29436a 55%,#1a2a44); color: #fff; text-align: left; cursor: pointer; box-shadow: 0 3px 9px #1a2a4466, inset 0 1px 0 #ffffff4d; }
     .settings-newgame:active { transform: translateY(1px); box-shadow: 0 1px 4px #1a2a4466, inset 0 1px 0 #ffffff4d; }
     .settings-newgame .ng-icon { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: #ffffff26; border: 1px solid #ffffff66; font: 15px/1 Arial,sans-serif; padding-left: 2px; box-sizing: border-box; }
@@ -825,11 +834,11 @@
     @media(max-width: 730px) { .workbench { display: flex; flex-direction: column; gap: 16px; padding: 17px; } aside { padding: 2px; } h1 { font-size: 32px; } .settings { margin-top: 12px; } .preview-area { padding-top: 0; } }
   </style>
   <!-- Task 2: Chapel at Midnight quest engine. The standalone build inlines it. -->
-  <script src="chapel_at_midnight.js?v=a6c3aef47e"></script>
+  <script src="chapel_at_midnight.js?v=41de9a97ef"></script>
   <!-- Marriage: the Sisters of Mercy (and the Bluebird wedding), the only victories. The standalone build inlines it. -->
-  <script src="marriage.js?v=a6c3aef47e"></script>
+  <script src="marriage.js?v=41de9a97ef"></script>
   <!-- Professor Vale: "The Professor Who Won't Disappear". The standalone build inlines it. -->
-  <script src="quests/professor-vale.js?v=a6c3aef47e"></script>
+  <script src="quests/professor-vale.js?v=41de9a97ef"></script>
 </head>
 <body>
   <main class="workbench">
@@ -2498,7 +2507,7 @@
         warmth:0,followUp:null,deeper:null,talk:sanitizeTalk(null),matchDay:world.day,
         awaiting,replyOnDay:responseMode==='tomorrow'?world.day+1:responseMode==='ghost'?world.day+2+hashSeed(world.seed+'|ghost|'+profile.id)%3:null,ghosted:responseMode==='ghost',
         log:awaiting?[]:[{who:'her',text:introFor(profile)}],callLog:[]};
-      if(world&&!world.guide&&selectedDifficulty==='normie'&&typeof coachState==='function'&&coachState().on===true&&profile.id!==bearHingeCard.id&&!profile.sorority&&!mustReply(profile))world.guide=profile.id; // your guide for the tour
+      if(world&&!world.guide&&selectedDifficulty==='normie'&&profile.id!==bearHingeCard.id&&!profile.sorority&&!mustReply(profile))world.guide=profile.id; // your guide: the first woman you match, tour or not (the starting quest is hers)
       if(!awaiting&&botched())botchTree(thread).said=true; // her first message was about it
       thread.bj=thread.log.length;
       hingeThreads.set(profile.id,thread);
@@ -2523,7 +2532,8 @@
     // your guide takes it back while the tour lasts. Found by the tour bot: 1 game in 200 lost her to a side story.
     const GUIDE_SORRY=['Sorry. Ignore that. I’m being dramatic. Where were we?','Okay, I take that back. Bad day. Keep talking to me.','Wait. Don’t go. I didn’t mean that. Ask me something.'];
     function guideShield(){
-      if(!world?.guide||!guideActive(world.guide)||world.bf?.dumped||world.st?.lost)return; // a starting quest: she meant it
+      const waiting=!window.MATCH_NO_BOYFRIEND&&selectedDifficulty==='normie'&&(world?.bf?.stage||'none')==='none'&&(world?.st?.stage||'none')==='none'&&world?.day<=3; // tour or not, she's there for her starting quest
+      if(!world?.guide||!(guideActive(world.guide)||waiting)||world.bf?.dumped||world.st?.lost)return; // a starting quest: she meant it
       const t=hingeThreads.get(world.guide);if(!t||t.missing||t.dead||t.pending)return;
       if(!(t.blocked||t.unmatched||t.quiet||t.fumbled))return;
       t.blocked=false;t.unmatched=false;t.quiet=false;t.fumbled=false;
@@ -4859,7 +4869,7 @@
     // ---- The dream: full screen, faded, one picture at a time, Next to go on ----
     var DREAM=null;
     function dreamStart(steps,done){
-      DREAM={steps,i:0,done};
+      DREAM={steps,i:0,done};dreamHum(true); // a soft hum under the dream
       $('call-bubble')?.classList.remove('visible');
       dreamShow();
     }
@@ -4878,7 +4888,7 @@
       const d=DREAM;if(!d)return;
       d.i++;
       if(d.i<d.steps.length){dreamShow();return;}
-      DREAM=null;$('dream').hidden=true;
+      DREAM=null;$('dream').hidden=true;dreamHum(false);
       d.done();
     }
 
@@ -4900,10 +4910,10 @@
       }
       return world.starterId;
     }
-    function starterReady(){ // the tour is on and you have your guide: day 1 after your call, or the next morning
+    function starterReady(){ // you have your guide: day 1 after your call with her, or the next morning. Tutorial or not (7 November 2026)
       if(!world||window.MATCH_NO_BOYFRIEND||selectedDifficulty!=='normie')return false;
-      if(!world.guide||coachState().on!==true||!(world.guideCalled||world.day>=2))return false;
-      const t=hingeThreads.get(world.guide);return !!t&&!t.blocked&&!t.unmatched;
+      if(!world.guide||!(world.guideCalled||world.day>=2))return false;
+      const t=hingeThreads.get(world.guide);return !!t&&!t.blocked&&!t.unmatched; // always the first girl you match
     }
     const starterHerName=id=>firstName(hingeProfile(id))||'She';
     function starterHerSays(id,lines,fill=x=>x,last){
@@ -4915,7 +4925,7 @@
     }
     const sceneOf=dir=>s=>({...s,image:'assets/quests/'+dir+'/'+s.image,stand:s.stand||'room',clear:true});
     // The police take you away, in your own room (the arrest pictures for the time of day).
-    function starterArrestSteps(captions){const ph=(dayPhases.includes(time.value)?time.value:'bedroom-night').replace('bedroom-','');return ['threshold','approach','cuff','grab'].map((f,i)=>({image:`assets/events/police-${ph}-${f}.webp`,stand:'room',caption:captions[i]}));}
+    function starterArrestSteps(captions){const ph=(dayPhases.includes(time.value)?time.value:'bedroom-night').replace('bedroom-','');return ['threshold','approach','cuff','grab'].map((f,i)=>({image:`assets/events/police-${ph}-${f}.webp`,stand:'room',caption:captions[i],...(i===0?{sound:'siren+radio'}:{})}));}
     function starterMaybeStart(){if(!starterReady())return;const id=starterId();if(id==='bf')bfMaybeStart();else stMaybeStart();}
     function starterNewDay(){if(!world)return;if((world.bf?.stage||'none')==='none'&&(world.st?.stage||'none')==='none')starterMaybeStart();stxNewDay();bfNewDay();stNewDay();infamyNewDay();}
     function starterAfterDayStart(){return bfAfterDayStart()||stAfterDayStart()||stxAfterDayStart();}
@@ -4954,13 +4964,13 @@
     // Sunfall that luck runs out. After that the quest carries on another way, or ends lost.
     var HOSPITAL={
       first:[
-        {image:'wake.png',caption:'You wake up in Sunfall General. Everything hurts.'},
+        {image:'wake.png',sound:'monitor',caption:'You wake up in Sunfall General. Everything hurts.'},
         {image:'doctor.png',caption:'Dr. Bernadette Hale: Look who’s awake. You’re lucky. You’re going to be fine.'},
         {image:'doctor.png',caption:'Listen to me. This is Sunfall. People die here from the choices they make. Every week. I sign the papers.'},
         {image:'doctor.png',caption:'Next time you won’t wake up on my ward. Look after yourself. This town does not pull punches.'}
       ],
       again:[
-        {image:'wake.png',caption:'You wake up in Sunfall General. Again.'},
+        {image:'wake.png',sound:'monitor',caption:'You wake up in Sunfall General. Again.'},
         {image:'doctor.png',caption:'Dr. Hale: You again. I told you. There is no third time.'}
       ],
       notice:'In Sunfall, choices have consequences. From here on, death is real.'
@@ -4985,7 +4995,7 @@
       rally:[
         {image:'rally-podium.png',caption:'You wake up famous. Last night, at the Sunfall Democrats’ Decency First rally, Tanner Voss held up your shirtless selfie.'},
         {image:'rally-podium.png',caption:'Then he read your messages out loud. All of them. He did your voice.'},
-        {image:'rally-crowd.png',caption:'Four hundred people laughed for eleven minutes. Channel 4 ran it twice.'}
+        {image:'rally-crowd.png',sound:'laugh',caption:'Four hundred people laughed for eleven minutes. Channel 4 ran it twice.'}
       ],
       askNumber:{label:'Ask her how to reach Tanner',you:'Give me his number. I’ll talk to him.',her:['It’s on every yard sign in Sunfall. {number}.','Be careful. He boxed in college and he still brings it up.']},
       tanner:{name:'Tanner Voss',detail:'Democrat for City Council',greeting:'Tanner Voss, Democrat for City Council. Who’s this?',after:'Tanner Voss, Democrat for City Council. Oh, it’s you again. Hang on. Everybody, it’s him.'},
@@ -4997,7 +5007,7 @@
       ],
       speaker:[
         {image:'speaker.png',caption:'You’re on speaker. Forty donors in black tie lean toward the phone.'},
-        {image:'speaker.png',caption:'Tanner: This, ladies and gentlemen, is who we are protecting our women from.'},
+        {image:'speaker.png',sound:'laugh',caption:'Tanner: This, ladies and gentlemen, is who we are protecting our women from.'},
         {image:'speaker.png',caption:'Somebody films it. By tonight it’s a ringtone.'}
       ],
       speakerMsg:['He posted the call. It has forty thousand views. Somebody set it to music.','Please make him stop.'],
@@ -5006,7 +5016,7 @@
       fightMsg:['You challenged Tanner to a fight?','He boxed in college. He has a coach. He has a guy who holds the bucket. Please don’t go.'],
       fight:[
         {image:'fight-park.png',caption:'Founders Park, first thing in the morning. Tanner has brought a boxing coach, six volunteers and a livestream.'},
-        {image:'fight-down.png',caption:'It takes nine seconds. Four hundred thousand people watch.'}
+        {image:'fight-down.png',sound:'crash+crowd',caption:'It takes nine seconds. Four hundred thousand people watch.'}
       ],
       fightAfter:['I watched it. Nine seconds. Are you okay?','He’s calling it self-defense. He cried on the stream. His numbers went up.','He still has to go. Not with your fists.'],
       report:{label:'Report Tanner Voss',reply:'Report him for what, love?'},
@@ -5023,9 +5033,9 @@
       truthAfter:['Tanner got the 911 tape. He played it at a rally. Then the part where you got tased.','I can’t do this. I’m dating Brad now. He’s six foot four and he has a boat.','Please don’t message me again.'],
       raid:[
         {image:'hottub.png',caption:'Across town, Tanner Voss is live on his campaign stream. In his hot tub. In his sash.'},
-        {image:'raid.png',caption:'SUNFALL POLICE. HANDS WHERE WE CAN SEE THEM.'},
+        {image:'raid.png',sound:'siren+radio',caption:'SUNFALL POLICE. HANDS WHERE WE CAN SEE THEM.'},
         {image:'dragged.png',caption:'They haul him out in a pink towel. The stream is still running. Eleven thousand people are watching.'},
-        {image:'hedge.png',caption:'He faints into his own hedge. Two ambulances come. So does a fire truck.'},
+        {image:'hedge.png',sound:'siren',caption:'He faints into his own hedge. Two ambulances come. So does a fire truck.'},
         {image:'tv.png',caption:'Channel 4, live: {chyron}. You watch it from bed with a bag of chips.'},
         {image:'mugshot.png',caption:'{found} They did find four dating apps on his phone.'}
       ],
@@ -5244,6 +5254,7 @@
       closeQte();
       d.bad+=a.bad||0;d.i++;if(a.tag)d.tags.push(a.tag);d.picks.push(Number(k));
       doorShow((a.bad||a.end)&&d.spec.doubt?d.spec.doubt:q.image,a.reply);
+      if(d.spec.laugh&&(a.bad||a.tag==='sad'))sceneSound(d.spec.laugh); // the room laughs at you
       playUiSound(a.bad||a.end?150:420);
       invasionTimers.push(window.setTimeout(()=>{
         if(doorNow!==d)return;
@@ -5287,7 +5298,7 @@
           {image:'gym-arrive.png',caption:'That evening. The Sunfall High School gym. Four hundred folding chairs, Channel 4, and one empty stool on the stage.'},
           {image:'stage-spot.png',caption:'Congressman Pruitt: Give a warm Sunfall welcome to my niece’s friend. Come on up, son. Don’t be shy. That’s the problem, isn’t it.'},
           {image:'slide-pie.png',caption:'He puts a pie chart of your screen time on the big screen. The biggest slice is Hinge. So is the second biggest.'},
-          {image:'slide-prompts.png',caption:'Then your dating profile, ten feet tall. He reads your prompts out loud. Slowly.'}
+          {image:'slide-prompts.png',sound:'laugh',caption:'Then your dating profile, ten feet tall. He reads your prompts out loud. Slowly.'}
         ],
         doubt:'stage-sweat.png',
         questions:[
@@ -5305,14 +5316,14 @@
             {label:'Grab the mic and ask about his own divorce',end:'tackle',reply:'You grab the mic. Congressman, is it true your wife left you for your speechwriter? The gym goes quiet. A man in an earpiece starts running.'}]}
         ],
         fatal:{
-          tackle:{steps:[{image:'tackle.png',caption:'Three men in earpieces take you down on live television. Your head hits the stage. So does the pizza.'},{image:'tackle.png',caption:'The congressman asks the gym to pray for you. Then he asks them to vote.'}],branch:'tackled'}
+          tackle:{steps:[{image:'tackle.png',sound:'crash+crowd',caption:'Three men in earpieces take you down on live television. Your head hits the stage. So does the pizza.'},{image:'tackle.png',caption:'The congressman asks the gym to pray for you. Then he asks them to vote.'}],branch:'tackled'}
         },
         // Two or more sad answers and he loves you: you're his poster boy, and she can't be seen with you.
         // Otherwise you were forgettable: he picks a sadder man from the crowd, and she likes you more for it.
         branch:d=>d.tags.filter(t=>t==='sad').length>=2?'poster':'forgettable',
         outro:{
-          poster:[{image:'paddles.png',caption:'Then the vote. Marriage material: green paddle yes, red paddle no. Three for. Four hundred against.'},{image:'pruitt-hug.png',caption:'Pruitt puts an arm around you for the cameras. This young man, he says, is why I’m running again.'}],
-          forgettable:[{image:'paddles.png',caption:'Then the vote. Forty for, three hundred and sixty against. The congressman looks disappointed in you.'},{image:'pruitt-hug.png',caption:'He picks a sadder man out of the crowd for the photo. You stand at the edge of the stage holding a slice of pizza.'}]
+          poster:[{image:'paddles.png',sound:'crowd',caption:'Then the vote. Marriage material: green paddle yes, red paddle no. Three for. Four hundred against.'},{image:'pruitt-hug.png',caption:'Pruitt puts an arm around you for the cameras. This young man, he says, is why I’m running again.'}],
+          forgettable:[{image:'paddles.png',sound:'crowd',caption:'Then the vote. Forty for, three hundred and sixty against. The congressman looks disappointed in you.'},{image:'pruitt-hug.png',caption:'He picks a sadder man out of the crowd for the photo. You stand at the edge of the stage holding a slice of pizza.'}]
         },
         outroNotice:'Go home. Go to bed. It’s on Channel 4 all night.',
         after:{
@@ -5342,7 +5353,7 @@
         teaser:{id:'st_alpha_teaser',section:'Business',title:'ALPHA SUNFALL SELLS OUT CONVENTION CENTER',summary:'Chadwick Stone brings his confidence seminar to town tonight.',body:'Self-made millionaire and confidence coach Chadwick Stone brings Alpha Sunfall to the Sunfall Convention Center tonight. Three hundred tickets sold out in an hour. Stone says the modern man has been softened by society, oat milk and dating apps. Women attend free.',image:'assets/quests/alpha/hall-arrive.png',fallbackImage:'local_ad'},
         intro:[
           {image:'hall-arrive.png',caption:'That evening. The Sunfall Convention Center. Three hundred men in tight T-shirts. Lasers. A smoke machine. She is the only woman in your row.'},
-          {image:'chadwick-stage.png',caption:'Chadwick Stone: I need a volunteer. You. In the polo. Gentlemen, look at this man. This is what we are fighting.'}
+          {image:'chadwick-stage.png',sound:'boys',caption:'Chadwick Stone: I need a volunteer. You. In the polo. Gentlemen, look at this man. This is what we are fighting.'}
         ],
         doubt:'stage-sweat.png',
         questions:[
@@ -5364,14 +5375,14 @@
             {label:'Her.',tag:'sad',reply:'Somebody get this man a protein shake and a therapist.'}]}
         ],
         fatal:{
-          swing:{steps:[{image:'chokehold.png',caption:'He puts you in a chokehold for the cameras and talks the room through it. Three hundred men take notes.'},{image:'lights-out.png',caption:'Gentlemen, this is what happens when a beta acts on emotion. You don’t hear the applause.'}],branch:'choked'}
+          swing:{steps:[{image:'chokehold.png',sound:'boys',caption:'He puts you in a chokehold for the cameras and talks the room through it. Three hundred men take notes.'},{image:'lights-out.png',caption:'Gentlemen, this is what happens when a beta acts on emotion. You don’t hear the applause.'}],branch:'choked'}
         },
         // The fewer sad answers, the more he respects you: he hires you to tour as his before picture. Either way she leaves with him.
         branch:d=>d.picks[0]===0?(d.tags.filter(t=>t==='safe').length>=2?'hired':'tshirt'):'walked',
         outro:{
           tshirt:[{image:'her-stage.png',caption:'Then he points at her. You. Come up here. She looks at you. She goes.'},{image:'her-stage.png',caption:'She leaves with him by the stage door. You walk home. Your texts are still on the big screen.'}],
           hired:[{image:'her-stage.png',caption:'Then he points at her. You. Come up here. She looks at you. She goes.'},{image:'chadwick-card.png',caption:'On the way out he hands you a business card. You’re a natural before picture, buddy. Come on tour. It pays.'}],
-          walked:[{image:'walk-out.png',caption:'You walk out through the lobby with her, three hundred men booing behind you. She is laughing so hard she can’t breathe.'}]
+          walked:[{image:'walk-out.png',sound:'crowd',caption:'You walk out through the lobby with her, three hundred men booing behind you. She is laughing so hard she can’t breathe.'}]
         },
         outroNotice:'Go home. Go to bed. Your phone won’t stop buzzing.',
         after:{
@@ -5493,7 +5504,7 @@
       s.stage='event';s.eventDay=world.day;saveRun(true);
       if(currentApp)returnHome();
       doorTalk({
-        intro:K.intro.map(step),doubt:art(K.doubt),gap:2600,
+        intro:K.intro.map(step),doubt:art(K.doubt),gap:2600,laugh:K.dir==='alpha'?'boys':'laugh',
         questions:K.questions.map(q=>({image:art(q.image),ask:q.ask,answers:q.answers})),
         onEnd:(end,d)=>{
           const F=K.fatal[end];clearInvasion();
@@ -5548,11 +5559,11 @@
       },
       missed:'You didn’t pick up. I was calling instead of texting, which means something.',
       callers:{
-        brad:{name:'Unknown number',sub:'Mobile',portrait:'assets/icons/calls.png',back:'Babe, he’s talking. Say hi. (She laughs too.) Okay buddy, we’re losing you. We’re at sea.',laugh:'Ha. You’re alright, man. Still not getting her back, though.'},
-        tanner:{name:'Tanner Voss',sub:'Democrat for City Council',portrait:'assets/quests/boyfriend/tanner.png',back:'Is that a threat? Hold on, buddy. I’m putting you on the livestream.',laugh:'He’s laughing! That’s the spirit, buddy. Vote Voss.'},
-        radio:{name:'KSUN Morning Show',sub:'KSUN 97.3',portrait:'assets/contacts/sq-radio.png',back:'Ooh, he has something to say! Go on, sir. Go on. (Nothing.) Folks, he has nothing. We’ll play it again at eight.',laugh:'He’s laughing! Folks, that is a man at peace. Good for you, sir. Genuinely.'},
-        pruitt:{name:'Office of Congressman Pruitt',sub:'Washington, D.C.',portrait:'assets/quests/townhall/pruitt.png',back:'Noted. The congressman says you’re welcome at his next town hall. As an example.',laugh:'Ha. The congressman likes a good sport. He might mention you in a speech. Kindly.'},
-        chadwick:{name:'Chadwick Stone',sub:'Alpha Sunfall',portrait:'assets/quests/alpha/chadwick.png',back:'He wants to talk! Gentlemen, a beta finding his voice. Beautiful. Too late, but beautiful.',laugh:'He’s laughing. Respect, buddy. A little. Not a lot.'}
+        brad:{laughs:'boys',name:'Unknown number',sub:'Mobile',portrait:'assets/icons/calls.png',back:'Babe, he’s talking. Say hi. (She laughs too.) Okay buddy, we’re losing you. We’re at sea.',laugh:'Ha. You’re alright, man. Still not getting her back, though.'},
+        tanner:{laughs:'laugh',name:'Tanner Voss',sub:'Democrat for City Council',portrait:'assets/quests/boyfriend/tanner.png',back:'Is that a threat? Hold on, buddy. I’m putting you on the livestream.',laugh:'He’s laughing! That’s the spirit, buddy. Vote Voss.'},
+        radio:{laughs:'laugh',name:'KSUN Morning Show',sub:'KSUN 97.3',portrait:'assets/contacts/sq-radio.png',back:'Ooh, he has something to say! Go on, sir. Go on. (Nothing.) Folks, he has nothing. We’ll play it again at eight.',laugh:'He’s laughing! Folks, that is a man at peace. Good for you, sir. Genuinely.'},
+        pruitt:{laughs:'laugh',name:'Office of Congressman Pruitt',sub:'Washington, D.C.',portrait:'assets/quests/townhall/pruitt.png',back:'Noted. The congressman says you’re welcome at his next town hall. As an example.',laugh:'Ha. The congressman likes a good sport. He might mention you in a speech. Kindly.'},
+        chadwick:{laughs:'boys',name:'Chadwick Stone',sub:'Alpha Sunfall',portrait:'assets/quests/alpha/chadwick.png',back:'He wants to talk! Gentlemen, a beta finding his voice. Beautiful. Too late, but beautiful.',laugh:'He’s laughing. Respect, buddy. A little. Not a lot.'}
       },
       // Who rings to laugh at you, and how they open, by how it ended.
       mock:{
@@ -5655,12 +5666,13 @@
     }
     function stxCallCard(id){const m=stxMock()||STX.callers.brad;return {id,name:m.name,gallery:[m.portrait],banner:m.portrait,ringName:m.name,sub:m.sub};}
     function stxMockStart(){const x=world.stx;x.stage='called';const kind=STX.infamy[x.branch];if(kind&&!infamous())infamyStart(kind);saveRun(true);} // it's a story again
-    function stxMockAnswer(id){stxMockStart();return {id,stranger:true,kind:'stxm',step:'open',said:stxMock()?.open||''};}
+    function stxMockAnswer(id){stxMockStart();const m=stxMock();if(m?.laughs)sceneSound(m.laughs);return {id,stranger:true,kind:'stxm',step:'open',said:m?.open||''};} // you hear them laughing
     function stxMockChoices(call){return call.step==='open'?[{id:'m:back',label:STX.picks.back},{id:'m:laugh',label:STX.picks.laugh},{id:'m:hang',label:STX.picks.hang}]:[{id:'hangup',label:'☎ Hang up'}];}
     function stxMockChoose(call,choice){
       const x=world.stx,m=stxMock();
       if(choice==='m:hang'||!m){x.mocked='hang';endHerCall();saveRun(true);return;}
       const f=world.infamy,on=infamous();
+      if(m.laughs)sceneSound(m.laughs);
       if(choice==='m:back'){call.said=m.back;x.mocked='back';if(on)f.until++;showGameNotice(STX.backNote);}
       else{call.said=m.laugh;x.mocked='laugh';if(on)f.until=Math.max(world.day,f.until-1);showGameNotice(STX.laughNote);}
       call.step='bye';saveRun(true);renderCalls();
@@ -7912,7 +7924,7 @@
     // ---- Surgery sounds (3 November 2026): drilling, sawing and screaming in the surgery scenes ----
     // The screams are CC0 recordings from OpenGameArt (assets/sounds/LICENSE.md). The drills, the saw and the
     // clippers are made here with Web Audio. Nothing plays while the game is muted.
-    var SFX={screams:[1,2,3,4,5,6].map(n=>`assets/sounds/scream-${n}.mp3`),death:'assets/sounds/death-scream.mp3',groan:'assets/sounds/groan.mp3'};
+    var SFX={screams:[1,2,3,4,5,6].map(n=>`assets/sounds/scream-${n}.mp3`),death:'assets/sounds/death-scream.mp3',groan:'assets/sounds/groan.mp3',laugh:'assets/sounds/laugh-audience.mp3',boys:'assets/sounds/laugh-boys.mp3',crowd:'assets/sounds/crowd-roar.mp3',siren:'assets/sounds/siren.mp3',radio:'assets/sounds/radio.mp3'}; // the starting quests (7 November 2026): CC0 and public domain, see assets/sounds/LICENSE.md
     var sfxLog=[],sfxCtx=null,sfxPlaying=[];
     function sfxMuted(){const m=document.getElementById('mute-audio');return !m||m.checked;}
     function playSfx(path,volume=.9){
@@ -7937,6 +7949,34 @@
         for(const n of [osc,lfo,noise]){n.start(now);n.stop(end);}
       }catch{}
     }
+    // Made here with Web Audio (7 November 2026): a body hitting a stage, a hospital monitor, and the hum under a dream.
+    function synthSound(kind){
+      if(sfxMuted())return;
+      try{
+        const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+        const ctx=sfxCtx||(sfxCtx=new AC()),now=ctx.currentTime;
+        if(kind==='crash'){
+          const len=1.1,buf=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*len),ctx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+          const n=ctx.createBufferSource();n.buffer=buf;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(5000,now);lp.frequency.exponentialRampToValueAtTime(300,now+.8);const g=ctx.createGain();g.gain.value=.45;n.connect(lp);lp.connect(g);g.connect(ctx.destination);n.start(now);
+          const o=ctx.createOscillator(),og=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(120,now);o.frequency.exponentialRampToValueAtTime(40,now+.35);og.gain.setValueAtTime(.6,now);og.gain.exponentialRampToValueAtTime(.0001,now+.5);o.connect(og);og.connect(ctx.destination);o.start(now);o.stop(now+.55);
+        }else if(kind==='monitor'){
+          for(let k=0;k<4;k++){const t=now+k*.85,o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=988;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.12,t+.01);g.gain.setValueAtTime(.12,t+.11);g.gain.exponentialRampToValueAtTime(.0001,t+.16);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.2);}
+        }
+      }catch{}
+    }
+    var dreamPad=null;
+    function dreamHum(on){
+      try{
+        if(!on){if(dreamPad){const {ctx,out,nodes}=dreamPad,t=ctx.currentTime;out.gain.cancelScheduledValues(t);out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+.8);nodes.forEach(n=>{try{n.stop(t+.9);}catch{}});dreamPad=null;}return;}
+        if(dreamPad||sfxMuted())return;
+        const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+        const ctx=sfxCtx||(sfxCtx=new AC()),now=ctx.currentTime,out=ctx.createGain();out.gain.setValueAtTime(0,now);out.gain.linearRampToValueAtTime(.05,now+1.5);
+        const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;lp.connect(out);out.connect(ctx.destination);
+        const nodes=[];for(const f of [220,277.18,329.63,221.2]){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=f;g.gain.value=.25;o.connect(g);g.connect(lp);o.start(now);nodes.push(o);} // a soft major chord, slightly out of tune
+        const lfo=ctx.createOscillator(),ld=ctx.createGain();lfo.frequency.value=.15;ld.gain.value=300;lfo.connect(ld);ld.connect(lp.frequency);lfo.start(now);nodes.push(lfo);
+        dreamPad={ctx,out,nodes};
+      }catch{}
+    }
     function sceneSound(spec){ // e.g. 'drill-bone+scream'
       for(const part of String(spec||'').split('+').filter(Boolean)){
         sfxLog=[...sfxLog.slice(-30),part];
@@ -7946,6 +7986,8 @@
         else if(part==='saw')machineSound('saw');
         else if(part.startsWith('drill-'))machineSound(part.slice(6));
         else if(part==='clippers')machineSound('clippers',1800);
+        else if(['laugh','boys','crowd','siren','radio'].includes(part))playSfx(SFX[part],part==='radio'?.6:.8); // the starting quests
+        else if(part==='crash'||part==='monitor')synthSound(part);
       }
     }
     // A caption needs time to be read (7 November 2026): a long one gets a little longer, never more than about 4 seconds.
@@ -13752,6 +13794,15 @@
         +(extra.length?`<h4>Other</h4>${extra.map(k=>item(k.slice(6).replace('|',' BY '),found[k])).join('')}`:'')+'</div>';
     }
     function runSummary(){const day=Number.isInteger(world?.day)?world.day:1;const cls=CLASS_NAMES[selectedDifficulty];return `Day ${day}`+(cls?` as the ${cls}`:'');}
+    // Sound on or off (7 November 2026): the same switch as Mute game sounds; it stops anything already playing.
+    const SOUND_ICON={on:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg>',
+      off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z"/><path d="m16.5 14.5 5-5"/><path d="m16.5 9.5 5 5"/></svg>'}; // Lucide icons, ISC licence
+    function soundButton(){const off=$('mute-audio').checked;return `<button class="settings-sound${off?' off':''}" data-settings-sound aria-pressed="${!off}" aria-label="${off?'Sound is off. Turn it on':'Sound is on. Turn it off'}">${off?SOUND_ICON.off:SOUND_ICON.on}<span>${off?'Sound is off':'Sound is on'}</span><span class="snd-switch"></span></button>`;}
+    function toggleSound(){
+      const m=$('mute-audio');m.checked=!m.checked;
+      if(m.checked){for(const a of sfxPlaying)try{a.pause();}catch{};sfxPlaying=[];dreamHum(false);}else playUiSound(620);
+      if(world)saveRun(true);
+    }
     function renderSettings(){
       if(settingsView==='newgame'){ // asked inside the phone: some browsers block their own confirm box
         $('opened').innerHTML=`<div class="settings-panel"><button class="settings-back" data-settings-view="main">‹ Settings</button><div class="settings-confirm"><div class="ng-big">⟲</div><h3>Start a new game?</h3><p>${esc(runSummary())} ends here. You go back to day one and pick a class. Endings you have found stay found.</p><div class="settings-options"><button class="danger" data-settings-newgame-yes>Start a new game</button><button data-settings-view="main">Keep playing</button></div></div></div>`;
@@ -13772,7 +13823,7 @@
       const sizeOptions=[[1,'Normal'],[1.15,'Comfortable'],[1.3,'Large']];
       const backgrounds=[['city-twilight','City twilight'],['prism-aurora','Prism aurora'],['original','Classic desert'],...EXTRA_WALLPAPERS.filter(([v])=>wallpapersDrawn.has(v))];
       const found=endingsCount();
-      $('opened').innerHTML=`<div class="settings-panel"><h3>⚙ Settings</h3>`
+      $('opened').innerHTML=`<div class="settings-panel"><h3>⚙ Settings</h3>${soundButton()}`
         +`<button class="settings-newgame" data-settings-newgame><span class="ng-icon">▶</span><span><b>New Game</b><small>${esc(runSummary())}</small></span><span class="ng-go">›</span></button>`
         +`<h4>Text size</h4><div class="settings-seg">${sizeOptions.map(([value,label])=>`<button data-setting-font="${value}" class="${fontScale===value?'selected':''}" aria-pressed="${fontScale===value}">${label}</button>`).join('')}</div><p class="settings-hint">Makes every app easier to read, and stays in your saved run.</p>`
         +`<h4>Home screen background</h4><div class="settings-options two">${backgrounds.map(([value,label])=>`<button data-setting-wallpaper="${value}" class="${currentWallpaper===value?'selected':''}" aria-pressed="${currentWallpaper===value}">${currentWallpaper===value?'✓ ':''}${label}</button>`).join('')}</div><p class="settings-hint">Press the physical Home button to see it.</p>`
@@ -13840,6 +13891,7 @@
       const journalDel=event.target.closest('[data-journal-delete]');
       if(journalDel){journalDelete(journalDel.dataset.journalDelete);return;}
       if(event.target.closest('[data-settings-newgame-yes]')){settingsView='main';pickDifficulty();return;} // then choose a difficulty
+      if(event.target.closest('[data-settings-sound]')){toggleSound();renderSettings();return;} // sound on or off
       if(event.target.closest('[data-settings-newgame]')){settingsView='newgame';renderSettings();return;} // a new game, any time
       if(event.target.closest('[data-coach-restart]')){coachRestart();returnHome();return;} // the guided tour, from the start
       if(event.target.closest('[data-tutorial-open]')){openTutorial(0,event.target.closest('[data-tutorial-open]').dataset.tutorialOpen||'main');return;} // How to play, and the classes' own

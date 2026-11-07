@@ -11,3 +11,19 @@ Screams for the Looksmaxxer's surgery scenes (added 3 November 2026). All of the
 Every clip was trimmed, converted to mono and loudness-normalized, then saved as 64 kbps MP3.
 
 The drill, bone saw and clippers sounds are not files. The game makes them itself with Web Audio (`machineSound` in `preview.html`).
+
+# Starting-quest sounds
+
+Added 7 November 2026 for the Normie's starting quests (crowds, mocking calls, the raid). All public domain or CC0, so no credit is required; credited here anyway.
+
+| File | Cut from | Author | License |
+|---|---|---|---|
+| `laugh-audience.mp3` | Lachkonserve 1.ogg (studio audience laughter), https://commons.wikimedia.org/wiki/File:Lachkonserve_1.ogg | Sleepytomcat | Public domain |
+| `laugh-boys.mp3` | Evil laugh.ogg (about 40 people laughing together, Ghent), 2.6 to 9.6 s, https://commons.wikimedia.org/wiki/File:Evil_laugh.ogg | freesound community recording | CC0 |
+| `crowd-roar.mp3` | Crowd Shouting/Speaking Ambience (`crowd_shouting_0.ogg`, 5 to 10 s), https://opengameart.org/content/crowd-shoutingspeaking-ambience | StarNinjas | CC0 |
+| `siren.mp3` | American police siren i.ogg (Washington DC), 10 to 17 s, https://commons.wikimedia.org/wiki/File:American_police_siren_i.ogg | lezer | Public domain |
+| `radio.mp3` | Frequency Static Sound Effects (`static3.wav`, 30 to 31.3 s, band-limited like a police radio), https://opengameart.org/content/frequency-static-sound-effects | OpenGameArt contributor | CC0 |
+
+Every clip was trimmed, converted to mono, loudness-normalized and faded, then saved as 64 kbps MP3.
+
+The tackle's crash, the hospital heart monitor and the hum under the call explainers' dreams are not files. The game makes them itself with Web Audio (`synthSound` and `dreamHum` in `preview.html`).
