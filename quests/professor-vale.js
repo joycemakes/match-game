@@ -118,13 +118,13 @@
             { image: 'assets/quests/professor/visit-hall.png', stand: 'room', caption: 'Founders’ Hall, second floor. A long corridor of closed doors, notice boards and a copier that never stops.' },
             { image: 'assets/quests/professor/visit-door.png', stand: 'room', caption: 'Professor Vale’s door. A brass plate, a card reader, and a sticky note that says Back soon. It does not say how soon.' }
           ] },
-          { mini: 'spotit', key: 'watch', title: 'WHO IS WATCHING?', crowd: ['🧑‍🎓', '👩‍🎓', '👨‍🎓', '🧑‍💼', '👩‍💼', '🧑‍🏫'], odd: '🕵️', peek: true, image: 'assets/quests/professor/visit-hall.png', caption: 'Somebody in this corridor keeps glancing at his door. Catch them at it, and tap them before they notice you.' },
+          { mini: 'spotit', key: 'watch', title: 'WHO IS WATCHING?', crowd: ['🧑‍🎓', '👩‍🎓', '👨‍🎓', '🧑‍💼', '👩‍💼', '🧑‍🏫'], crowdArt: ['crowd-1', 'crowd-2', 'crowd-3', 'crowd-4', 'crowd-5', 'crowd-6'], odd: '🕵️', oddArt: 'crowd-watcher', peek: true, image: 'assets/quests/professor/visit-hall.png', caption: 'Somebody in this corridor keeps glancing at his door. Catch them at it, and tap them before they notice you.' },
           { scene: [ { image: 'assets/quests/professor/visit-lorraine.png', stand: 'room', caption: 'Lorraine from the department office has left her keycard on the copier. She has gone for more paper.' } ] },
           { mini: 'cardswipe', key: 'card', cardLabel: 'FOUNDERS’ HALL STAFF', image: 'assets/quests/professor/visit-door.png', caption: 'Lorraine’s card. Swipe it through his reader before she comes back.' },
           { when: c => c.results.card !== 'miss', then: [
             { qte: 'hold', key: 'door', labels: ['EASE IT OPEN'], image: 'assets/quests/professor/visit-door.png', caption: 'The door sticks. Ease it open. Too fast and it bangs the filing cabinet.' },
             { scene: [ { image: 'assets/quests/professor/visit-office.png', stand: 'room', caption: 'His office. Books to the ceiling, a framed photo with Camille Paglia, and a desk buried in paper.' } ] },
-            { mini: 'spotit', key: 'desk', title: 'SEARCH THE DESK', crowd: ['📄', '📃', '📑', '🗒️', '📰', '📜'], odd: '📓', image: 'assets/quests/professor/visit-office.png', caption: 'Somewhere under the complaints is the thing that matters. Find it.' }
+            { mini: 'spotit', key: 'desk', title: 'SEARCH THE DESK', crowd: ['📄', '📃', '📑', '🗒️', '📰'], crowdArt: ['paper-1', 'paper-2', 'paper-3', 'paper-4', 'paper-5'], odd: '📓', oddArt: 'notebook', image: 'assets/quests/professor/visit-office.png', caption: 'Somewhere under the complaints is the thing that matters. Find it.' }
           ], else: [
             { scene: [ { image: 'assets/quests/professor/visit-lorraine.png', stand: 'room', caption: 'The reader beeps red twice. Lorraine is back. She takes her card and looks at you for a long time.' } ] }
           ] }
@@ -137,7 +137,7 @@
           { scene: [
             { image: 'assets/quests/professor/visit-lot.png', stand: 'room', caption: 'The faculty parking lot. Rows of bays with names painted on them, a security booth, and one barrier at the exit.' }
           ] },
-          { mini: 'spotit', key: 'car', title: 'WHICH ONE IS HIS?', crowd: ['🚗', '🚕', '🛻', '🚘'], odd: '🚙', image: 'assets/quests/professor/visit-lot.png', caption: 'Find Vale’s car. It is the one that looks like it reads.' },
+          { mini: 'spotit', key: 'car', title: 'WHICH ONE IS HIS?', crowd: ['🚗', '🚕', '🛻', '🚘'], crowdArt: ['car-1', 'car-2', 'car-3', 'car-4'], odd: '🚙', oddArt: 'car-vale', image: 'assets/quests/professor/visit-lot.png', caption: 'Find Vale’s car. It is the one that looks like it reads.' },
           { qte: 'swipe', key: 'cart', dirs: ['left', 'right'], image: 'assets/quests/professor/visit-lot.png', caption: 'A security cart comes round the corner. Get out of its way.' },
           { mini: 'rewire', key: 'barrier', image: 'assets/quests/professor/visit-barrier.png', caption: 'The exit barrier is stuck down and the booth is empty. Rewire the panel and get out.' },
           { scene: [ { image: 'assets/quests/professor/visit-barrier.png', stand: 'room', caption: 'The barrier lifts. You walk out like you work here.' } ] }

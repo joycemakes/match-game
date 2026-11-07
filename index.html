@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="e25a54110e">
+<html lang="en" data-build="bcb22bb93e">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -749,6 +749,17 @@
     .floor-item.parcel::before { background: linear-gradient(90deg,transparent 45%,#e6d7b2 45% 55%,transparent 55%),#a5784a; }
     .floor-item.letter::before { background: radial-gradient(circle at 50% 60%,#8f1f22 0 12%,transparent 13%),#e4d8c0; transform: scaleY(.6); }
     .floor-item:focus-visible { outline: 2px solid #ffd978; }
+    .room-dog { position: absolute; z-index: 4; transform: translate(-50%,-100%); padding: 0; border: 0; background: none; cursor: pointer; --floor-light: .8; }
+    .room-dog[hidden] { display: none; }
+    .room-dog img { display: block; width: 100%; height: auto; image-rendering: pixelated; transform-origin: 50% 100%; animation: dogBreathe 3.4s ease-in-out infinite; filter: brightness(var(--floor-light)) drop-shadow(0 3px 4px #0008); }
+    .room-dog.stand-in::before { content: ''; display: block; width: 100%; aspect-ratio: 2 / 1; border-radius: 48% 52% 40% 40%; background: radial-gradient(ellipse at 30% 40%,#f3e6cf 0 18%,transparent 19%),radial-gradient(ellipse at 70% 55%,#7a4a22 0 26%,transparent 27%),#b07a42; transform-origin: 50% 100%; animation: dogBreathe 3.4s ease-in-out infinite; filter: brightness(var(--floor-light)); }
+    .dog-z { position: absolute; left: 22%; top: 8%; width: 0; height: 0; pointer-events: none; }
+    .dog-z i { position: absolute; left: 0; top: 0; font: 700 13px/1 'Press Start 2P','Courier New',monospace; font-style: normal; color: #eef3ff; text-shadow: 1px 1px 0 #1c2340; opacity: 0; animation: dogZ 3.6s linear infinite; }
+    .dog-z i:nth-child(2) { animation-delay: 1.2s; font-size: 15px; }
+    .dog-z i:nth-child(3) { animation-delay: 2.4s; font-size: 18px; }
+    @keyframes dogBreathe { 0%,100% { transform: scale(1,1); } 45% { transform: scale(1.012,1.05); } }
+    @keyframes dogZ { 0% { opacity: 0; transform: translate(0,0); } 15% { opacity: 1; } 80% { opacity: .85; } 100% { opacity: 0; transform: translate(-22px,-46px); } }
+    @media (prefers-reduced-motion: reduce) { .room-dog img,.room-dog.stand-in::before,.dog-z i { animation: none; } .dog-z i:first-child { opacity: 1; } }
     @keyframes floorGlow { 0%,100% { filter: none; } 50% { filter: drop-shadow(0 0 5px #ffd978); } }
     @media (prefers-reduced-motion: reduce) { .floor-item { animation: none; filter: drop-shadow(0 0 3px #ffd978); } }
     @keyframes cupboardGlow { 0%,100% { box-shadow: inset 0 0 0 0 #ffd97800; } 50% { box-shadow: inset 0 0 14px 3px #ffd97899; } }
@@ -864,6 +875,56 @@
     .beat-choose .beat-icon svg { width: 46px; height: 46px; }
     .beat-choose b { display: block; font-size: 16px; } .beat-choose small { display: block; font: 12px Tahoma,sans-serif; color: #555; }
     @media (prefers-reduced-motion: reduce) { .beat-tap { animation: none; } }
+    /* phones first: no tap flash, no long-press menus, nothing selectable while you play */
+    .beat, .beat * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+    .beat-bigbtn { display: block; width: 80%; margin: 8% auto 0; min-height: 64px; border-radius: 18px; background: #ffd34d; box-shadow: 0 5px 0 #a6801a; font-size: 19px; touch-action: none; }
+    .beat-bigbtn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a6801a; }
+    .beat-lane { position: relative; width: 34%; height: 58%; margin: 0 auto; border-radius: 14px; background: #ffffff14; border: 2px solid #ffffff2a; overflow: hidden; }
+    .beat-lane.flash-miss { background: #ff6b6b33; }
+    .beat-hitline { position: absolute; left: 0; right: 0; top: 82%; height: 4px; background: #ffd34d; box-shadow: 0 0 8px #ffd34d; }
+    .beat-note { position: absolute; left: 50%; width: 46px; height: 22px; margin: -11px 0 0 -23px; border-radius: 11px; background: #7dd3ff; box-shadow: 0 0 6px #7dd3ffaa; }
+    .beat-glass { position: relative; width: 38%; height: 52%; margin: 2% auto 0; border: 4px solid #e9f2ff; border-top: 0; border-radius: 0 0 22px 22px; background: #ffffff10; overflow: hidden; }
+    .beat-band { position: absolute; left: 0; right: 0; border-top: 2px dashed #7dff9b; border-bottom: 2px dashed #7dff9b; background: #7dff9b22; z-index: 1; }
+    .beat-liquid { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(#ffe9a3,#f2c94c); }
+    .beat-sortcard { margin: 6% auto 0; width: 86%; min-height: 96px; padding: 16px; border-radius: 14px; background: #f3efe6; color: #222; display: grid; place-items: center; text-align: center; font: bold 17px Tahoma,sans-serif; box-shadow: 0 4px 0 #0006; }
+    .beat-sortcard.slide { animation: beatSlide .2s ease-out; } .beat-sortcard.wrong { background: #ffb3b3; }
+    @keyframes beatSlide { from { transform: translateY(-16px); opacity: 0; } }
+    .beat-bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12% 2% 0; }
+    .beat-bins button { min-height: 72px; border-radius: 16px; background: #ffd34d; box-shadow: 0 5px 0 #a6801a; font-size: 20px; }
+    .beat-tracebox { width: 100%; height: 62%; margin-top: 2%; border-radius: 14px; background: #f3efe6; touch-action: none; }
+    .beat-tracebox svg { width: 100%; height: 100%; touch-action: none; }
+    .beat-guide { fill: none; stroke: #b9b0a0; stroke-width: 2.4; stroke-dasharray: 3 3; stroke-linecap: round; stroke-linejoin: round; }
+    .beat-start { fill: #e24b4b; }
+    .beat-ink { fill: none; stroke: #1f3a8a; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .beat-watcher { margin: 2% auto 0; width: 62%; padding: 10px; border-radius: 16px; text-align: center; background: #2e7d4f; transition: background .15s; }
+    .beat-watcher.warn { background: #b7891a; } .beat-watcher.stop { background: #b23a3a; } .beat-watcher.caught { animation: beatShake .3s; }
+    .beat-watcher .beat-face { display: block; font-size: 46px; line-height: 1.1; } .beat-watcher b { font: bold 20px Impact,Tahoma,sans-serif; letter-spacing: .08em; }
+    @keyframes beatShake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    .beat-wire, .beat-socket { width: 54px !important; height: 40px !important; } /* thumb-sized */
+    /* the art kit, once drawn (see BEAT_ART) */
+    .beat-sprite { width: 86%; height: 86%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+    .beat-sprite.big { width: 120px; height: 120px; }
+    html.beatart-panel .beat.no-bg { background: var(--beat-panel) center/cover no-repeat, #10141c; }
+    html.beatart-title .beat-top b { background: var(--beat-title) center/100% 100% no-repeat; box-shadow: none; padding: 10px 26px; }
+    html.beatart-button .beat-bigbtn, html.beatart-button .beat-mash, html.beatart-button .beat-holdbtn, html.beatart-button .beat-bins button { background: var(--beat-button) center/100% 100% no-repeat; box-shadow: none; }
+    html.beatart-pressed .beat-bigbtn:active, html.beatart-pressed .beat-mash:active, html.beatart-pressed .beat-holdbtn:active, html.beatart-pressed .beat-bins button:active { background-image: var(--beat-pressed); transform: none; }
+    html.beatart-tap .beat-tap { background: var(--beat-tap) center/contain no-repeat; box-shadow: none; color: transparent; }
+    html.beatart-arrow .beat-arrow[data-dir] { color: transparent; background: var(--beat-arrow) center/72% no-repeat, #ffffff1f; }
+    html.beatart-arrow .beat-arrow[data-dir=left] { transform: scaleX(-1); } html.beatart-arrow .beat-arrow[data-dir=up] { transform: rotate(-90deg); } html.beatart-arrow .beat-arrow[data-dir=down] { transform: rotate(90deg); }
+    html.beatart-meter .beat-meter, html.beatart-meter .beat-hold { background: var(--beat-meter) center/100% 100% no-repeat; }
+    html.beatart-ring .beat-ring { border: 0; box-shadow: none; background: var(--beat-ring) center/contain no-repeat; }
+    html.beatart-rewire .beat-wires { background: var(--beat-rewire) center/cover no-repeat; border: 0; }
+    html.beatart-plug .beat-wire { background: var(--beat-plug) center/contain no-repeat, var(--wc); background-blend-mode: multiply; box-shadow: none; }
+    html.beatart-socket .beat-socket { background: var(--beat-socket) center/contain no-repeat, var(--wc); background-blend-mode: multiply; border: 0; }
+    html.beatart-reader .beat-reader { background: var(--beat-reader) center/contain no-repeat; border: 0; } html.beatart-reader .beat-slot { opacity: 0; }
+    html.beatart-card .beat-card { background: var(--beat-card) center/100% 100% no-repeat; color: transparent; box-shadow: none; }
+    html.beatart-lane .beat-lane { background: var(--beat-lane) center/100% 100% no-repeat; border: 0; } html.beatart-lane .beat-hitline { opacity: 0; }
+    html.beatart-note .beat-note { background: var(--beat-note) center/contain no-repeat; box-shadow: none; }
+    html.beatart-glass .beat-glass { border: 0; background: none; } html.beatart-glass .beat-glass::after { content: ''; position: absolute; inset: 0; z-index: 2; background: var(--beat-glass) center/100% 100% no-repeat; pointer-events: none; }
+    html.beatart-sortcard .beat-sortcard { background: var(--beat-sortcard) center/100% 100% no-repeat; box-shadow: none; }
+    html.beatart-tray .beat-bins button { background: var(--beat-tray) center bottom/contain no-repeat; box-shadow: none; padding-top: 34px; }
+    html.beatart-paper .beat-tracebox { background: var(--beat-paper) center/cover no-repeat; }
+
 
     .home-invasion.clear img { filter: brightness(.94); } /* the starting quests: bright pictures, shown nearly as drawn */
     .home-invasion.police-arrest .invasion-lights { display: none; }
@@ -886,11 +947,11 @@
     @media(max-width: 730px) { .workbench { display: flex; flex-direction: column; gap: 16px; padding: 17px; } aside { padding: 2px; } h1 { font-size: 32px; } .settings { margin-top: 12px; } .preview-area { padding-top: 0; } }
   </style>
   <!-- Task 2: Chapel at Midnight quest engine. The standalone build inlines it. -->
-  <script src="chapel_at_midnight.js?v=e25a54110e"></script>
+  <script src="chapel_at_midnight.js?v=bcb22bb93e"></script>
   <!-- Marriage: the Sisters of Mercy (and the Bluebird wedding), the only victories. The standalone build inlines it. -->
-  <script src="marriage.js?v=e25a54110e"></script>
+  <script src="marriage.js?v=bcb22bb93e"></script>
   <!-- Professor Vale: "The Professor Who Won't Disappear". The standalone build inlines it. -->
-  <script src="quests/professor-vale.js?v=e25a54110e"></script>
+  <script src="quests/professor-vale.js?v=bcb22bb93e"></script>
 <style>html,body{width:100%;height:100%;overflow:hidden}.workbench>aside,.device-label,.preview-area>.tip{display:none!important}.workbench{display:block;width:100%;height:100%;min-height:0;max-width:none;margin:0;padding:0}.preview-area{width:100%;height:100%;padding:0}.stage-holder{border:0;border-radius:0;box-shadow:none}.phone-wrap{max-width:414px}</style></head>
 <body>
   <main class="workbench">
@@ -1014,6 +1075,7 @@
           <img class="desk-ring" id="desk-ring" src="assets/marriage/wedding-ring.png" alt="A gold wedding band on your desk"><!-- Marriage: shown once a jeweller gives you the ring -->
           <button class="cupboard-spot" id="cupboard-spot" aria-label="Open your bedside cupboard"></button>
           <button class="car-keys" id="car-keys" hidden aria-label="Your car keys: drive somewhere"><img src="assets/items/car-keys.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span hidden>🔑</span></button><!-- Looksmaxxer and Divorcé: tap to drive somewhere --><!-- Bedside cupboard: tap area over the cabinet in the room art -->
+          <button class="room-dog" id="room-dog" hidden aria-label="Biscuit, asleep on your floor"><img alt=""><span class="dog-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span></button><!-- Biscuit (the Mediation): asleep on your floor every few days -->
           <div class="floor-items" id="floor-items"></div><!-- Things left at your door: on the floor until you pick them up -->
           <div class="cupboard" id="cupboard" aria-hidden="true"><div class="cupboard-frame" role="dialog" aria-label="Bedside cupboard"><div class="cupboard-head"><b>Bedside cupboard</b><button data-cup-close aria-label="Close the cupboard">✕ Close</button></div><div class="cupboard-body" id="cupboard-body"></div></div></div>
           <img class="leg-layer hidden" id="leg-layer" src="assets/ui/jeans-legs.png" alt="First-person knees in jeans">
@@ -5784,7 +5846,7 @@
     // Nothing in one touches the class's own goal (alimony, the Looksmaxxer's ninety): small warmth and infamy only.
     // The morning after: the paper, what she says, then the follow-up above (her call, or somebody laughing at you
     // live), and a last word on Hinge.
-    var CS_GIVER_POOL=5;
+    var CS_GIVER_POOL=5,CS_GIVER_LATE=8;
     var csOn=()=>!!world&&!window.MATCH_NO_BOYFRIEND&&selectedDifficulty!=='normie'&&!!STARTER_POOLS[selectedDifficulty];
     function csState(){
       if(!world)return null;
@@ -5811,7 +5873,7 @@
       const sur=p=>String(p?.name||'').split(' ').pop();
       const first=[...hingeThreads.values()].filter(csCanGive).slice(0,CS_GIVER_POOL); // the map keeps the order you matched
       const k=hashSeed(world.seed+'|csgiver')%CS_GIVER_POOL;
-      if(first.length<=k&&world.day<3)return null; // she's a match you haven't made yet; from Day 3 one you have will do
+      if(first.length<=k&&world.day<CS_GIVER_LATE)return null; // she's a match you haven't made yet: wait for her (Chris, 7 November 2026); only if she never comes does one you have do
       const live=first.filter(t=>csLive(t)&&!(Q.clash||[]).includes(sur(hingeProfile(t.id)))); // never a woman with a villain's surname
       if(!live.length)return null;
       const pick=live.includes(first[k])?first[k]:live[hashSeed(world.seed+'|csgiver2')%live.length];
@@ -5936,8 +5998,11 @@
       if(b.choose)return {choose:{...b.choose,image:art(b.choose.image),caption:csFill(b.choose.caption,s),options:b.choose.options.map(o=>({...o,label:csFill(o.label,s),reply:csFill(o.reply,s)}))},key:b.key};
       const out={...b,image:art(b.image),caption:csFill(b.caption,s)};
       delete out.when;delete out.then;
+      if(b.want&&csBeatCan(b.want)){delete out.qte;out.mini=b.want;} // the real mini game, once the toolkit has it
       return out;
     }
+    // Does the beat toolkit play this mini game yet? (It answers through window.beatSupports(kind) or window.BEAT_KINDS.)
+    function csBeatCan(kind){try{if(typeof window.beatSupports==='function')return !!window.beatSupports(kind);if(Array.isArray(window.BEAT_KINDS))return window.BEAT_KINDS.includes(kind);}catch{}return false;}
     function csAsk(b,ctx,after){
       const Q=CSQ[ctx.quest],s=ctx.s,art=p=>csArt(Q,csFill(p,s)),A=b.ask;
       const keep=d=>{ctx.asks[b.key]={bad:d.bad,tags:[...d.tags],picks:[...d.picks]};};
@@ -5990,6 +6055,7 @@
         for(const e of A.effects||[])csEffect(e,s);
       }
       if(s.daily&&world.day<=s.daily.until&&world.day>s.afterDay)(s.notes||(s.notes=[])).push(s.daily.line); // the registry app, a photo of the dog
+      if(roomDogOn())(s.notes||(s.notes=[])).push(DOG.here[(world.day-s.dogDay)/3%DOG.here.length|0]); // Biscuit's days with you
     }
     function csAfterDayStart(){
       const s=world?.cs,Q=csKit();if(!s||!Q)return false;
@@ -6018,9 +6084,26 @@
       }
       else if(e==='pings')s.daily={until:world.day+2,line:'The Registry app: Good morning! How are your feelings today? 🙂 😐 🙁 😢 😭'};
       else if(e==='photos')s.daily={until:world.day+2,line:'Denise sent a photo of Biscuit. He is on a treadmill. Brayden is spotting him.'};
-      else if(e==='dog'){s.dog=true;recordClue('Biscuit is yours every few days now. The mediator wrote it down.');}
-      else if(e==='voss')strangerVoicemail('Dr. Anton Voss','Dr. Voss’s office. We heard about your nose on the sorority stream. Come in when the swelling is down. Full price, of course, but the doctor says he will throw in the splint.');
+      else if(e==='dog'){s.dog=true;s.dogDay=world.day;recordClue('Biscuit is yours every few days now. The mediator wrote it down.');}
+      else if(e==='voss'&&selectedDifficulty==='looksmaxxer'&&world.cls?.lx){world.cls.lx.vossOff=VOSS_NOSE_OFF;strangerVoicemail('Dr. Anton Voss',`Dr. Voss’s office. We saw your nose on the sorority stream. The doctor will take ${money(VOSS_NOSE_OFF)} off the monobloc, and set the nose while he’s in there. Book a consultation when the swelling is down.`);} // a real discount on the one surgery he does
     }
+    // ---- Biscuit (the Mediation): a fat, ugly St Bernard, asleep on your motel floor every third day from the morning after.
+    // One transparent picture on the carpet in front of the door, breathing, with z's drifting up (CSS). Tap him and he snores.
+    var DOG={art:'assets/motel/biscuit-asleep.png',spot:{x:.41,y:.618,w:.42},
+      here:['Biscuit is here today. He came in, looked at you, and went straight to sleep on the carpet.','Biscuit’s day with you. He has taken the floor in front of the door. All of it.','Biscuit is here. He ate breakfast, then lay down where he ate it.'],
+      snore:['Biscuit snores. The microwave rattles.','Biscuit opens one eye, sees it’s you, and closes it again.','A long, wet snore. Something under the bed rattles.','Biscuit rolls onto his back. Every leg goes straight up. Then he’s asleep again.','Biscuit twitches. He is chasing something in his sleep. It is probably a sandwich.']};
+    function roomDogOn(){const s=world?.cs;return selectedDifficulty==='divorce'&&!!s?.dog&&Number.isInteger(s.dogDay)&&world.day>=s.dogDay&&(world.day-s.dogDay)%3===0&&!world.cls?.dead;}
+    function renderRoomDog(){
+      const el=$('room-dog');if(!el)return;
+      const on=!!world&&roomDogOn();el.hidden=!on;if(!on)return;
+      const img=el.querySelector('img');if(img&&!img.dataset.set){img.dataset.set='1';img.onerror=()=>{el.classList.add('stand-in');img.remove();};img.src=assetUrl(DOG.art);}
+      const bg=$('background'),W=stage.offsetWidth,H=stage.offsetHeight,nw=bg.naturalWidth||1179,nh=bg.naturalHeight||2556; // on the room art itself, like the things at your door
+      const scale=Math.max(W/nw,H/nh),dw=nw*scale,dh=nh*scale,ox=(W-dw)/2,oy=(H-dh)/2;
+      el.style.left=`${ox+DOG.spot.x*dw}px`;el.style.top=`${oy+DOG.spot.y*dh}px`;el.style.width=`${DOG.spot.w*dw}px`;
+      el.style.setProperty('--floor-light',String(FLOOR_LIGHT[$('time').value]??.8));
+    }
+    try{if(typeof document!=='undefined'&&document.addEventListener)document.addEventListener('click',e=>{if(e.target?.closest?.('#room-dog')){e.preventDefault();roomDogSnore();}});}catch{}
+    function roomDogSnore(){if(!roomDogOn())return;showGameNotice(DOG.snore[(hashSeed(world.seed+'|snore')+(world.dogTaps=(world.dogTaps||0)+1))%DOG.snore.length]);playUiSound(110);}
     var CS_KINDRED=['Hi. I saw the video. The diner one. I’m not laughing.','I’ve been the one in the booth with the camera pointed at me. Want to get coffee somewhere with no ring lights?'];
     // ---- A broken nose (the Bachelor Auction, Rate Me Live): three days of women saying so, and fewer matches ----
     var NOSE={lines:['Oh my gosh, your nose. What happened?','Is your nose okay? It looks like it’s pointing at me.','I saw your new picture. The nose. Are you alright?','Okay, I have to ask about the nose.','Did somebody break your nose? It’s kind of a look, honestly.']};
@@ -6178,10 +6261,10 @@
         teaser:{id:'cs_auction_teaser',section:'Society',title:'BLUEBIRDS’ BACHELOR AUCTION TONIGHT',summary:'Sunfall’s most eligible men go under the hammer for the children’s hospital.',body:'The Bluebirds hold their bachelor auction at the Sunfall Country Club tonight. Each lot walks the catwalk and goes to the highest bidder for one dinner. Last year’s top lot raised nine thousand dollars and married the auctioneer. Bidders are asked to keep their husbands informed.',image:'club.png',fallbackImage:'charity_gala'},
         beats:[
           {scene:[{image:'club.png',caption:'Sundown. The Sunfall Country Club. Two hundred women with paddles and champagne, and a catwalk with a lot of steps.'},{image:'backstage.png',caption:'Backstage, {her} oils your arms with something that smells like coconut. You’re lot one. You’re the reason they came.'},{image:'catwalk.png',sound:'crowd',caption:'The lights come up. The music drops. Walk.'}]},
-          {qte:'sequence',key:'catwalk',image:'catwalk.png',caption:'Step, step, turn, pose. Don’t trip on the stairs.'},
+          {qte:'sequence',key:'catwalk',want:'rhythm',image:'catwalk.png',caption:'Step, step, turn, pose. Don’t trip on the stairs.'},
           {scene:[{image:'bidding.png',sound:'crowd',caption:'The bidding opens at fifty dollars. It reaches two thousand before you finish your turn.'},{image:'paddle.png',caption:'One paddle never goes down. Tiffany Rourke, in diamonds, bored, very rich. Nine thousand dollars. Sold.'},{image:'tiffany.png',caption:'She doesn’t look up from her phone. My husband’s at a cattle auction, she says. He hates surprises. Let’s eat.'}]},
           {scene:[{image:'dinner.png',caption:'A corner table in the club dining room. Candles, and a bottle of champagne that costs more than your car.'}]},
-          {qte:'hold',key:'pour',image:'pour.png',caption:'Pour her champagne. Stop at the line.'},
+          {qte:'hold',key:'pour',want:'pour',image:'pour.png',caption:'Pour her champagne. Stop at the line.'},
           {ask:{intro:[{image:'texts.png',caption:'Her phone keeps buzzing. Her husband, Rex. She hands it to you. You answer him, she says. He thinks you’re me.'}],doubt:'texts-close.png',questions:[
             {image:'texts.png',ask:'Rex texts: Who’s the guy in the picture the Bluebirds just posted?',answers:[
               {label:'Type: A waiter, babe.',reply:'Three dots. Then: A waiter with those arms?'},
@@ -6652,7 +6735,7 @@
         teaser:{id:'cs_rateme_teaser',section:'Society',title:'ALPHA RHO XI RATES SUNFALL’S MEN FOR CHARITY',summary:'Rate Me Live comes to Greek Row tonight.',body:'The sisters of Alpha Rho Xi host Rate Me Live tonight on their front lawn, a charity livestream in which local men walk a short runway and are scored out of a hundred. Last year’s highest score was a sixty-one. The money goes to the dog shelter. The dogs are not being rated.',image:'lawn.png',fallbackImage:'charity_gala'},
         beats:[
           {scene:[{image:'lawn.png',caption:'Sundown. The Alpha Rho Xi lawn. A short runway, string lights, a phone on a tripod, and a table of judges in matching sweaters.'},{image:'judges.png',caption:'Stacey Vandermeer in the middle, scorecards in her lap, not smiling. Twelve thousand people are watching the stream.'},{image:'runway.png',sound:'crowd',caption:'Your turn. The music is very loud. Walk.'}]},
-          {qte:'sequence',key:'walk',image:'runway.png',caption:'Walk, turn, pose. Don’t trip on the sprinkler.'},
+          {qte:'sequence',key:'walk',want:'rhythm',image:'runway.png',caption:'Walk, turn, pose. Don’t trip on the sprinkler.'},
           {scene:[{image:'score.png',sound:'laugh',caption:'The cards go up. Thirty-one. Stacey holds hers a little longer than the others, so the camera can get it.'},{image:'stacey.png',caption:'Stacey, into the microphone: Thirty-one. And honestly, that’s generous. It’s for charity.'}]},
           {choose:{caption:'Twelve thousand people are watching. What do you do?',image:'stacey.png',options:[
             {id:'heckle',label:'Heckle back',icon:'🎤',reply:'You walk back up the runway and ask for the microphone.'},
@@ -6869,7 +6952,7 @@
         },
         beats:[
           {scene:[{image:'car.png',caption:'Sundown. Your car, which smells like soup. The recital starts in a quarter of an hour, across town. Every light on Main is red.'}]},
-          {qte:'tap',key:'drive',want:'drive',image:'lights.png',caption:'Go on the green. Tap the moment each light changes.'},
+          {qte:'tap',key:'drive',image:'lights.png',caption:'Go on the green. Tap the moment each light changes.'},
           {scene:[{image:'hall.png',caption:'The Fourth Street hall. Folding chairs, paper stars on strings, and a hundred parents already holding their phones up.'},{image:'seat.png',caption:'One empty seat left. Front row. Between Denise and a man whose neck is as wide as his head.'},{image:'brayden.png',caption:'Brayden, her personal trainer. He shakes your hand too hard and asks what you bench. Denise doesn’t look at you.'}]},
           {scene:[{image:'stage.png',sound:'crowd',caption:'The lights go down. Twelve little bumblebees in yellow tutus come out onto the stage. One of them is yours. Third from the left.'}]},
           {qte:'aim',key:'film',image:'stage-film.png',caption:'Film her. Keep your phone on the third bumblebee from the left. Brayden keeps leaning into your shot.'},
@@ -7002,7 +7085,7 @@
           text:'Hi. Awkward: I’m a family mediator and your case is on my list tonight. About Biscuit the dog? County building, sundown. Coming?'
         },
         beats:[
-          {scene:[{image:'room.png',caption:'Sundown. A beige room in the county building. A table, a box of tissues, a water jug, and Biscuit, a small fat dog, asleep under the table.'},{image:'brayden.png',caption:'Denise, and Brayden, her personal trainer, who has come as emotional support. He is doing calf raises behind her chair.'},{image:'mediator.png',caption:'{her} opens a folder. Okay. Biscuit. Let’s be adults about this. Let’s try.'}]},
+          {scene:[{image:'room.png',caption:'Sundown. A beige room in the county building. A table, a box of tissues, a water jug, and Biscuit, a fat, ugly St Bernard, asleep under the table and most of the floor.'},{image:'brayden.png',caption:'Denise, and Brayden, her personal trainer, who has come as emotional support. He is doing calf raises behind her chair.'},{image:'mediator.png',caption:'{her} opens a folder. Okay. Biscuit. Let’s be adults about this. Let’s try.'}]},
           {ask:{doubt:'table-close.png',questions:[
             {image:'table.png',ask:'{her}: Who walks Biscuit, usually?',answers:[
               {label:'I did. Every morning, for six years.',tag:'good',nudge:-25,reply:'Denise doesn’t argue. {her} writes it down. The next payment goes down a little.'},
@@ -7033,19 +7116,19 @@
           const before=cl.owed;cl.owed=Math.max(Math.round(ALIMONY*.8),cl.owed+n);s.nudged=cl.owed-before;
         },
         outro:{
-          dog:[{image:'dog-you.png',caption:'Biscuit waddles across the room, ignores Brayden’s abs and sits on your foot. {her} writes: every few days, with the father. Denise says nothing. Brayden puts his shirt back on.'}],
-          photo:[{image:'dog-brayden.png',caption:'Biscuit waddles straight past you to Brayden, who has a chicken strip in his pocket. {her} writes it down. You get a photo every few days, by text.'}]
+          dog:[{image:'dog-you.png',caption:'Biscuit heaves himself up, lumbers across the room, ignores Brayden’s abs and sits on your foot. All of him. {her} writes: every few days, with the father. Denise says nothing. Brayden puts his shirt back on.'}],
+          photo:[{image:'dog-brayden.png',caption:'Biscuit lumbers straight past you to Brayden, who has a chicken strip in his pocket. {her} writes it down. You get a photo every few days, by text.'}]
         },
         outroNotice:'Go home. Go to bed. The next payment is in the Bank app.',
         after:{
           dog:{msgs:['Officially, I can’t say this. Unofficially: Biscuit picked you, and it was the best part of my week.','The paperwork says every few days. Bring him back fed.','Also. Now that the case is closed. I’d like to see you somewhere that isn’t beige.'],lose:false,effects:['dog'],
-            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'Biscuit was allowed to choose.',body:'A family mediation in the county building last night ended when Biscuit, a small and very overweight dog, was allowed to choose who he would see more of. {dogLine} Personal trainer Brayden Cole, who attended as emotional support, has started a fitness class for dogs. It is fully booked.',image:'dog-you.png',fallbackImage:'political_briefing'},
+            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'Biscuit was allowed to choose.',body:'A family mediation in the county building last night ended when Biscuit, a very overweight St Bernard, was allowed to choose who he would see more of. {dogLine} Personal trainer Brayden Cole, who attended as emotional support, has started a fitness class for dogs. It is fully booked.',image:'dog-you.png',fallbackImage:'political_briefing'},
             scene:[]},
           photo:{msgs:['Denise sent the first photo of Biscuit. He’s on Brayden’s shoulders. At the gym.','I’m sorry. The dog decides. It’s the one rule I can’t mediate.','I can’t see you while your file is open. It will be open for a while.'],lose:true,infamy:'cs_mediation_photo',effects:['photos'],
-            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'Biscuit was allowed to choose.',body:'A family mediation in the county building last night ended when Biscuit, a small and very overweight dog, was allowed to choose who he would see more of. {dogLine} Brayden Cole has started a fitness class for dogs. It is fully booked.',image:'dog-brayden.png',fallbackImage:'political_briefing'},
+            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'Biscuit was allowed to choose.',body:'A family mediation in the county building last night ended when Biscuit, a very overweight St Bernard, was allowed to choose who he would see more of. {dogLine} Brayden Cole has started a fitness class for dogs. It is fully booked.',image:'dog-brayden.png',fallbackImage:'political_briefing'},
             scene:[]},
           declined:{msgs:['Denise got Biscuit. And she asked for leash money.','Brayden carried him out like a trophy.','I’m sorry. The file is closed.'],lose:true,
-            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'One party did not attend.',body:'A family mediation in the county building last night over Biscuit, a small and very overweight dog, ended quickly. {dogLine} Personal trainer Brayden Cole carried the dog out over his head. He has started a fitness class for dogs.',image:'dog-brayden.png',fallbackImage:'political_briefing'},
+            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'One party did not attend.',body:'A family mediation in the county building last night over Biscuit, a very overweight St Bernard, ended quickly. {dogLine} Personal trainer Brayden Cole carried the dog out over his head, which took two attempts. He has started a fitness class for dogs.',image:'dog-brayden.png',fallbackImage:'political_briefing'},
             scene:[]}
         },
         good:{open:'Hi. It’s me. Off the record. I’m calling about Biscuit, and also not about Biscuit.',
@@ -7063,7 +7146,7 @@
         }
       }
     };
-    var ADOPT_BID=60,MEDIATION_NUDGE=75; // the car wash costs sixty dollars, from what's left after Denise; mediation moves the next payment by at most seventy-five
+    var ADOPT_BID=60,MEDIATION_NUDGE=75,VOSS_NOSE_OFF=500; // the car wash costs sixty dollars, from what's left after Denise; mediation moves the next payment by at most seventy-five
     for(const Q of Object.values(CSQ))Object.assign(INFAMY,Q.infamy||{}); // everybody saw: their lines join the Normie's
 
     // ===== Local hero (6 November 2026) =====
@@ -9391,12 +9474,25 @@
       next();
     }
     window.runBeats=runBeats;
-    const BEAT_TITLES={tap:'NOW',mash:'TAP TAP TAP',hold:'HOLD, THEN LET GO',swipe:'DODGE',sequence:'REPEAT IT',aim:'KEEP IT STEADY',rewire:'REWIRE IT',cardswipe:'SWIPE THE CARD',spotit:'SPOT IT'};
+    // The art kit (assets/ui/beats, requested 7 November 2026): each piece is used once it has been drawn and loads;
+    // until then the plain look stays. A loaded piece becomes a CSS variable (--beat-<name>) and a class on <html>.
+    const BEAT_ART={panel:'panel',title:'title-plate',button:'button-big',pressed:'button-big-pressed',tap:'qte-tap',arrow:'qte-arrow',meter:'meter-frame',ring:'aim-ring',rewire:'rewire-panel',plug:'wire-plug',socket:'wire-socket',reader:'card-reader',card:'keycard',lane:'rhythm-lane',note:'rhythm-note',glass:'pour-glass',sortcard:'sort-card',tray:'sort-tray',paper:'trace-paper',away:'redlight-away',look:'redlight-look'};
+    const beatArtPath=name=>'assets/ui/beats/'+name+'.png';
+    var beatArtReady={};
+    function beatArtLoad(){
+      for(const [k,f] of Object.entries(BEAT_ART)){
+        if(k in beatArtReady)continue;beatArtReady[k]=false;
+        try{const img=new Image(),url=assetUrl(beatArtPath(f));img.onload=()=>{beatArtReady[k]=true;document.documentElement.style.setProperty('--beat-'+k,`url("${url}")`);document.documentElement.classList.add('beatart-'+k);};img.src=url;}catch{}
+      }
+    }
+    // A face, a car or a paper in spot-it: its picture once drawn, the stand-in icon until then.
+    const beatSprite=(icon,art)=>art?`<img class="beat-sprite" src="${esc(assetUrl(art.includes('/')?art:'assets/ui/beats/'+art+'.png'))}" alt="" data-alt="${esc(icon)}" onerror="this.replaceWith(document.createTextNode(this.dataset.alt))">`:esc(icon);
+    const BEAT_TITLES={tap:'NOW',mash:'TAP TAP TAP',hold:'HOLD, THEN LET GO',swipe:'DODGE',sequence:'REPEAT IT',aim:'KEEP IT STEADY',rewire:'REWIRE IT',cardswipe:'SWIPE THE CARD',spotit:'SPOT IT',rhythm:'KEEP THE BEAT',pour:'POUR IT',sort:'SORT IT',trace:'TRACE IT',redlight:'DON’T GET SEEN'};
     function beatPlay(b,done){
       const auto=window.MATCH_BEAT_AUTO;
       if(auto){const r=typeof auto==='function'?auto(b):auto;window.setTimeout(()=>done(b.choose?(typeof r==='string'&&b.choose.options.some(o=>o.id===r)?r:b.choose.options[0].id):r),0);return;}
       const el=$('beat');if(!el){window.setTimeout(()=>done(b.choose?b.choose.options[0].id:'ok'),0);return;}
-      closeBeat(true);
+      closeBeat(true);beatArtLoad();
       const kind=b.qte||b.mini||'choose',easy=easyMinis();
       BEAT={b,kind,easy,done,timers:[],over:false};
       el.hidden=false;el.className='beat kind-'+kind; // not beat-<kind>: that is a button's class
@@ -9407,7 +9503,7 @@
       $('beat-stamp').hidden=true;$('beat-timer').hidden=true;
       $('call-bubble')?.classList.remove('visible');
       playUiSound(440);
-      ({tap:qteTap,mash:qteMash,hold:qteHold,swipe:qteSwipe,sequence:qteSequence,aim:qteAim,rewire:miniRewire,cardswipe:miniCardSwipe,spotit:miniSpotIt,choose:beatChoose}[kind]||qteTap)(b,$('beat-play'),easy);
+      ({tap:qteTap,mash:qteMash,hold:qteHold,swipe:qteSwipe,sequence:qteSequence,aim:qteAim,rewire:miniRewire,cardswipe:miniCardSwipe,spotit:miniSpotIt,rhythm:miniRhythm,pour:miniPour,sort:miniSort,trace:miniTrace,redlight:miniRedLight,choose:beatChoose}[kind]||qteTap)(b,$('beat-play'),easy);
     }
     const beatLater=(fn,ms)=>{const t=window.setTimeout(()=>{if(BEAT&&!BEAT.over)fn();},ms);BEAT?.timers.push(t);return t;};
     function beatTimer(ms,onOut){ // a thin bar that empties
@@ -9417,6 +9513,7 @@
     }
     function beatFinish(result,stamp){
       const B=BEAT;if(!B||B.over)return;B.over=true;
+      if(B.easy&&B.b.mini&&result==='miss'){result='ok';stamp=null;} // Easy: a mini game never fails
       B.timers.forEach(t=>window.clearTimeout(t));
       const s=$('beat-stamp');s.textContent=stamp||{perfect:'PERFECT',ok:'DONE',miss:'TOO SLOW'}[result]||'DONE';s.className='beat-stamp '+(typeof result==='string'?result:'ok');s.hidden=false;
       playUiSound(result==='miss'?170:result==='perfect'?880:660);
@@ -9466,7 +9563,7 @@
       const dirs=b.dirs||[['left','right','up'][Math.floor(Math.random()*3)]],win=easy?2200:1300;let i=0,good=0;
       const show=()=>{
         const d=dirs[i];
-        play.innerHTML=`<div class="beat-arrow">${ARROWS[d]}</div><div class="beat-arrows">${Object.entries(ARROWS).map(([k,v])=>`<button data-beat-dir="${k}">${v}</button>`).join('')}</div>`;
+        play.innerHTML=`<div class="beat-arrow" data-dir="${d}">${ARROWS[d]}</div><div class="beat-arrows">${Object.entries(ARROWS).map(([k,v])=>`<button data-beat-dir="${k}">${v}</button>`).join('')}</div>`;
         const t=beatLater(()=>answer(null),win);
         const answer=dir=>{window.clearTimeout(t);if(dir===d){good++;playUiSound(620);}else playUiSound(180);i++;if(i>=dirs.length){beatFinish(good===dirs.length?'perfect':good>=Math.ceil(dirs.length/2)?'ok':'miss');return;}show();};
         play.querySelectorAll('[data-beat-dir]').forEach(btn=>btn.onclick=()=>answer(btn.dataset.beatDir));
@@ -9550,14 +9647,91 @@
       }else{
         // a crowd: a mix of look-alikes (b.crowd) or one face (b.common); with b.peek the odd one looks like the rest
         // and only shows itself for a moment now and then, so you have to catch it (7 November 2026: it was too easy)
-        const crowd=b.crowd||[b.common],n=b.count||16,odd=Math.floor(Math.random()*n),items=Array.from({length:n},()=>crowd[Math.floor(Math.random()*crowd.length)]);
-        const disguise=items[odd];if(!b.peek)items[odd]=b.odd;
-        play.innerHTML=`<div class="beat-grid">${items.map((t,i)=>`<button data-spot="${i===odd?1:0}">${esc(t)}</button>`).join('')}</div>`;
+        const crowd=b.crowd||[b.common],n=b.count||16,odd=Math.floor(Math.random()*n),pick=Array.from({length:n},()=>Math.floor(Math.random()*crowd.length));
+        const face=k=>beatSprite(crowd[k],(b.crowdArt||[])[k]),oddFace=beatSprite(b.odd,b.oddArt),disguise=face(pick[odd]);
+        play.innerHTML=`<div class="beat-grid">${pick.map((k,i)=>`<button data-spot="${i===odd?1:0}">${i===odd&&!b.peek?oddFace:face(k)}</button>`).join('')}</div>`;
         play.querySelectorAll('[data-spot]').forEach(btn=>btn.onclick=()=>btn.dataset.spot==='1'?hit():miss(btn));
-        if(b.peek){const cell=play.querySelector('[data-spot="1"]'),flash=()=>{cell.textContent=b.odd;beatLater(()=>{cell.textContent=disguise;},easy?700:420);beatLater(flash,(easy?1400:1700)+Math.random()*1100);};beatLater(flash,700+Math.random()*900);}
+        if(b.peek){const cell=play.querySelector('[data-spot="1"]'),flash=()=>{cell.innerHTML=oddFace;beatLater(()=>{cell.innerHTML=disguise;},easy?700:420);beatLater(flash,(easy?1400:1700)+Math.random()*1100);};beatLater(flash,700+Math.random()*900);}
       }
       beatTimer(ms,()=>beatFinish(easy?'ok':'miss','TOO SLOW'));
     }
+
+    // --- five more mini games (7 November 2026). Matchfall is a phone game: one thumb, big targets, taps, a hold
+    // or one finger dragging; nothing needs a keyboard, a mouse or hover.
+    function miniRhythm(b,play,easy){ // notes fall down one lane: tap the big button as each one reaches the line
+      const n=b.notes||8,gap=b.gap||(easy?850:650),win=easy?240:160,good=easy?110:70,t0=Date.now()+900,times=Array.from({length:n},(_,i)=>t0+i*gap);
+      const judged=Array(n).fill(null);
+      play.innerHTML=`<div class="beat-lane"><i class="beat-hitline"></i>${times.map((_,i)=>`<b class="beat-note" data-n="${i}"></b>`).join('')}</div><button class="beat-bigbtn">${esc(b.label||'TAP')}</button>`;
+      const notes=[...play.querySelectorAll('.beat-note')],lane=play.querySelector('.beat-lane');
+      const draw=()=>{if(!BEAT||BEAT.over)return;const now=Date.now();notes.forEach((el,i)=>{const p=1-(times[i]-now)/1600;el.style.top=(Math.max(-10,Math.min(110,p*82)))+'%';el.style.opacity=judged[i]?0:1;if(!judged[i]&&now-times[i]>win){judged[i]='miss';lane.classList.add('flash-miss');beatLater(()=>lane.classList.remove('flash-miss'),150);}});if(judged.every(Boolean)){finish();return;}requestAnimationFrame(draw);};
+      const finish=()=>{const hit=judged.filter(j=>j!=='miss').length,perf=judged.filter(j=>j==='perfect').length;beatFinish(hit>=n*.85&&perf>=n*.5?'perfect':hit>=n*.6?'ok':'miss');};
+      play.querySelector('.beat-bigbtn').onpointerdown=e=>{e.preventDefault();const now=Date.now();let best=-1,d=1e9;times.forEach((t,i)=>{if(!judged[i]&&Math.abs(now-t)<d){d=Math.abs(now-t);best=i;}});if(best>=0&&d<=win){judged[best]=d<=good?'perfect':'ok';playUiSound(d<=good?760:600);}else playUiSound(170);};
+      requestAnimationFrame(draw);
+      beatTimer(900+n*gap+win+400,finish);
+    }
+    function miniPour(b,play,easy){ // hold to pour; let go between the lines; too much and it spills
+      const band=easy?[60,90]:[70,84],ms=easy?3200:2400;let lvl=0,t=0,raf=null,done=false;
+      play.innerHTML=`<div class="beat-glass"><i class="beat-band" style="bottom:${band[0]}%;height:${band[1]-band[0]}%"></i><s class="beat-liquid"></s></div><button class="beat-bigbtn">${esc(b.label||'HOLD TO POUR')}</button>`;
+      const liq=play.querySelector('.beat-liquid'),btn=play.querySelector('.beat-bigbtn');
+      const tick=()=>{if(!t||done)return;lvl=Math.min(100,(Date.now()-t)/ms*100+lvl0);liq.style.height=lvl+'%';if(lvl>=100){done=true;beatFinish('miss','SPILLED');return;}raf=requestAnimationFrame(tick);};
+      let lvl0=0;
+      btn.onpointerdown=e=>{e.preventDefault();if(done)return;t=Date.now();lvl0=lvl;tick();};
+      const stop=()=>{if(!t||done)return;cancelAnimationFrame(raf);t=0;
+        if(lvl>=band[0]&&lvl<=band[1]){done=true;beatFinish(Math.abs(lvl-(band[0]+band[1])/2)<3?'perfect':'ok');}
+        else if(lvl>band[1]){done=true;beatFinish('miss','TOO MUCH');}};
+      btn.onpointerup=stop;btn.onpointercancel=stop;btn.onpointerleave=stop;
+      beatTimer(easy?20000:12000,()=>{if(!done)beatFinish(lvl>=band[0]-8?'ok':'miss');});
+    }
+    const SORT_DEFAULT={bins:['Yes','No'],items:[['Do you live alone?','Yes'],['Have you been on a date this year?','No'],['Do you talk to your microwave?','Yes'],['Is your mother your emergency contact?','Yes'],['Do you own more than one plant?','No'],['Has a woman ever saved your number?','No']]};
+    function miniSort(b,play,easy){ // a card at a time: tap the box it goes in
+      const bins=b.bins||SORT_DEFAULT.bins,items=shuffleCopy(b.items||SORT_DEFAULT.items);let i=0,wrong=0;
+      play.innerHTML=`<div class="beat-sortcard"></div><small class="beat-round"></small><div class="beat-bins">${bins.map(x=>`<button data-bin="${esc(x)}">${esc(x)}</button>`).join('')}</div>`;
+      const card=play.querySelector('.beat-sortcard'),count=play.querySelector('.beat-round');
+      const show=()=>{card.textContent=items[i][0];count.textContent=`${i+1} of ${items.length}`;card.classList.remove('slide');void card.offsetWidth;card.classList.add('slide');};
+      play.querySelectorAll('[data-bin]').forEach(btn=>btn.onclick=()=>{
+        if(btn.dataset.bin===items[i][1])playUiSound(600+i*40);else{wrong++;playUiSound(170);card.classList.add('wrong');beatLater(()=>card.classList.remove('wrong'),250);}
+        i++;if(i>=items.length){beatFinish(wrong===0?'perfect':wrong<=1?'ok':'miss');return;}show();
+      });
+      show();
+      beatTimer(easy?30000:15000,()=>beatFinish(i>=items.length-1&&wrong<=1?'ok':'miss'));
+    }
+    const TRACE_PATHS={signature:[[8,40],[16,22],[22,44],[30,18],[36,42],[44,30],[52,38],[60,20],[66,44],[74,26],[82,36],[92,30]],line:[[8,30],[92,30]],star:[[50,6],[61,40],[92,40],[66,58],[76,92],[50,70],[24,92],[34,58],[8,40],[39,40],[50,6]]};
+    function miniTrace(b,play,easy){ // draw along the dotted line with one finger, without lifting it
+      const pts=b.path||TRACE_PATHS[b.shape||'signature'],tol=easy?12:8,vbH=b.shape==='star'?100:60;
+      const samples=[];for(let k=0;k<pts.length-1;k++)for(let s=0;s<10;s++){const [x1,y1]=pts[k],[x2,y2]=pts[k+1];samples.push([x1+(x2-x1)*s/10,y1+(y2-y1)*s/10]);}samples.push(pts[pts.length-1]);
+      play.innerHTML=`<div class="beat-tracebox"><svg viewBox="0 0 100 ${vbH}" preserveAspectRatio="xMidYMid meet"><polyline class="beat-guide" points="${pts.map(p=>p.join(',')).join(' ')}"/><circle class="beat-start" cx="${pts[0][0]}" cy="${pts[0][1]}" r="3.5"/><polyline class="beat-ink" points=""/></svg></div><p class="beat-read">Start at the dot. Don’t lift your finger.</p>`;
+      const svg=play.querySelector('svg'),ink=play.querySelector('.beat-ink'),msg=play.querySelector('.beat-read');let drawn=[],down=false;
+      const toVb=e=>{const r=svg.getBoundingClientRect(),sc=Math.min(r.width/100,r.height/vbH),ox=(r.width-100*sc)/2,oy=(r.height-vbH*sc)/2;return [(e.clientX-r.left-ox)/sc,(e.clientY-r.top-oy)/sc];};
+      const near=(p,set)=>set.some(q=>Math.hypot(p[0]-q[0],p[1]-q[1])<tol);
+      play.onpointerdown=e=>{const p=toVb(e);if(Math.hypot(p[0]-pts[0][0],p[1]-pts[0][1])>tol*1.6){msg.textContent='Start at the dot.';return;}down=true;drawn=[p];ink.setAttribute('points','');svg.setPointerCapture?.(e.pointerId);};
+      play.onpointermove=e=>{if(!down)return;drawn.push(toVb(e));ink.setAttribute('points',drawn.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' '));};
+      play.onpointerup=()=>{if(!down)return;down=false;
+        const cover=samples.filter(s=>near(s,drawn)).length/samples.length,off=drawn.filter(p=>!samples.some(s=>Math.hypot(p[0]-s[0],p[1]-s[1])<tol*1.6)).length/Math.max(1,drawn.length);
+        if(cover>.9&&off<.1)beatFinish('perfect','SIGNED');else if(cover>.7&&off<.3)beatFinish('ok','SIGNED');
+        else{msg.textContent=cover<=.7?'Follow it all the way. Try again.':'Stay on the line. Try again.';playUiSound(170);ink.setAttribute('points','');}};
+      beatTimer(easy?30000:15000,()=>beatFinish('miss'));
+    }
+    function miniRedLight(b,play,easy){ // hold to sneak while he looks away; let go when he turns round
+      const strikesMax=easy?4:2,speed=easy?4500:3500;let prog=0,holding=false,state='go',strikes=0,last=Date.now(),warnAt=0;
+      play.innerHTML=`<div class="beat-watcher go"><span class="beat-face">${esc(b.away||'🙈')}</span><b>GO</b></div><div class="beat-meter"><i></i></div><small class="beat-round"></small><button class="beat-bigbtn">${esc(b.label||'HOLD TO SNEAK')}</button>`;
+      const w=play.querySelector('.beat-watcher'),face=w.querySelector('.beat-face'),word=w.querySelector('b'),bar=play.querySelector('.beat-meter i'),count=play.querySelector('.beat-round'),btn=play.querySelector('.beat-bigbtn');
+      const set=st=>{state=st;w.className='beat-watcher '+st;face.innerHTML=st==='stop'?(beatArtReady.look&&!b.look?`<img class="beat-sprite big" src="${esc(assetUrl(beatArtPath(BEAT_ART.look)))}" alt="">`:esc(b.look||'👀')):(beatArtReady.away&&!b.away?`<img class="beat-sprite big" src="${esc(assetUrl(beatArtPath(BEAT_ART.away)))}" alt="">`:esc(b.away||'🙈'));word.textContent={go:'GO',warn:'...',stop:'FREEZE'}[st];if(st==='stop')warnAt=Date.now();};
+      const cycle=()=>{set('go');beatLater(()=>{set('warn');beatLater(()=>{set('stop');beatLater(cycle,(easy?1500:1000)+Math.random()*600);},easy?650:420);},(easy?1500:900)+Math.random()*1100);};
+      btn.onpointerdown=e=>{e.preventDefault();holding=true;};
+      const up=()=>{holding=false;};btn.onpointerup=up;btn.onpointercancel=up;btn.onpointerleave=up;
+      const tick=()=>{if(!BEAT||BEAT.over)return;const now=Date.now(),dt=now-last;last=now;
+        if(holding&&state!=='stop')prog=Math.min(100,prog+dt/speed*100);
+        if(holding&&state==='stop'&&now-warnAt>160){strikes++;holding=false;prog=Math.max(0,prog-15);playUiSound(160);w.classList.add('caught');beatLater(()=>w.classList.remove('caught'),400);if(strikes>=strikesMax){beatFinish('miss','CAUGHT');return;}}
+        bar.style.width=prog+'%';count.textContent=strikes?`Seen ${strikes} of ${strikesMax}`:'';
+        if(prog>=100){beatFinish(strikes?'ok':'perfect','MADE IT');return;}
+        requestAnimationFrame(tick);};
+      cycle();requestAnimationFrame(tick);
+      beatTimer(easy?40000:22000,()=>beatFinish(prog>=80?'ok':'miss'));
+    }
+    // Which mini games the toolkit plays (the class starting quests ask before swapping a QTE for the real thing).
+    var BEAT_KINDS=['tap','mash','hold','swipe','sequence','aim','rewire','cardswipe','spotit','rhythm','pour','sort','trace','redlight','choose'];
+    window.BEAT_KINDS=BEAT_KINDS;
+    window.beatSupports=kind=>BEAT_KINDS.includes(kind);
     function beatChoose(b,play){ // a big decision, with pictures on the buttons
       play.innerHTML=`<div class="beat-choose">${b.choose.options.map(o=>`<button data-beat-choose="${esc(o.id)}">${o.icon?`<span class="beat-icon">${o.svg?o.icon:esc(o.icon)}</span>`:''}<b>${esc(o.label)}</b>${o.sub?`<small>${esc(o.sub)}</small>`:''}</button>`).join('')}</div>`;
       play.querySelectorAll('[data-beat-choose]').forEach(btn=>btn.onclick=()=>{const B=BEAT;if(!B||B.over)return;B.over=true;playUiSound(640);window.setTimeout(()=>{if(BEAT!==B)return;closeBeat();B.done(btn.dataset.beatChoose);},250);});
@@ -14763,6 +14937,7 @@
       if(id==='house')return c.owed;
       const ad=selectedDifficulty==='looksmaxxer'&&c.lx?.off?.[id]?Object.values(LOOKS_ADS).find(a=>a.trip===id):null;
       if(id==='face'&&c.lx?.plan)return FACE_DOWN; // Dr. Voss's plan: the deposit now
+      if(id==='face'&&c.lx?.vossOff)return Math.max(0,(d.cost||0)-c.lx.vossOff); // Rate Me Live: his discount for the nose
       return Math.max(0,(d.cost||0)-(ad?.off||0));
     }
     function lxNewDay(){
@@ -15095,7 +15270,7 @@
     function driveViewHtml(){
       const c=classState(),trips=DRIVES[selectedDifficulty]||{};
       const head=selectedDifficulty==='looksmaxxer'?`${money(c.cash)} in your wallet · looks ${c.looks} (${ladderName(looksTier())})${botched()?', botched':''} · ${feet(heightNow())}`:c.payDue===null?`${money(c.cash)} in your wallet · ${EX.name} is gone`:`${money(c.cash)} in your wallet · ${money(c.owed)} due to ${EX.name} on Day ${c.payDue}`;
-      return `${cupBack}<div class="cup-paper cup-drive"><h3>Where to?</h3><p class="drive-head">${esc(head)}</p>${Object.entries(trips).filter(([,d])=>!d.show||d.show()).map(([id,d])=>{const why=driveBlock(id);const sub=id==='house'?`Pay the ${money(c.owed)} you owe now.`:id==='face'&&c.lx?.plan?`${money(FACE_DOWN)} down, ${money(FACE_INSTALL)} a payday after. ${d.sub.split('·')[1].trim()}`:tripCost(id)!==(d.cost||0)?`${d.sub} With the ad: ${money(tripCost(id))}.`:d.sub;return `<button data-drive="${id}"${why?' disabled':''}>${esc(d.label)}<small>${esc(why||sub)}</small></button>`;}).join('')}</div>`;
+      return `${cupBack}<div class="cup-paper cup-drive"><h3>Where to?</h3><p class="drive-head">${esc(head)}</p>${Object.entries(trips).filter(([,d])=>!d.show||d.show()).map(([id,d])=>{const why=driveBlock(id);const sub=id==='house'?`Pay the ${money(c.owed)} you owe now.`:id==='face'&&c.lx?.plan?`${money(FACE_DOWN)} down, ${money(FACE_INSTALL)} a payday after. ${d.sub.split('·')[1].trim()}`:tripCost(id)!==(d.cost||0)?`${d.sub} ${id==='face'&&c.lx?.vossOff?'With his discount':'With the ad'}: ${money(tripCost(id))}.`:d.sub;return `<button data-drive="${id}"${why?' disabled':''}>${esc(d.label)}<small>${esc(why||sub)}</small></button>`;}).join('')}</div>`;
     }
     var DRIVE_PIC='assets/trips/driving.png';
     function driveTo(id){
@@ -15146,7 +15321,8 @@
         if(d.once)c.did[d.didKey||id]=true;
         if(d.surgery){c.did[id==='cheap'?'cheap':'height']=true;c.laidUntil=world.day+d.bed;gain=growTaller(id);} // three inches taller, and the log
         else if(d.bed)c.laidUntil=world.day+d.bed; // facial surgery: in bed, but your legs are your own
-        if(id==='face'&&lx().plan)lx().owe=(DRIVES.looksmaxxer.face.cost||3000)-FACE_DOWN; // the rest of Dr. Voss's bill
+        if(id==='face'&&lx().plan)lx().owe=Math.max(0,(DRIVES.looksmaxxer.face.cost||3000)-FACE_DOWN-(lx().vossOff||0)); // the rest of Dr. Voss's bill, less his discount
+        if(id==='face')lx().vossOff=0; // used
         if(d.mishap&&gameRandom()<d.mishap.chance){c.laidUntil=world.day+d.mishap.bed;c.bedLine=d.mishap.block;achToast(d.mishap.line);} // one peel in twelve
         c.looks=Math.min(100,c.looks+gain);
         const after=looksTier();
@@ -16602,6 +16778,7 @@
     }
     let floorShown=null;
     function renderFloor(){
+      try{renderRoomDog();}catch{} // Biscuit, on his days
       const layer=$('floor-items');
       if(!layer)return;
       const items=floorItems(),shown=items.slice(0,4),key=shown.map(item=>item.id).join('|');
@@ -16622,6 +16799,7 @@
     }
     // Placed on the room art itself, so it stays on the floorboards whatever the window's shape.
     function placeFloor(){
+      try{renderRoomDog();}catch{}
       const layer=$('floor-items'),bg=$('background');
       if(!layer)return;
       layer.style.setProperty('--floor-light',String(FLOOR_LIGHT[$('time').value]??.8));
