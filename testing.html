@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="7099178cb4">
+<html lang="en" data-build="e25a54110e">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -886,11 +886,11 @@
     @media(max-width: 730px) { .workbench { display: flex; flex-direction: column; gap: 16px; padding: 17px; } aside { padding: 2px; } h1 { font-size: 32px; } .settings { margin-top: 12px; } .preview-area { padding-top: 0; } }
   </style>
   <!-- Task 2: Chapel at Midnight quest engine. The standalone build inlines it. -->
-  <script src="chapel_at_midnight.js?v=7099178cb4"></script>
+  <script src="chapel_at_midnight.js?v=e25a54110e"></script>
   <!-- Marriage: the Sisters of Mercy (and the Bluebird wedding), the only victories. The standalone build inlines it. -->
-  <script src="marriage.js?v=7099178cb4"></script>
+  <script src="marriage.js?v=e25a54110e"></script>
   <!-- Professor Vale: "The Professor Who Won't Disappear". The standalone build inlines it. -->
-  <script src="quests/professor-vale.js?v=7099178cb4"></script>
+  <script src="quests/professor-vale.js?v=e25a54110e"></script>
 </head>
 <body>
   <main class="workbench">
@@ -2817,9 +2817,10 @@
             if(world.hingeReview===world.day&&!fionnGirlNow(profile.id))showHingeToast(spurnKit()?.report||'Your matches are paused today.',1800); // a woman you ignored reported you
             else if(selectedDifficulty==='divorce'&&profile.factionId==='sisters_of_mercy')showHingeToast(`${firstName(profile)} doesn’t date divorced men.`,1800); // the Sisters won't look at the Divorcé (3 November 2026)
             else if(matchesToday()>=MATCHES_A_DAY){flashBlocked('OUT OF MATCHES',`${MATCHES_A_DAY} matches a day. Try again tomorrow.`);showHingeToast('Out of matches for today.',1800);} // five a day (4 November 2026)
-            else if(profile.jeweller||fionnGirlNow(profile.id)||chapel?.likesYou?.(profile.id)||rqLikesYou(profile.id)||sqLikes(profile.id)||(hingeLikes===1&&rarity===1)||gameRandom()<(glowState().stage==='active'?.9:(famous()?1.5:1)*infamyRate()*matchRates[profile.factionId==='sisters_of_mercy'&&baseClass()==='truecel'?'normie':baseClass()])*rarity){ // the Sisters show a Truecel mercy: Normie odds
+            else if(profile.jeweller||fionnGirlNow(profile.id)||chapel?.likesYou?.(profile.id)||rqLikesYou(profile.id)||sqLikes(profile.id)||(hingeLikes===1&&rarity===1)||gameRandom()<(glowState().stage==='active'?.9:(famous()?1.5:1)*infamyRate()*noseRate()*matchRates[profile.factionId==='sisters_of_mercy'&&baseClass()==='truecel'?'normie':baseClass()])*rarity){ // the Sisters show a Truecel mercy: Normie odds
               const responseMode=hingeLikes===1||profile.jeweller||fionnGirlNow(profile.id)||chapel?.likesYou?.(profile.id)||rqLikesYou(profile.id)||sqLikes(profile.id)?'now':gameRandom()<.50?'now':gameRandom()<.60?'tomorrow':'ghost';
               fameOnMatch(ensureHingeThread(profile,responseMode)); // famous: she opens with it
+              if(selectedDifficulty!=='normie')csMaybeStart(); // one of your first five may be the one who pulls you in
               countMatchToday();
               fionnGirlMatched(profile.id); // Theon: she knows your face
               showHingeToast(`${profile.name} matched with you! ${matchesToday()} of ${MATCHES_A_DAY} today.`);teach('match');
@@ -2887,7 +2888,7 @@
       guideShield();
       const thread=hingeThreads.get(activeChatId),profile=hingeProfile(activeChatId);
       if(id==='dad:unmatch'&&thread&&profile&&!thread.blocked)return chooseDad(id,thread,profile); // her father: even while her reply is pending
-      if((id.startsWith('bf:')||id.startsWith('st:')||id.startsWith('sx:'))&&thread&&profile&&!thread.pending&&!thread.awaiting&&!thread.blocked){thread.quiet=false;thread.fumbled=false;return starterChoose(id,thread,profile);} // the starting quest: never uses up the day, and she answers it even when she'd gone quiet
+      if((id.startsWith('bf:')||id.startsWith('st:')||id.startsWith('sx:')||id.startsWith('cs:'))&&thread&&profile&&!thread.pending&&!thread.awaiting&&!thread.blocked){thread.quiet=false;thread.fumbled=false;return starterChoose(id,thread,profile);} // the starting quest: never uses up the day, and she answers it even when she'd gone quiet
       if(!thread||!profile||thread.pending||thread.awaiting||thread.fumbled||thread.blocked||thread.quiet)return;
       if(!freeAsk(thread,profile,id)){if(doneForToday(thread))return;countAsk(thread,id);} // small talk uses up the day
       else if(QUEST_ASK.test(id)&&doneForToday(thread))return; // and quest questions wait for tomorrow
@@ -4953,9 +4954,11 @@
     // you arrested anywhere else in the game; on the tour it ends in Sunfall General instead. Only you get humiliated:
     // the powerful men come out on top whatever you do (except Tanner Voss, who you are allowed to ruin). Every picture
     // lives in assets/quests/<quest>/; until one is drawn your room stands in. Captions stay up long enough to read.
-    var STARTERS=['bf','townhall','alpha'];
+    var STARTER_POOLS={normie:['bf','townhall','alpha'],mogger:['campaign','auction','toohot','wingman'],truecel:['pity','thesis','registry'],looksmaxxer:['rateme','bonesmash','before'],divorce:['recital','adoptadad','mediation']}; // each class rolls one (the other four: below STX)
+    var STARTERS=STARTER_POOLS.normie;
     function starterId(){
       if(!world)return null;
+      if(selectedDifficulty!=='normie'&&STARTER_POOLS[selectedDifficulty]){const pool=STARTER_POOLS[selectedDifficulty];if(!pool.includes(world.starterId))world.starterId=pool[hashSeed(world.seed+'|starter|'+selectedDifficulty)%pool.length];return world.starterId;} // the other classes: one of their own
       if(!STARTERS.includes(world.starterId)){ // never a villain with your guide's surname: he would sound like her brother
         const sur=String(hingeProfile(world.guide)?.name||'').split(' ').pop(),clash={bf:'Voss',alpha:'Stone'};
         const pool=STARTERS.filter(id=>clash[id]!==sur);
@@ -4979,11 +4982,11 @@
     const sceneOf=dir=>s=>({...s,image:'assets/quests/'+dir+'/'+s.image,stand:s.stand||'room',clear:true});
     // The police take you away, in your own room (the arrest pictures for the time of day).
     function starterArrestSteps(captions){const ph=(dayPhases.includes(time.value)?time.value:'bedroom-night').replace('bedroom-','');return ['threshold','approach','cuff','grab'].map((f,i)=>({image:`assets/events/police-${ph}-${f}.webp`,stand:'room',caption:captions[i],...(i===0?{sound:'siren+radio'}:{})}));}
-    function starterMaybeStart(){if(!starterReady())return;const id=starterId();if(id==='bf')bfMaybeStart();else stMaybeStart();}
-    function starterNewDay(){if(!world)return;if((world.bf?.stage||'none')==='none'&&(world.st?.stage||'none')==='none')starterMaybeStart();stxNewDay();bfNewDay();stNewDay();infamyNewDay();}
-    function starterAfterDayStart(){return bfAfterDayStart()||stAfterDayStart()||stxAfterDayStart();}
-    function starterChoices(thread){return [...bfChoices(thread),...stChoices(thread),...stxChoices(thread)];}
-    function starterChoose(id,thread,profile){return id.startsWith('bf:')?chooseBf(id,thread,profile):id.startsWith('sx:')?chooseStx(id,thread,profile):chooseStChat(id,thread,profile);}
+    function starterMaybeStart(){if(selectedDifficulty!=='normie'){csMaybeStart();return;}if(!starterReady())return;const id=starterId();if(id==='bf')bfMaybeStart();else stMaybeStart();}
+    function starterNewDay(){if(!world)return;if((world.bf?.stage||'none')==='none'&&(world.st?.stage||'none')==='none')starterMaybeStart();stxNewDay();bfNewDay();stNewDay();csNewDay();noseNewDay();infamyNewDay();}
+    function starterAfterDayStart(){return bfAfterDayStart()||stAfterDayStart()||csAfterDayStart()||stxAfterDayStart();}
+    function starterChoices(thread){return [...bfChoices(thread),...stChoices(thread),...csChoices(thread),...stxChoices(thread)];}
+    function starterChoose(id,thread,profile){return id.startsWith('bf:')?chooseBf(id,thread,profile):id.startsWith('sx:')?chooseStx(id,thread,profile):id.startsWith('cs:')?chooseCsChat(id,thread,profile):chooseStChat(id,thread,profile);}
     function starterCoach(){if(world?.stx)return world.stx.stage==='over'?null:starterArrow(stxGoal());return world?.bf&&world.bf.stage!=='none'?bfCoach():world?.st&&world.st.stage!=='none'?stCoach():null;} // after the quest: the follow-up, then the rest of the game
 
     // ---- Everybody saw (7 November 2026): for two or three days after a starting quest, women around town
@@ -5000,7 +5003,7 @@
     function infamyRate(){return infamous()?(INFAMY[world.infamy.kind].good?1.25:.7):1;}
     function infamyNewDay(){
       if(!infamous())return;
-      const f=world.infamy,kit=INFAMY[f.kind],skip=[world.bf?.her,world.st?.her];let sent=0;
+      const f=world.infamy,kit=INFAMY[f.kind],skip=[world.bf?.her,world.st?.her,world.cs?.her];let sent=0;
       if(!Array.isArray(f.told))f.told=[];
       const ready=[...hingeThreads.values()].filter(t=>{const p=hingeProfile(t.id);return p&&t.id!==bearHingeCard.id&&!skip.includes(t.id)&&!f.told.includes(t.id)&&eventReady(t)&&!t.followUp&&!t.blocked&&!t.unmatched&&!t.left&&!t.missing&&morningRoom(t);})
         .sort((a,b)=>hashSeed(world.seed+'|infamy|'+a.id+world.day)-hashSeed(world.seed+'|infamy|'+b.id+world.day));
@@ -5663,8 +5666,9 @@
       },
       clue:'Marriage in Sunfall: a woman who really likes you, a ring, and the Sisters of Mercy’s exam.'
     };
+    var stxGood=q=>STX.good[q]||csGoodKit(q); // the other classes' quests bring their own lines
     function stxBegin(o){
-      if(!world||selectedDifficulty!=='normie')return;
+      if(!world||!(selectedDifficulty==='normie'||CSQ[o.quest]))return;
       world.stx={quest:o.quest,branch:o.branch,good:!!o.good,her:o.her,stage:o.wait?'wait':'ring',ringDay:world.day+(o.wait?1:0),closeDay:world.day,talked:false};
       if(!o.wait)stxRingSoon(3500);
       saveRun(true);
@@ -5688,7 +5692,7 @@
     function stxAfterDayStart(){const x=world?.stx;if(x?.stage==='ring'&&x.ringDay<=world.day)stxRingSoon(9000);return false;}
     // Her call, if it went well
     function stxHerCall(id){
-      const x=world?.stx,K=STX.good[x?.quest];if(!K||!x.good||x.stage!=='ring'||id!==x.her)return false;
+      const x=world?.stx,K=stxGood(x?.quest);if(!K||!x.good||x.stage!=='ring'||id!==x.her)return false;
       x.stage='called';
       const t=hingeThreads.get(id);if(t){t.calledDay=world.day;warmBy(t,1);}
       herCall={id,kind:'stx',step:'open',said:K.open};
@@ -5696,29 +5700,30 @@
       saveRun(true);renderCalls();
       return true;
     }
-    function stxCallChoices(call){const K=STX.good[world?.stx?.quest];return K?K.picks.map(p=>({id:p.id,label:p.label})):[];}
+    function stxCallChoices(call){const K=stxGood(world?.stx?.quest);return K?K.picks.map(p=>({id:p.id,label:p.label})):[];}
     function stxChooseCall(choice,call,thread){
-      const x=world.stx,K=STX.good[x?.quest],p=K?.picks.find(p=>p.id===choice);
+      const x=world.stx,K=stxGood(x?.quest),p=K?.picks.find(p=>p.id===choice);
       if(!p){endHerCall();return;}
       thread.callLog.push({who:'you',text:p.you});
       call.said=p.her+' '+K.next;thread.callLog.push({who:'her',text:p.her},{who:'her',text:K.next});
       warmBy(thread,1);if(choice==='g:out')x.asked=true;
-      recordClue(STX.clue);
+      recordClue(stxClue(x));
       call.step='bye';saveRun(true);renderCalls();
     }
     function stxMissed(id){
-      const x=world?.stx,K=STX.good[x?.quest];if(!K||!x.good||x.stage!=='ring'||id!==x.her)return false;
-      x.stage='called';starterHerSays(x.her,[STX.missed,K.next]);recordClue(STX.clue);saveRun(true);
+      const x=world?.stx,K=stxGood(x?.quest);if(!K||!x.good||x.stage!=='ring'||id!==x.her)return false;
+      x.stage='called';starterHerSays(x.her,[STX.missed,K.next]);recordClue(stxClue(x));saveRun(true);
       return true;
     }
     // Somebody rings to laugh at you, if it went badly
     function stxMock(){
       const x=world?.stx;if(!x)return null;
+      if(CSQ[x.quest])return csMock(x);
       const key=x.branch==='declined'?(x.quest==='townhall'?'thDeclined':'alDeclined'):x.branch,m=STX.mock[key];
       return m?{...STX.callers[m[0]],open:m[1]}:null;
     }
     function stxCallCard(id){const m=stxMock()||STX.callers.brad;return {id,name:m.name,gallery:[m.portrait],banner:m.portrait,ringName:m.name,sub:m.sub};}
-    function stxMockStart(){const x=world.stx;x.stage='called';const kind=STX.infamy[x.branch];if(kind&&!infamous())infamyStart(kind);saveRun(true);} // it's a story again
+    function stxMockStart(){const x=world.stx;x.stage='called';const kind=CSQ[x.quest]?CSQ[x.quest].after[x.branch]?.infamy:STX.infamy[x.branch];if(kind&&!infamous())infamyStart(kind);saveRun(true);} // it's a story again
     function stxMockAnswer(id){stxMockStart();const m=stxMock();if(m?.laughs)sceneSound(m.laughs);return {id,stranger:true,kind:'stxm',step:'open',said:m?.open||''};} // you hear them laughing
     function stxMockChoices(call){return call.step==='open'?[{id:'m:back',label:STX.picks.back},{id:'m:laugh',label:STX.picks.laugh},{id:'m:hang',label:STX.picks.hang}]:[{id:'hangup',label:'☎ Hang up'}];}
     function stxMockChoose(call,choice){
@@ -5744,7 +5749,7 @@
         return fionnReply(thread,profile,STX.warm.her[id].map(text=>({text})),()=>saveRun(true));
       }
       thread.log.push({who:'you',text:STX.closing.you[id]});
-      let line=STX.closing.her[x.quest]?.[id]||'Bye.';
+      let line=(CSQ[x.quest]?csClosing(x,id):STX.closing.her[x.quest]?.[id])||'Bye.';
       if(typeof line==='object')line=line[x.branch]||line.other||'Bye.';
       return fionnReply(thread,profile,[{text:line,block:true}],()=>{thread.blocked=true;showGameNotice('She blocked you.');saveRun(true);});
     }
@@ -5768,6 +5773,1298 @@
       x.stage='over';recordClue(STX.clue);STX.next.over.forEach(showGameNotice);saveRun(true);
       return null;
     }
+    // ===== The other four classes' starting quests (7 November 2026) =====
+    // Every class has starting quests of its own now (INTERACTIVE_PLAN.md, section 5). For the Normie it is still the
+    // first girl you match (above). For the Mogger, the Truecel, the Looksmaxxer and the Divorcé, one of your first five
+    // matches pulls you in: she is picked at random (seeded) and fixed once picked, and the quest starts the morning
+    // after (Day 2), or as soon as she is picked if that is later. The class rolls one of its quests. She rings with an
+    // invitation (or texts it, if you miss her); say yes and the evening plays out as beats: scenes, questions on the
+    // spot, quick-time events, mini games and big choices, played by runBeats once the beat toolkit exists and by
+    // starterBeatsFallback until then. No starting quest can be won. The worst ends in Sunfall General, never a death.
+    // Nothing in one touches the class's own goal (alimony, the Looksmaxxer's ninety): small warmth and infamy only.
+    // The morning after: the paper, what she says, then the follow-up above (her call, or somebody laughing at you
+    // live), and a last word on Hinge.
+    var CS_GIVER_POOL=5;
+    var csOn=()=>!!world&&!window.MATCH_NO_BOYFRIEND&&selectedDifficulty!=='normie'&&!!STARTER_POOLS[selectedDifficulty];
+    function csState(){
+      if(!world)return null;
+      if(!world.cs||typeof world.cs!=='object'||Array.isArray(world.cs))world.cs={stage:'none'};
+      return world.cs;
+    }
+    var csKit=()=>CSQ[world?.cs?.id]||null;
+    var csArt=(Q,p)=>p&&!/^assets\//.test(p)?'assets/quests/'+Q.dir+'/'+p:p;
+    // Whatever a line needs: her name, and the quest's own (the candidate, a match who phones in, a quote).
+    function csFill(text,s=world?.cs){
+      const Q=CSQ[s?.id];if(text==null)return text;
+      const m={her:starterHerName(s?.her),...(Q?.fill?Q.fill(s||{}):{})};
+      return String(text).replace(/\{(\w+)\}/g,(x,k)=>k in m?m[k]:x);
+    }
+    var csStep=(Q,s)=>st=>({...st,image:csArt(Q,csFill(st.image,s)),caption:csFill(st.caption,s),stand:st.stand||'room',clear:true});
+    // Who can pull you in: a woman you matched, never a Sister, an older woman, the jeweler, the sorority or the bear.
+    function csCanGive(t){
+      const p=hingeProfile(t?.id);
+      return !!p&&t.id!==bearHingeCard.id&&!p.sorority&&!p.jeweller&&!mustReply(p)&&p.factionId!=='sisters_of_mercy'&&(p.age||0)<=OLDER_WOMAN_AGE&&(p.age||21)>=21;
+    }
+    var csLive=t=>!!t&&!t.blocked&&!t.unmatched&&!t.left&&!t.missing&&!t.dead&&!t.ghosted;
+    function csGiver(Q){
+      const s=csState();if(s.her&&csLive(hingeThreads.get(s.her)))return s.her;
+      const sur=p=>String(p?.name||'').split(' ').pop();
+      const first=[...hingeThreads.values()].filter(csCanGive).slice(0,CS_GIVER_POOL); // the map keeps the order you matched
+      const k=hashSeed(world.seed+'|csgiver')%CS_GIVER_POOL;
+      if(first.length<=k&&world.day<3)return null; // she's a match you haven't made yet; from Day 3 one you have will do
+      const live=first.filter(t=>csLive(t)&&!(Q.clash||[]).includes(sur(hingeProfile(t.id)))); // never a woman with a villain's surname
+      if(!live.length)return null;
+      const pick=live.includes(first[k])?first[k]:live[hashSeed(world.seed+'|csgiver2')%live.length];
+      s.her=pick.id;
+      return s.her;
+    }
+    function csMaybeStart(){
+      if(!csOn())return;
+      const s=csState();if(s.stage!=='none'||world.day<2)return; // the morning after
+      const id=starterId(),Q=CSQ[id];if(!Q||Q.cls!==selectedDifficulty)return;
+      const her=csGiver(Q);if(!her)return;
+      const t=hingeThreads.get(her);
+      if(t?.awaiting){t.awaiting=false;t.replyOnDay=null;if(!t.log.length)t.log.push({who:'her',text:introFor(hingeProfile(her))});} // she answers you now
+      Object.assign(s,{stage:'invite',id,her,inviteDay:world.day,rang:false,texted:false,tries:0,picks:{},results:{},asks:{}});
+      if(Q.teaser)queueNews({...Q.teaser,title:csFill(Q.teaser.title,s),body:csFill(Q.teaser.body,s),image:csArt(Q,Q.teaser.image)},world.day);
+      if(!dayTransitionInFlight)csRingSoon(6000); // picked in the middle of the day: she rings soon; at a new day csAfterDayStart does it
+      saveRun(true);
+    }
+    // She rings, as soon as nothing else is happening. If the phone is never free, she texts instead.
+    function csRingSoon(ms){
+      const s=world?.cs;if(!s||s.ringing)return;
+      s.ringing=true;
+      window.setTimeout(()=>{
+        s.ringing=false;
+        if(world?.cs!==s||s.stage!=='invite'||s.rang||s.texted)return;
+        const t=hingeThreads.get(s.her);
+        if(!csLive(t)){s.her=null;const her=csGiver(csKit());if(!her){s.stage='none';saveRun(true);return;}s.her=her;} // she's gone: one of the others
+        if(callBusy()||stage.classList.contains('lowered')){if((s.tries=(s.tries||0)+1)<40)csRingSoon(5000);else csMissed(s.her);return;}
+        s.rang=true;saveRun(true);startIncomingCall(s.her);
+      },ms);
+    }
+    function csInviteCall(id){
+      const s=world?.cs,Q=csKit();if(!Q||s.stage!=='invite'||id!==s.her)return false;
+      herCall={id,kind:'csinv',step:'open',said:csFill(Q.invite.open)};
+      hingeThreads.get(id)?.callLog.push({who:'her',text:herCall.said});
+      renderCalls();
+      return true;
+    }
+    function csCallChoices(call){
+      const Q=csKit();if(!Q)return [];
+      return [...(call.explained?[]:[{id:'inv:what',label:Q.invite.what.label}]),{id:'inv:yes',label:Q.invite.yes.label},{id:'inv:no',label:Q.invite.no.label}];
+    }
+    function csChooseCall(choice,call,thread){
+      const Q=csKit(),you=text=>thread.callLog.push({who:'you',text}),say=text=>{call.said=text;thread.callLog.push({who:'her',text});};
+      if(!Q){endHerCall();return;}
+      if(choice==='inv:what'){you(Q.invite.what.you);say(csFill(Q.invite.what.her));call.explained=true;renderCalls();return;}
+      const yes=choice==='inv:yes';
+      you(yes?Q.invite.yes.you:Q.invite.no.you);say(csFill(yes?Q.invite.yes.her:Q.invite.no.her));
+      csAnswer(yes);
+      call.step='bye';renderCalls();
+    }
+    function csAnswer(yes){
+      const s=csState();
+      if(yes){s.stage='going';s.goingDay=world.day;csEventSoon(4000);}
+      else{s.stage='declined';s.branch='declined';s.eventDay=world.day;}
+      saveRun(true);
+    }
+    // You missed her call (or the phone was never free): she texts the invitation.
+    function csMissed(id){
+      const s=world?.cs,Q=csKit();if(!Q||s.stage!=='invite'||id!==s.her||s.texted)return false;
+      s.texted=true;starterHerSays(s.her,[csFill(Q.invite.text)]);showGameNotice(`${starterHerName(s.her)} messaged you.`);saveRun(true);return true;
+    }
+    function csChoices(thread){
+      const s=world?.cs,Q=csKit();if(!Q||thread?.id!==s.her||thread.blocked)return [];
+      if(s.stage==='invite'&&s.texted)return [['cs:yes',Q.invite.yes.label],['cs:no',Q.invite.no.label]];
+      return [];
+    }
+    function chooseCsChat(id,thread,profile){
+      const Q=csKit();if(!csChoices(thread).some(([key])=>key===id))return;
+      const yes=id==='cs:yes';
+      thread.log.push({who:'you',text:yes?Q.invite.yes.you:Q.invite.no.you});
+      return fionnReply(thread,profile,[{text:csFill(yes?Q.invite.yes.her:Q.invite.no.her)}],()=>csAnswer(yes));
+    }
+    function csEventSoon(ms){
+      const s=world?.cs;
+      window.setTimeout(()=>{
+        if(world?.cs!==s||s.stage!=='going')return;
+        if(herCall||incomingCall||ringingContact||activeGenericCall||activeCallId||dayTransitionInFlight||$('home-invasion')?.classList.contains('visible')){csEventSoon(2500);return;}
+        csEvent();
+      },ms);
+    }
+    // ---- The evening: the quest's beats, one at a time ----
+    function csEvent(){
+      const s=csState(),Q=csKit();if(!Q)return;
+      Object.assign(s,{stage:'event',eventDay:world.day,branch:null,picks:{},results:{},asks:{},hospital:false});
+      saveRun(true);
+      if(currentApp)returnHome();
+      const ctx={quest:s.id,results:s.results,picks:s.picks,asks:s.asks,hospital:null,s};
+      csRun(Q.beats,ctx,()=>{
+        const branch=Q.branch(ctx);
+        s.branch=Q.after[branch]?branch:Q.quiet;
+        if(Q.apply)Q.apply(ctx,s); // what the evening changed right away (a small payment nudge, a car wash)
+        saveRun(true);
+        const step=csStep(Q,s);
+        const outro=()=>playScene((Q.outro[s.branch]||[]).map(step),()=>{setLowered(false);showGameNotice(Q.outroNotice||'Go home. Go to bed. Somebody will be talking about this in the morning.');saveRun(true);},{gap:2600,read:true});
+        if(ctx.hospital){s.hospital=true;saveRun(true);starterHospital(ctx.hospital.map(step),outro);return;} // you live
+        outro();
+      });
+    }
+    // A beat with when:ctx=>bool plays only if that is true; then:ctx=>{} runs after it. Questions on the spot run
+    // through doorTalk here (their answers are this quest's own data); everything else goes to the beat toolkit.
+    function csRun(list,ctx,done){
+      let i=0;
+      const next=()=>{
+        if(world?.cs!==ctx.s)return; // a new game
+        while(i<list.length&&list[i].when&&!list[i].when(ctx))i++;
+        if(i>=list.length){done();return;}
+        const b=list[i++],after=()=>{if(b.then)b.then(ctx);next();};
+        if(b.ask){csAsk(b,ctx,after);return;}
+        const beat=csBeat(b,ctx);
+        (window.runBeats||starterBeatsFallback)([beat],ctx,()=>{
+          if(b.choose){const ids=b.choose.options.map(o=>o.id),v=ctx.results[b.key];ctx.picks[b.key]=ids.includes(v)?v:ids[0];}
+          else if(b.key&&!['perfect','ok','miss'].includes(ctx.results[b.key]))ctx.results[b.key]='ok';
+          saveRun(true);after();
+        });
+      };
+      next();
+    }
+    function csBeat(b,ctx){
+      const Q=CSQ[ctx.quest],s=ctx.s,art=p=>csArt(Q,csFill(p,s));
+      if(b.scene)return {scene:b.scene.map(csStep(Q,s))};
+      if(b.choose)return {choose:{...b.choose,image:art(b.choose.image),caption:csFill(b.choose.caption,s),options:b.choose.options.map(o=>({...o,label:csFill(o.label,s),reply:csFill(o.reply,s)}))},key:b.key};
+      const out={...b,image:art(b.image),caption:csFill(b.caption,s)};
+      delete out.when;delete out.then;
+      return out;
+    }
+    function csAsk(b,ctx,after){
+      const Q=CSQ[ctx.quest],s=ctx.s,art=p=>csArt(Q,csFill(p,s)),A=b.ask;
+      const keep=d=>{ctx.asks[b.key]={bad:d.bad,tags:[...d.tags],picks:[...d.picks]};};
+      doorTalk({
+        intro:(A.intro||[]).map(csStep(Q,s)),doubt:A.doubt?art(A.doubt):null,gap:2600,laugh:A.laugh===undefined?'laugh':A.laugh,
+        questions:A.questions.map(q=>({image:art(q.image),ask:csFill(q.ask,s),answers:q.answers.map(a=>({...a,label:csFill(a.label,s),reply:csFill(a.reply,s)}))})),
+        onDone:d=>{keep(d);saveRun(true);after();},
+        onEnd:(end,d)=>{keep(d);ctx.asks[b.key].end=end;saveRun(true);after();}
+      });
+    }
+    // If the beat toolkit (runBeats) is ever missing: scenes play, choices are buttons, and a quick-time event or a
+    // mini game shows its picture and caption and counts as ok. window.MATCH_BEAT_AUTO says otherwise, as it does
+    // for runBeats (the tests and the bot set it).
+    function starterBeatsFallback(list,ctx,done){
+      const auto=window.MATCH_BEAT_AUTO,autoOf=b=>auto?(typeof auto==='function'?auto(b):auto):null;
+      let i=0;
+      const next=()=>{
+        if(i>=list.length){done();return;}
+        const b=list[i++];
+        if(b.scene){playScene(b.scene,next,{keep:true,gap:2600,read:true});return;}
+        if(b.choose){
+          const c=b.choose,a=autoOf(b);
+          if(a){if(b.key)ctx.results[b.key]=c.options.some(o=>o.id===a)?a:c.options[0].id;next();return;}
+          doorTalk({intro:[],gap:2600,laugh:null,questions:[{image:c.image,ask:c.caption||'',answers:c.options.map(o=>({label:(o.icon?o.icon+' ':'')+o.label,reply:o.reply||o.label}))}],
+            onDone:d=>{const o=c.options[d.picks[0]]||c.options[0];if(b.key)ctx.results[b.key]=o.id;next();}});
+          return;
+        }
+        if(b.ask){doorTalk({...b.ask,onDone:d=>{if(b.key)ctx.results[b.key]=d;next();},onEnd:(e,d)=>{if(b.key)ctx.results[b.key]=d;next();}});return;}
+        if(b.qte||b.mini){
+          const r=autoOf(b)||'ok';
+          playScene([{image:b.image,stand:'room',clear:true,caption:b.caption||''}],()=>{if(b.key)ctx.results[b.key]=r;next();},{keep:true,gap:2200,read:true});
+          return;
+        }
+        next();
+      };
+      next();
+    }
+    // ---- The morning after ----
+    function csNewDay(){
+      const s=world?.cs,Q=csKit();if(!s||!Q)return;
+      if(s.stage==='invite'&&world.day>s.inviteDay){s.stage='declined';s.branch='declined';s.eventDay=world.day-1;} // you never answered her: she went without you
+      if(s.stage==='going'&&world.day>(s.goingDay??s.inviteDay)){s.stage='declined';s.branch='declined';s.eventDay=world.day-1;} // you said yes and never went (a reload): you stood her up
+      if(s.stage==='event'&&!s.branch)s.branch=Q.quiet; // the evening was cut short: the quiet version
+      if(['event','declined'].includes(s.stage)&&world.day>s.eventDay){
+        const A=Q.after[s.branch];if(!A){s.stage='done';return;}
+        s.stage='after';s.scene='after';s.afterDay=world.day;
+        if(A.infamy)infamyStart(A.infamy);
+        if(A.news)queueNews({...A.news,title:csFill(A.news.title,s),summary:csFill(A.news.summary,s),body:csFill(A.news.body,s),image:csArt(Q,csFill(A.news.image,s))},world.day);
+        starterHerSays(s.her,A.msgs.map(t=>csFill(t,s))); // she blocks you after her last word (the follow-up), or she likes you
+        for(const e of A.effects||[])csEffect(e,s);
+      }
+      if(s.daily&&world.day<=s.daily.until&&world.day>s.afterDay)(s.notes||(s.notes=[])).push(s.daily.line); // the registry app, a photo of the dog
+    }
+    function csAfterDayStart(){
+      const s=world?.cs,Q=csKit();if(!s||!Q)return false;
+      if(s.notes?.length){for(const n of s.notes)showGameNotice(n);s.notes=[];}
+      if(s.stage==='invite'&&world.day===s.inviteDay&&!s.rang&&!s.texted){csRingSoon(12000);return false;}
+      if(s.scene!=='after')return false;
+      s.scene=null;
+      const A=Q.after[s.branch];
+      const finish=()=>{s.stage='done';if(A.lose)s.lost=true;showGameNotice(`${starterHerName(s.her)} messaged you.`);setLowered(false);stxBegin({quest:s.id,branch:s.branch,good:!A.lose,her:s.her});saveRun(true);}; // then the phone rings
+      if(!A.scene?.length){finish();return false;}
+      playScene(A.scene.map(csStep(Q,s)),finish,{gap:2600,read:true});
+      return true;
+    }
+    // Small things a quest leaves behind. Never surgery, never looks, never the alimony itself.
+    function csEffect(e,s){
+      if(e==='nose')noseStart(3);
+      else if(e==='kindred'){ // one woman who saw the video messages you for real
+        const pool=hingeProfiles.filter(p=>!hingeThreads.has(p.id)&&p.gallery?.length&&csCanGive({id:p.id})&&!hingeDeck.slice(hingeIndex,hingeIndex+3).some(c=>c.id===p.id));
+        if(!pool.length)return;
+        const p=pool[hashSeed(world.seed+'|kindred')%pool.length],t=ensureHingeThread(p,'now');
+        lineSpeaker=t.id;t.log.push(...CS_KINDRED.map(text=>({who:'her',text})));warmBy(t,1);talkState(t).unread=true;s.kindred=p.id;
+      }
+      else if(e==='cheer'){ // a cheerleader likes you a little more
+        const t=[...hingeThreads.values()].find(t=>hingeProfile(t.id)?.sorority&&!t.blocked&&!t.unmatched);
+        if(t){warmBy(t,1);s.cheer=t.id;}
+      }
+      else if(e==='pings')s.daily={until:world.day+2,line:'The Registry app: Good morning! How are your feelings today? 🙂 😐 🙁 😢 😭'};
+      else if(e==='photos')s.daily={until:world.day+2,line:'Denise sent a photo of Biscuit. He is on a treadmill. Brayden is spotting him.'};
+      else if(e==='dog'){s.dog=true;recordClue('Biscuit is yours every few days now. The mediator wrote it down.');}
+      else if(e==='voss')strangerVoicemail('Dr. Anton Voss','Dr. Voss’s office. We heard about your nose on the sorority stream. Come in when the swelling is down. Full price, of course, but the doctor says he will throw in the splint.');
+    }
+    var CS_KINDRED=['Hi. I saw the video. The diner one. I’m not laughing.','I’ve been the one in the booth with the camera pointed at me. Want to get coffee somewhere with no ring lights?'];
+    // ---- A broken nose (the Bachelor Auction, Rate Me Live): three days of women saying so, and fewer matches ----
+    var NOSE={lines:['Oh my gosh, your nose. What happened?','Is your nose okay? It looks like it’s pointing at me.','I saw your new picture. The nose. Are you alright?','Okay, I have to ask about the nose.','Did somebody break your nose? It’s kind of a look, honestly.']};
+    function noseStart(days){if(world)world.nose={day:world.day,until:world.day+days-1,told:[]};}
+    var nosed=()=>!!world?.nose&&world.day>=world.nose.day&&world.day<=world.nose.until;
+    function noseRate(){return nosed()?.85:1;}
+    function noseNewDay(){
+      if(!nosed())return;
+      const f=world.nose;if(!Array.isArray(f.told))f.told=[];
+      const t=[...hingeThreads.values()].filter(t=>hingeProfile(t.id)&&t.id!==bearHingeCard.id&&t.id!==world.cs?.her&&!f.told.includes(t.id)&&eventReady(t)&&!t.followUp&&!t.blocked&&!t.unmatched&&!t.left&&!t.missing&&morningRoom(t))
+        .sort((a,b)=>hashSeed(world.seed+'|nose|'+a.id+world.day)-hashSeed(world.seed+'|nose|'+b.id+world.day))[0];
+      if(!t)return;
+      lineSpeaker=t.id;t.log.push({who:'her',text:freshHers(t,NOSE.lines,world.seed+'|noseline|'+t.id)});f.told.push(t.id);talkState(t).unread=true;talkState(t).morningDay=world.day;
+    }
+    // ---- The follow-up's lines for these quests (the STX module above reads them through these) ----
+    function csGoodKit(q){
+      const Q=CSQ[q];if(!Q?.good)return null;
+      const s=world.cs;
+      return {open:csFill(Q.good.open,s),picks:Q.good.picks.map(p=>({...p,label:csFill(p.label,s),you:csFill(p.you,s),her:csFill(p.her,s)})),next:CS_NEXT[Q.cls]||STX.good.townhall.next};
+    }
+    function csMock(x){
+      const Q=CSQ[x.quest],s=world.cs;let m=Q?.mock?.[x.branch];if(!m)return null;
+      if(!Array.isArray(m))m=m[Q.fill?.(s)?.side||'dem']||Object.values(m)[0];
+      const caller=CS_CALLERS[m[0]]||STX.callers[m[0]];if(!caller)return null;
+      return {...caller,open:csFill(m[1],s)};
+    }
+    function csClosing(x,id){
+      const Q=CSQ[x.quest];let line=Q?.closing?.[id];if(!line)return null;
+      if(typeof line==='object')line=line[x.branch]||line.other||'Bye.';
+      return csFill(line,world.cs);
+    }
+    var CS_NEXT={
+      mogger:'Also, since you’re new. If you get serious about somebody here, the Sisters of Mercy do the weddings: a ring, their exam, all of it. And read the paper. Everybody’s business ends up in it.',
+      truecel:'Also, since you’re new. If you ever get serious about somebody, the Sisters of Mercy do the weddings: a ring and their exam. And read the paper. Everything ends up in it.',
+      looksmaxxer:'Also. You know the sorority only dates a ninety, right? Teeth, height, face. Go to the expensive surgeon, never the cheap one. And read the paper. It has all the ads.',
+      divorce:'Also. Pay Denise before it’s due, at the bank, every time. Your lawyer can buy you time. And read the paper. Everybody’s business ends up in it.'
+    };
+    var CS_CLUE={looksmaxxer:'The sorority dates a ninety: teeth, height and face. Never the cheap surgeon.',divorce:'Denise: pay before the day it is due. Your lawyer can buy you time.'};
+    var stxClue=x=>CSQ[x?.quest]?(CS_CLUE[CSQ[x.quest].cls]||STX.clue):STX.clue;
+    var csPicked=(k,v)=>c=>c.picks[k]===v;
+    var csMisses=(c,keys)=>keys.filter(k=>c.results[k]==='miss').length;
+    var csBad=(c,k)=>c.asks[k]?.bad||0;
+    var csTag=(c,k,t)=>(c.asks[k]?.tags||[]).filter(x=>x===t).length;
+    // Two of your other matches, for the quests that need them (Too Hot to Be Real's witnesses).
+    function csOthers(s){const out=[...hingeThreads.values()].filter(t=>t.id!==s?.her&&csCanGive(t)).map(t=>firstName(hingeProfile(t.id))).filter(Boolean);return [out[0]||'Kayla',out[1]||'Brianna'];}
+    // Who rings to laugh at you after these quests (the Normie's callers are in STX.callers).
+    var CS_CALLERS={
+      dem:STX.callers.tanner,
+      rep:{laughs:'boys',name:'Brock Halverson',sub:'Republican for City Council',portrait:'assets/quests/campaign/brock.png',back:'You talk back to me on my own radio hour? Folks, that is what happens when you let them go to college.',laugh:'Ha! Now that’s a good sport. Halverson for council.'},
+      rex:{laughs:'boys',name:'Rex Rourke',sub:'Rourke Land and Cattle',portrait:'assets/quests/auction/rex.png',back:'You want another go, son? I’m at the club. I own it now.',laugh:'Ha. You’re alright, son. You still owe me a dessert trolley.'},
+      trent:{laughs:'laugh',name:'Trent Gable',sub:'Too Hot to Be Real',portrait:'assets/quests/toohot/trent-portrait.png',back:'Ooh, he’s angry! Folks, that is exactly what a liar sounds like. We’re clipping that.',laugh:'He’s laughing! Folks, that is the laugh of a man who knows. Good sport. Still a liar.'},
+      howard:{laughs:'laugh',name:'Howard Finch',sub:'Work',portrait:'assets/quests/wingman/howard-portrait.png',back:'Okay. Okay. Everyone heard that. Kevin is writing it on the whiteboard.',laugh:'You’re laughing? Everybody, he’s laughing. Okay. Ha. Okay.'},
+      kim:{laughs:'laugh',name:'Kimberly Shaw',sub:'Speed Dating Sunfall',portrait:'assets/quests/wingman/kimberly.png',back:'Ooh, feisty. That’s going in the trailer, hon.',laugh:'Ha! A good sport. Come back as my control group any time.'},
+      stream:{laughs:'laugh',name:'Unknown number',sub:'Live',portrait:'assets/icons/calls.png',back:'Ooh, he’s mad! Chat, he’s mad! Clip it, clip it.',laugh:'He’s laughing! Chat, he’s actually laughing. Okay, that’s kind of wholesome.'},
+      campus:{laughs:'laugh',name:'KSUN Campus Radio',sub:'Sunfall University',portrait:'assets/contacts/university.png',back:'Ooh, Subject E speaks! Folks, that is primary data.',laugh:'He’s laughing! Subject E has a sense of humor. Footnote that.'},
+      plus:{laughs:'laugh',name:'Plus One Sunfall',sub:'Crystal',portrait:'assets/quests/registry/crystal-portrait.png',back:'Babe. You’re on speaker. That makes it worse, babe.',laugh:'He’s laughing! Okay, that’s one more star. Two stars.'},
+      axo:{laughs:'laugh',name:'Alpha Rho Xi',sub:'Greek Row',portrait:'assets/sorority/standin.png',back:'Oh my gosh, he’s talking back! Write that down. Minus two.',laugh:'He’s laughing! Okay, plus one. Thirty-two.'},
+      brick:{laughs:'boys',name:'Brick Vance',sub:'The Bone King',portrait:'assets/quests/bonesmash/brick-portrait.png',back:'Whoa, the rookie has a mouth on him! Brothers, that’s his jaw talking. Respect the jaw.',laugh:'He’s laughing! That’s the bone listening, brothers.'},
+      gus:{laughs:'laugh',name:'Dr. Gus',sub:'Desert Plaza',portrait:'assets/contacts/lx-gus.png',back:'Whoa, whoa. Buddy. That’s the before talking. The after would never.',laugh:'Ha! That’s the spirit. Come in any time. Cash.'},
+      brayden:{laughs:'boys',name:'Brayden Cole',sub:'Personal Trainer',portrait:'assets/quests/recital/brayden-portrait.png',back:'Whoa, bro. Aggression. Channel it, bro. Channel it into a squat.',laugh:'Ha! Respect, bro. You can laugh at yourself. Rare in a client.'},
+      pike:{laughs:'laugh',name:'Gordon Pike',sub:'Family Law',portrait:'assets/quests/adoptadad/pike-portrait.png',back:'I’d be careful, sir. Everything you say is billable.',laugh:'Ha. Good. Laughing is free. For now.'}
+    };
+    var CSQ={
+      // ===== Mogger: The Face of the Campaign =====
+      // She volunteers for the council race and both campaigns want your face. The donkey (Tanner Voss) or the
+      // elephant (Brock Halverson, a gun-shop owner in a red tie and a cowboy hat). Whoever you pick comes out fine.
+      campaign:{cls:'mogger',dir:'campaign',clash:['Voss','Halverson'],
+        fill:s=>{const dem=s.picks?.side!=='rep';const cand=dem?'Tanner Voss':'Brock Halverson';return {side:dem?'dem':'rep',cand,CAND:cand.toUpperCase(),party:dem?'Democrat':'Republican',icon:dem?'🫏':'🐘',other:dem?'Brock Halverson':'Tanner Voss',
+          shoot:dem?'Upstairs. A blue backdrop, a ring light and a cardboard donkey 🫏 as tall as you. Tanner: Less smolder, buddy. Decency. Think decency.':'Downstairs. A flag, a hay bale and a cardboard elephant 🐘 as tall as you. Brock puts his cowboy hat on your head. It is too small. Brock: Now look like you own land.'};},
+        invite:{
+          open:'Okay, so. I volunteer for the council race, and both campaigns saw your profile. They both want your face on their posters. I’m not joking.',
+          what:{label:'Ask why they want you',you:'Why me?',her:'Because you look like a man who wins. Neither of the candidates does. Pick a side tonight and your face is on every pole by morning.'},
+          yes:{label:'Say you’ll be the face',you:'Fine. I’ll be the face.',her:'Yes! The old bank on Main, at sundown. Both offices are in it, one on each floor. Pick a door.'},
+          no:{label:'Say you don’t do politics',you:'I don’t do politics.',her:'Everybody in Sunfall does politics. Fine. They’ll find a less handsome man. They always do.'},
+          text:'Long story, but both council campaigns want your face on their posters. Photo shoot tonight at the old bank on Main. Come?'
+        },
+        teaser:{id:'cs_campaign_teaser',section:'Politics',title:'BOTH CAMPAIGNS HUNT FOR A FACE',summary:'With the council race tied, Tanner Voss and Brock Halverson both want a younger look.',body:'With the city council race tied, Democrat Tanner Voss and Republican Brock Halverson, who owns the gun shop on Route 9, are both looking for a new face for their posters. Both campaigns rent a floor of the old bank on Main. Halverson says his posters will have an elephant on them. Voss says his will have a donkey and decency.',image:'office.png',fallbackImage:'political_briefing'},
+        beats:[
+          {scene:[{image:'office.png',caption:'Sundown. The old bank on Main. Upstairs, the Voss campaign. Downstairs, the Halverson campaign. Both doors open. Both candidates are watching you.'},{image:'candidates.png',caption:'Tanner Voss leans over the banister with a pamphlet about banning dating apps. Brock Halverson leans in the doorway below in a red tie and a cowboy hat, holding a coffee mug shaped like a revolver.'},{image:'her-clipboard.png',caption:'{her} hands you a clipboard. Pick a door. Whoever you pick, your face goes on every pole in Sunfall by morning.'}]},
+          {choose:{caption:'Pick a side. The posters go up tonight.',image:'candidates.png',options:[{id:'dem',label:'Tanner Voss, Democrat',icon:'🫏',reply:'You go upstairs. Tanner Voss hugs you for slightly too long.'},{id:'rep',label:'Brock Halverson, Republican',icon:'🐘',reply:'You go downstairs. Brock Halverson shakes your hand and checks your grip.'}]},key:'side'},
+          {scene:[{image:'shoot-{side}.png',caption:'{shoot}'},{image:'shoot-{side}.png',caption:'{cand}: Three shots. Smolder, wave, thumbs up. Look like a man Sunfall would trust with its potholes.'}]},
+          {qte:'hold',key:'pose1',image:'pose-smolder.png',caption:'Shot one: the smolder. Hold it, and let go on the flash.'},
+          {qte:'hold',key:'pose2',image:'pose-wave.png',caption:'Shot two: the wave. Friendly. Not too friendly.'},
+          {qte:'hold',key:'pose3',image:'pose-thumbs.png',caption:'Shot three: thumbs up. Like you mean it.'},
+          {ask:{intro:[{image:'rally.png',sound:'crowd',caption:'An hour later, the launch party in the bank lobby. Your face is already on a banner behind the stage, under a big {icon}. The crowd wants to hear from the face.'}],doubt:'rally-sweat.png',questions:[
+            {image:'rally.png',ask:'A woman in the front row: Why should Sunfall trust a man this handsome?',answers:[
+              {label:'Because I’m honest. Look at me.',reply:'She looks. She nods. That was enough for her.'},
+              {label:'You shouldn’t. That’s the fun part.',bad:1,reply:'Laughter. Not the good kind. Somebody is filming.'},
+              {label:'Ask {cand}. I’m just the face.',reply:'{cand} gives you two thumbs up from the side of the stage.'}]},
+            {image:'rally.png',ask:'A man at the back: Where do you stand on the dating apps?',answers:[
+              {label:'Wherever {cand} stands.',reply:'The right answer. {cand} mouths good man at you.'},
+              {label:'I’m on all of them. I’m doing great.',bad:1,reply:'The whole room checks their phones. Three women find you. So does a reporter.'},
+              {label:'Ban them. Then I get all the dates.',bad:1,reply:'A gasp, then a laugh. The reporter writes it down word for word.'}]},
+            {image:'rally.png',ask:'Last one. Are you even voting for {cand}?',answers:[
+              {label:'Of course I am.',reply:'Big applause. The balloons drop a little early.'},
+              {label:'I’m not registered.',bad:1,reply:'A long silence. Someone from the campaign unplugs your microphone.'},
+              {label:'I haven’t decided yet.',bad:1,reply:'{cand} laughs very loudly to cover it. Nobody else does.'}]}
+          ]},key:'rally'},
+          {scene:[{image:'posters-night.png',caption:'Late that night. {her}, a bucket of glue and four hundred posters of your face. Every lamppost on Main.'}]},
+          {qte:'swipe',key:'paste',image:'posters-night.png',caption:'Slap them on before the glue dries. Up, across, down.'},
+          {scene:[{image:'volunteers.png',caption:'Headlights. A van full of the other side’s volunteers, with buckets of their own and a leaf blower.'}]},
+          {qte:'swipe',key:'dodge',image:'volunteers.png',caption:'A bucket of glue comes flying at your head. Dodge it.'}
+        ],
+        // The candidate always comes out fine. You: the posters work, they backfire, or you end up glued to a pole.
+        branch:c=>c.results.dodge==='miss'?'glued':(csBad(c,'rally')>=2||csMisses(c,['pose1','pose2','pose3'])>=2)?'meme':'works',
+        quiet:'works',
+        outro:{
+          works:[{image:'poles-{side}.png',caption:'By sunrise your face is on every pole on Main, under a big {icon}. A jogger stops to look. Then another. Then a third, walking backward.'}],
+          meme:[{image:'meme.png',caption:'By sunrise your face is on every pole on Main. In every one of them you are halfway through a blink. Somebody has already drawn glasses on the first forty.'}],
+          glued:[{image:'glued.png',sound:'laugh',caption:'They glue you to a lamppost on Main, under your own face, and take a lot of pictures. {her} peels you off with a scraper before sunrise.'}]
+        },
+        outroNotice:'Go home. Go to bed. Your face is on every pole in town.',
+        after:{
+          works:{msgs:['You’re everywhere. Like, everywhere.','Three of my friends asked for your number this morning. I said no. Mostly.','{cand} is up four points and says it’s his policies. It’s your jaw.','Thanks for doing this. When the race calms down, I owe you a drink.'],lose:false,infamy:'cs_campaign_works',
+            news:{id:'cs_campaign_after',section:'Politics',title:'NEW FACE LIFTS {CAND} CAMPAIGN',summary:'Posters of a local volunteer went up overnight on every pole on Main.',body:'The {party} council campaign put up four hundred posters overnight showing a local volunteer under a big {icon}, and by breakfast the campaign office was taking calls from women asking who he was. {cand} says the bump in the polls is about his policies. His opponent, {other}, called the posters a cheap trick and asked whether the young man was single.',image:'poles-{side}.png',fallbackImage:'political_briefing'},
+            scene:[{image:'poles-{side}.png',caption:'On the way to the store, a woman takes a selfie with your poster. Then she sees you. She takes another one.'}]},
+          meme:{msgs:['So. The posters.','You blinked. In all of them. It was a meme by breakfast.','{cand} says the posters were a volunteer’s idea. The volunteer is me.','I can’t be seen with the blink guy. It’s politics. I’m sorry.'],lose:true,infamy:'cs_campaign_meme',
+            news:{id:'cs_campaign_after',section:'Politics',title:'{CAND} POSTER BLUNDER GOES VIRAL',summary:'Four hundred posters, one blink.',body:'Overnight, the {party} campaign put up four hundred posters of a local volunteer along Main, every one of them taken halfway through a blink. By breakfast the picture had been shared across Sunfall with captions this paper cannot print. {cand} says he has never met the young man, and his polls are up two points. A man who lives above the old Rialto was seen taking one of the posters home.',image:'meme.png',fallbackImage:'political_briefing'},
+            scene:[{image:'meme.png',caption:'A kid on a bike points at your poster and laughs so hard he has to stop pedaling.'}]},
+          glued:{msgs:['The other side posted the photo of you glued to the lamppost.','{cand} went on Channel 4 and said you were never part of his campaign. Then he said you were what is wrong with it.','He’s up two points. Off you.','I have to block you. Campaign rules. I’m sorry.'],lose:true,infamy:'cs_campaign_glued',
+            news:{id:'cs_campaign_after',section:'Politics',title:'VOLUNTEER GLUED TO LAMPPOST IN POSTER WAR',summary:'{cand} says the young man was never part of his campaign.',body:'A volunteer for the {party} campaign was found glued to a lamppost on Main early this morning, under a poster of his own face. Volunteers for {other} say it was an accident involving a leaf blower. {cand} told Channel 4 that the young man was never part of his campaign and stands for the kind of politics Sunfall is tired of. His polls rose two points.',image:'glued.png',fallbackImage:'political_briefing'},
+            scene:[]},
+          declined:{msgs:['They found another guy. He has no chin. The posters went up anyway.','I told both campaigns you’d come. I looked stupid twice.','Don’t message me again.'],lose:true,
+            news:{id:'cs_campaign_after',section:'Politics',title:'BOTH CAMPAIGNS CLAIM THE SAME FACE',summary:'One volunteer, two parties, four hundred posters each.',body:'Both council campaigns put up posters overnight of the same volunteer, a man with a gentle face and no chin who agreed to work for either side. Tanner Voss and Brock Halverson each say he is theirs. Both are up in the polls.',image:'poles-dem.png',fallbackImage:'political_briefing'},
+            scene:[]}
+        },
+        good:{open:'Hey, it’s me. I’m calling instead of texting, which means something. I drove past your face eleven times on the way to work.',
+          picks:[
+            {id:'g:fun',label:'Tell her it was fun',you:'That was the most fun I’ve ever had with glue.',her:'Same. You held still for four hundred posters. Very professional.'},
+            {id:'g:cand',label:'Ask if {cand} is happy',you:'Is {cand} happy?',her:'He’s thrilled. He thinks it was him. Let him think it.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere with no posters?',her:'Yes. Ask me again on Hinge so I can show my boss.'}]},
+        mock:{
+          meme:{dem:['dem','Tanner Voss, Democrat for City Council. You’re live on the campaign stream, buddy. (Somebody plays a slideshow of you blinking. The whole office laughs.) Decency means keeping your eyes open.'],rep:['rep','Brock Halverson, live on KSUN. Folks, I have the blink boy on the line. (A studio full of men laughs.) Son, I have seen deer in headlights with more fight in them.']},
+          glued:{dem:['dem','Tanner Voss, Democrat for City Council. Is this the lamppost guy? (The office laughs.) We raised nine thousand dollars off that photo, buddy. You’re fired, by the way. From a job that didn’t pay.'],rep:['rep','Brock Halverson, live on KSUN. Folks, here’s the boy who got himself glued to a pole on my watch. (The studio howls.) Son, you are fired from a job that did not pay.']},
+          declined:['radio','Good morning, Sunfall, you’re live on KSUN! We found him, folks. The man who turned down both campaigns. (The studio laughs.) Sir, the guy they got instead has no chin, and he’s polling great.']
+        },
+        closing:{'sx:why':{meme:'You blinked in four hundred posters. My boss says it’s optics.',glued:'You were glued to a lamppost on the front page. That’s the whole why.',declined:'You said no to two campaigns in one night. In Sunfall that’s a whole thing.'},'sx:luck':'Thanks. You too. Maybe stay off lampposts.','sx:wrong':'Maybe. But it’s the kind of mistake that doesn’t end up on a pole.'},
+        infamy:{
+          cs_campaign_works:{good:true,lines:['Wait. Are you the guy on the posters? On every pole on Main?','My roommate stole one of your posters. It’s in our kitchen now. Sorry.','I don’t even like politics, but I’d vote for your jaw.','Okay, I have to ask. Is that really you on the posters, or a lot of editing?']},
+          cs_campaign_meme:{good:false,lines:['Are you the blink guy? From the posters?','Somebody put your blinking poster on the vending machine at my work. It’s a whole thing.','I saw the meme. I’m so sorry. Your eyes were, like, halfway.','My little brother has your blink as his phone background.']},
+          cs_campaign_glued:{good:false,lines:['Are you the guy who got glued to a lamppost?','I saw the picture of you on the pole. Are you still sticky?','My dad saw you on Channel 4. He said, now that is politics.','Okay, real question. How long were you up there?']}
+        }
+      },
+      // ===== Mogger: The Bachelor Auction =====
+      // She runs the Bluebirds' charity auction and you are the top lot. A rich man's wife wins you; her husband comes
+      // for you. Win the fight, lose it (a broken nose for three days), or sit down and take his twenty dollars.
+      auction:{cls:'mogger',dir:'auction',clash:['Rourke'],
+        invite:{
+          open:'Okay, I need a huge favor. I run the Bluebirds’ charity bachelor auction tonight and my top lot just got engaged. You’d be perfect. Please say yes.',
+          what:{label:'Ask what you’d have to do',you:'What would I have to do?',her:'Walk down a catwalk, look handsome, get bought. Then one dinner with whoever wins you. It’s for the children’s hospital.'},
+          yes:{label:'Say yes, for the children',you:'For the children’s hospital? Fine.',her:'You’re a saint. The country club, at sundown. Wear something that fits. Tightly.'},
+          no:{label:'Say you’re not a piece of meat',you:'I’m not a piece of meat.',her:'Everyone in Sunfall is a piece of meat. Some of us are for charity. Fine.'},
+          text:'Huge favor. I need a top lot for the Bluebirds’ bachelor auction tonight, for the children’s hospital. You’d be perfect. Please?'
+        },
+        teaser:{id:'cs_auction_teaser',section:'Society',title:'BLUEBIRDS’ BACHELOR AUCTION TONIGHT',summary:'Sunfall’s most eligible men go under the hammer for the children’s hospital.',body:'The Bluebirds hold their bachelor auction at the Sunfall Country Club tonight. Each lot walks the catwalk and goes to the highest bidder for one dinner. Last year’s top lot raised nine thousand dollars and married the auctioneer. Bidders are asked to keep their husbands informed.',image:'club.png',fallbackImage:'charity_gala'},
+        beats:[
+          {scene:[{image:'club.png',caption:'Sundown. The Sunfall Country Club. Two hundred women with paddles and champagne, and a catwalk with a lot of steps.'},{image:'backstage.png',caption:'Backstage, {her} oils your arms with something that smells like coconut. You’re lot one. You’re the reason they came.'},{image:'catwalk.png',sound:'crowd',caption:'The lights come up. The music drops. Walk.'}]},
+          {qte:'sequence',key:'catwalk',image:'catwalk.png',caption:'Step, step, turn, pose. Don’t trip on the stairs.'},
+          {scene:[{image:'bidding.png',sound:'crowd',caption:'The bidding opens at fifty dollars. It reaches two thousand before you finish your turn.'},{image:'paddle.png',caption:'One paddle never goes down. Tiffany Rourke, in diamonds, bored, very rich. Nine thousand dollars. Sold.'},{image:'tiffany.png',caption:'She doesn’t look up from her phone. My husband’s at a cattle auction, she says. He hates surprises. Let’s eat.'}]},
+          {scene:[{image:'dinner.png',caption:'A corner table in the club dining room. Candles, and a bottle of champagne that costs more than your car.'}]},
+          {qte:'hold',key:'pour',image:'pour.png',caption:'Pour her champagne. Stop at the line.'},
+          {ask:{intro:[{image:'texts.png',caption:'Her phone keeps buzzing. Her husband, Rex. She hands it to you. You answer him, she says. He thinks you’re me.'}],doubt:'texts-close.png',questions:[
+            {image:'texts.png',ask:'Rex texts: Who’s the guy in the picture the Bluebirds just posted?',answers:[
+              {label:'Type: A waiter, babe.',reply:'Three dots. Then: A waiter with those arms?'},
+              {label:'Type: Nobody. Go back to your cows.',bad:1,reply:'Three dots, for a long time. Then: I’m on my way.'},
+              {label:'Type: It’s for charity, honey.',reply:'Then: How much charity?'}]},
+            {image:'texts.png',ask:'Rex texts: Nine thousand dollars? For one dinner?',answers:[
+              {label:'Type: It’s tax deductible.',reply:'A long pause. Then: Fair.'},
+              {label:'Type: He’s worth every cent.',bad:1,reply:'Tiffany laughs so hard champagne comes out of her nose. Rex’s dots go on forever.'},
+              {label:'Hand the phone back to her',reply:'She types something with one thumb and puts the phone face down. Then she smiles at you for the first time.'}]}
+          ]},key:'texts'},
+          {scene:[{image:'rex-door.png',sound:'crash',caption:'The dining room doors bang open. Rex Rourke, six foot five, in a cowboy hat, straight from the cattle auction, still holding his bidding paddle.'},{image:'rex-close.png',caption:'Rex: Nine thousand dollars. For you. Stand up, son.'}]},
+          {choose:{caption:'He hands his hat to a waiter. The whole dining room goes quiet.',image:'rex-close.png',options:[{id:'fight',label:'Put up your fists',icon:'👊',reply:'You stand up. Tiffany puts her phone away. This she wants to see.'},{id:'refuse',label:'Sit back down',icon:'🪑',reply:'You stay in your chair and fold your napkin. Rex looks almost disappointed.'}]},key:'fight'},
+          {when:csPicked('fight','fight'),qte:'swipe',key:'dodge1',image:'swing.png',caption:'He swings a right like a fence post. Duck it.'},
+          {when:csPicked('fight','fight'),qte:'hold',key:'punch1',image:'punch.png',caption:'Your turn. Wind it up, and let go in the green.'},
+          {when:csPicked('fight','fight'),qte:'swipe',key:'dodge2',image:'swing.png',caption:'A left this time, low. Step aside.'},
+          {when:csPicked('fight','fight'),qte:'hold',key:'punch2',image:'punch.png',caption:'Again. Let go in the green.'},
+          {when:csPicked('fight','fight'),qte:'swipe',key:'dodge3',image:'chair.png',caption:'He picks up a chair. Dodge.',
+            then:c=>{if(csMisses(c,['dodge1','punch1','dodge2','punch2','dodge3'])>=4)c.hospital=[{image:'ko.png',sound:'crash+crowd',caption:'The chair connects. Then the floor does.'}];}}
+        ],
+        // Most of it a miss and he puts you in hospital; two or three and he knocks you out; one at most and he goes down.
+        branch:c=>{if(c.picks.fight!=='fight')return 'tipped';const n=csMisses(c,['dodge1','punch1','dodge2','punch2','dodge3']);return n>=4?'floored':n>=2?'knocked':'won';},
+        quiet:'tipped',
+        outro:{
+          won:[{image:'rex-down.png',sound:'crash+crowd',caption:'Rex goes down into the dessert trolley. The Bluebirds applaud. Somebody bids on the trolley.'},{image:'rex-leaves.png',caption:'He gets up, puts his hat back on and leaves without a word. Tiffany orders another bottle, and a steak for you.'}],
+          knocked:[{image:'ko.png',sound:'crash+crowd',caption:'You don’t see the last one. You see the ceiling, then the carpet, then a lot of Bluebirds standing over you.'},{image:'nose.png',caption:'Your nose is pointing somewhere new. Rex buys the whole room a drink, kisses his wife and takes her home.'}],
+          floored:[{image:'nose.png',caption:'They let you out with a splint on your nose and a bill for the dessert trolley.'}],
+          tipped:[{image:'tip.png',caption:'Rex looks at you for a long time. Then he peels a twenty off a roll of hundreds and tucks it in your shirt pocket.'},{image:'rex-leaves.png',caption:'For your trouble, son. He takes his wife home. She waves at you with her phone.'}]
+        },
+        outroNotice:'Go home. Go to bed. The Bluebirds will be talking about this for a year.',
+        after:{
+          won:{msgs:['You punched Rex Rourke. Into a dessert trolley.','The Bluebirds raised eleven thousand dollars. Two women bid on the trolley.','Tiffany sent me a thank-you card. It has your photo in it. She drew a heart.','Honestly? That was hot. Come by the club sometime. Not on a catwalk.'],lose:false,infamy:'cs_auction_brawler',
+            news:{id:'cs_auction_after',section:'Society',title:'BRAWL AT THE BLUEBIRDS’ BACHELOR AUCTION',summary:'The top lot knocked a cattle baron into the dessert trolley.',body:'The Bluebirds’ bachelor auction raised eleven thousand dollars for the children’s hospital and ended with its top lot, a local man, knocking rancher Rex Rourke into the dessert trolley. Rourke says he slipped. His company bought the Sunfall Country Club the next morning. Witnesses described the local man as a brawler. Mrs. Rourke described him as worth it.',image:'rex-down.png',fallbackImage:'charity_gala'},
+            scene:[{image:'rex-down.png',caption:'Somebody filmed it. In slow motion, the trolley looks almost graceful.'}]},
+          knocked:{msgs:['Are you okay? Your nose was facing the dessert trolley.','Rex bought the whole room a drink. Then he bought the club.','The Bluebirds raised eleven thousand dollars, so. For the children.','I can’t date the guy who got knocked out at my auction. It’s a small town. I’m sorry.'],lose:true,infamy:'cs_auction_ko',effects:['nose'],
+            news:{id:'cs_auction_after',section:'Society',title:'BACHELOR KNOCKED OUT AT CHARITY DINNER',summary:'Rancher Rex Rourke flattened the man his wife had won.',body:'The Bluebirds’ bachelor auction raised eleven thousand dollars for the children’s hospital. The evening ended when rancher Rex Rourke arrived and knocked out the man his wife had bought for dinner. Rourke then bought every guest a drink and, by morning, the club. The bachelor’s nose has been set.',image:'ko.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          floored:{msgs:['They said you’re out of the hospital. I’m glad. Truly.','Rex sent the club a check for the trolley. And one for the carpet. And then he bought the club.','I can’t date the guy who got carried out of my auction. I’m sorry.'],lose:true,infamy:'cs_auction_ko',effects:['nose'],
+            news:{id:'cs_auction_after',section:'Society',title:'BACHELOR CARRIED OUT OF THE COUNTRY CLUB',summary:'A chair, a rancher and the children’s hospital.',body:'The Bluebirds’ bachelor auction raised eleven thousand dollars for the children’s hospital, and one of its lots was treated at Sunfall General after rancher Rex Rourke arrived for dessert with a chair. Rourke bought the club the next morning. The hospital has thanked the Bluebirds for both.',image:'ko.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          tipped:{msgs:['Rex tipped you twenty dollars. Everybody saw.','He told the whole bar it was the best twenty he ever spent.','You were a gentleman. That’s the problem. The Bluebirds wanted someone with fight.','Don’t message me. I’m sorry.'],lose:true,infamy:'cs_auction_tip',
+            news:{id:'cs_auction_after',section:'Society',title:'RANCHER TIPS THE BACHELOR',summary:'Rex Rourke paid his wife’s date twenty dollars to go away.',body:'The Bluebirds’ bachelor auction raised eleven thousand dollars for the children’s hospital. Rancher Rex Rourke, whose wife won the top lot, arrived during dinner, tipped the bachelor twenty dollars and took his wife home. He told the bar it was the best money he had ever spent. The bachelor did not object.',image:'tip.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          declined:{msgs:['We found another lot. He went for forty dollars.','I told the Bluebirds you’d come. I looked stupid.','Don’t message me again.'],lose:true,
+            news:{id:'cs_auction_after',section:'Society',title:'BLUEBIRDS’ TOP LOT GOES FOR FORTY DOLLARS',summary:'The bachelor auction raised less than last year.',body:'The Bluebirds’ bachelor auction raised four thousand dollars for the children’s hospital, less than half of last year’s total. Organizers say their top lot did not show. His replacement went for forty dollars, to his mother.',image:'club.png',fallbackImage:'charity_gala'},
+            scene:[]}
+        },
+        good:{open:'Hey, it’s me. I’m calling, which means something. The Bluebirds want you back next year. So do I. Not on a catwalk.',
+          picks:[
+            {id:'g:fun',label:'Tell her it was a wild night',you:'That was the wildest dinner I’ve ever had.',her:'You put a cattle baron through a dessert trolley. It’s all anyone at the club can talk about.'},
+            {id:'g:rex',label:'Ask if Rex is coming for you',you:'Is Rex Rourke coming after me?',her:'He bought the club. He’s too busy being the club. You’re fine.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you to dinner? I’ll pay this time.',her:'Yes. Ask me again on Hinge so the Bluebirds can see it.'}]},
+        mock:{
+          knocked:['rex','Is this the bachelor? Son, you’re on speaker at the club bar. (A room full of men laughs.) My wife says your nose looks better this way.'],
+          floored:['rex','Son, you’re on speaker at the club. I own it now. (Men laughing.) The boys want to know whether the trolley hurt more than the chair.'],
+          tipped:['radio','You’re live on KSUN! It’s the twenty dollar bachelor! (The studio laughs.) Sir, did you at least frame it?'],
+          declined:['radio','You’re live on KSUN! The man who stood up a charity auction for sick children! (The studio boos, then laughs.) The forty dollar guy says hi. So does his mom.']
+        },
+        closing:{'sx:why':{knocked:'You got knocked out at my auction. The Bluebirds talk.',floored:'You left my auction on a stretcher. The Bluebirds talk.',tipped:'You took the twenty. Everybody saw you take the twenty.',declined:'You stood up the children’s hospital. In front of the Bluebirds, basically.'},'sx:luck':'Thanks. Keep your guard up out there.','sx:wrong':'Maybe. But Rex Rourke owns the club now, and I still have to work there.'},
+        infamy:{
+          cs_auction_brawler:{good:true,lines:['Wait. You’re the guy who punched Rex Rourke into a dessert trolley?','My aunt was at the auction. She hasn’t stopped talking about your arms.','I heard you fought a cattle baron for charity. That’s the most Sunfall thing I’ve ever heard.','Okay. Was it really nine thousand dollars? For one dinner?']},
+          cs_auction_ko:{good:false,lines:['Are you the bachelor who got knocked out at the country club?','My mom was at the Bluebirds’ dinner. She said you went down like a folding chair.','I saw the video. You were out before you hit the carpet.','So you got bought, and then you got punched. Big night.']},
+          cs_auction_tip:{good:false,lines:['Is it true a rancher tipped you twenty dollars to go away?','My friend said Rex Rourke paid you off with a twenty. Did you keep it?','You’re the twenty dollar bachelor! Sorry. That’s what they’re calling you.','I heard you sat back down. Honestly? Kind of respect it. Kind of.']}
+        }
+      },
+      // ===== Mogger: Too Hot to Be Real =====
+      // She works on the Channel 4 show and told her producer about you: now they think your profile is fake.
+      toohot:{cls:'mogger',dir:'toohot',clash:['Gable'],
+        fill:s=>{const [w1,w2]=csOthers(s);return {w1,w2,heightReply:s.results?.tape==='miss'?'The needle hits the roof. The tape said six foot one and a half. The audience howls.':'The needle stays flat. The tape agrees. A woman in the front row fans herself.'};},
+        invite:{
+          open:'Okay, confession. I work on Too Hot to Be Real. The Channel 4 show? I told my producer about your profile, and now they think you’re fake.',
+          what:{label:'Ask what that means for you',you:'What does that mean for me?',her:'They film you tonight. If you’re real, you get certified. If you’re not, Trent Gable says liar on live TV. He loves saying liar.'},
+          yes:{label:'Say you’ll prove it',you:'I’m real. Let’s prove it.',her:'Great. The Channel 4 studio, at sundown. Bring proof. Receipts. Your mom. Anything.'},
+          no:{label:'Say you don’t need to prove anything',you:'I don’t need to prove anything.',her:'That’s exactly what a fake would say. They’ll run the episode without you. Sorry.'},
+          text:'Weird one. The TV show I work on thinks your profile is fake. They want to film you tonight. Come and prove them wrong?'
+        },
+        teaser:{id:'cs_toohot_teaser',section:'Local',title:'TOO HOT TO BE REAL COMES TO SUNFALL',summary:'The Channel 4 show investigates a local dating profile tonight.',body:'Channel 4’s Too Hot to Be Real, in which host Trent Gable tests whether attractive dating profiles are real, films in Sunfall tonight. The show says its target is a local man whose photos are, in Gable’s words, a statistical impossibility. Gable has called eleven men liars this season. He has been right nine times.',image:'studio.png',fallbackImage:'local_ad'},
+        beats:[
+          {scene:[{image:'studio.png',caption:'Sundown. Channel 4’s studio. A giant screen with your profile photo on it, and a big red question mark.'},{image:'trent.png',sound:'crowd',caption:'Trent Gable, all teeth: Sunfall, is he too hot to be real? Let’s find out.'},{image:'tape.png',caption:'First, the measuring tape. Your profile says six foot two. Stand against the wall. Don’t move.'}]},
+          {qte:'hold',key:'tape',image:'tape.png',caption:'Hold still. Shoulders back. Don’t rise onto your toes.'},
+          {scene:[{image:'detector.png',caption:'Then the lie detector. Wires on your fingers, a strap round your chest, a needle on a roll of paper.'}]},
+          {qte:'aim',key:'needle',image:'needle.png',caption:'Keep the needle steady while they ask. Breathe.'},
+          {ask:{doubt:'needle-jump.png',questions:[
+            {image:'detector.png',ask:'Trent: Are those your real teeth?',answers:[
+              {label:'Yes. All of them.',reply:'The needle sits still. The audience goes ooh.'},
+              {label:'I had them whitened once.',reply:'The needle sits still. Trent looks annoyed by your honesty.'},
+              {label:'Are those yours, Trent?',bad:1,reply:'The needle jumps. So does Trent. The audience loves it.'}]},
+            {image:'detector.png',ask:'Have you ever used a filter on a dating photo?',answers:[
+              {label:'Never. I don’t need one.',bad:1,reply:'The needle jumps off the paper. Trent: Folks, that is a cocky needle.'},
+              {label:'Once. For the lighting.',reply:'The needle barely moves. Trent: The lighting. Sure.'},
+              {label:'What’s a filter?',reply:'The needle sits still. Trent narrows his eyes at it.'}]},
+            {image:'detector.png',ask:'Last one. Is the height on your profile your real height?',answers:[
+              {label:'Yes.',reply:'{heightReply}'},
+              {label:'Give or take an inch.',reply:'The needle wobbles. Trent: An inch. Write that down.'},
+              {label:'Measure me again.',reply:'Trent: We did. That’s rather the point.'}]}
+          ]},key:'detector'},
+          {scene:[{image:'room-search.png',caption:'Then the receipts. A camera crew follows you home. Prove you are who you say. Show them something only the real you would have.'}]},
+          {mini:'spotit',key:'receipts',image:'room-search.png',caption:'Find your receipts in your own room, on camera: the photo of you as a kid, the gym card, the passport.'},
+          {scene:[{image:'witness-screen.png',caption:'Back in the studio. Two of your matches have phoned in as witnesses.'},{image:'witness-screen.png',caption:'{w1}: He’s real. He sent me a voice note once. It was very boring. Very real.'},{image:'witness-screen.png',caption:'{w2}: I’ve never met him. I’d like to. Is that allowed on this show?'},{image:'verdict.png',sound:'crowd',caption:'Trent opens a gold envelope very, very slowly.'}]}
+        ],
+        // The tape catches the half inch; enough jumps of the needle (or no receipts) and he stamps you a liar.
+        branch:c=>c.results.tape==='miss'?'fibber':(csBad(c,'detector')+csMisses(c,['needle','receipts']))>=2?'liar':'real',
+        quiet:'real',
+        outro:{
+          real:[{image:'certified.png',sound:'crowd',caption:'CERTIFIED REAL. A gold stamp on the giant screen, over your face. Confetti. Trent shakes your hand like it hurts him.'}],
+          liar:[{image:'liar.png',sound:'laugh',caption:'PROBABLY A LIAR. A red stamp over your face, forty feet wide. Trent says it slowly, twice. He loves saying it.'}],
+          fibber:[{image:'tape-replay.png',sound:'laugh',caption:'They replay the tape in slow motion. Your heels lift off the floor. Half an inch. The audience counts it out loud.'},{image:'liar.png',caption:'Trent: He’s real, folks. He’s just not six foot two. LIAR.'}]
+        },
+        outroNotice:'Go home. Go to bed. The episode is on all night.',
+        after:{
+          real:{msgs:['Certified real! My producer is furious. I’m thrilled.','The episode got the best ratings of the season. Women are calling the station asking for your number.','For the record, I never thought you were fake. I just wanted to see you in person.','So. Now that you’re certified. Want to get dinner?'],lose:false,infamy:'cs_toohot_real',
+            news:{id:'cs_toohot_after',section:'Local',title:'LOCAL MAN CERTIFIED REAL ON LIVE TV',summary:'Too Hot to Be Real could not catch him out.',body:'Channel 4’s Too Hot to Be Real filmed its Sunfall episode last night and, for only the third time this season, host Trent Gable had to stamp a profile CERTIFIED REAL. Gable says the show will appeal. The station took two hundred calls from women asking for the man’s number. Gable’s own ratings rose eighteen points.',image:'certified.png',fallbackImage:'local_ad'},
+            scene:[{image:'certified.png',caption:'The clip of your gold stamp is on every phone in Sunfall by breakfast.'}]},
+          liar:{msgs:['So. Probably a liar.','The needle jumped like it saw a ghost. My producer is calling it the best TV of the year.','I believe you. Mostly. But I can’t date a certified liar. My mom watches the show.','I’m so sorry. Block incoming.'],lose:true,infamy:'cs_toohot_liar',
+            news:{id:'cs_toohot_after',section:'Local',title:'TOO HOT TO BE REAL: PROBABLY A LIAR',summary:'Trent Gable stamps a Sunfall profile on live TV.',body:'Channel 4’s Too Hot to Be Real filmed in Sunfall last night and host Trent Gable stamped a local man’s profile PROBABLY A LIAR after a lie detector session the show called conclusive. Experts say lie detectors are not reliable. Gable says neither are men. His ratings rose eighteen points.',image:'liar.png',fallbackImage:'local_ad'},
+            scene:[]},
+          fibber:{msgs:['Half an inch. On live TV.','They made a GIF of your heels. It loops forever.','You’re real. You’re just six foot one and a half. That’s fine! It’s the lying.','My producer says I can’t see you. Conflict of interest. Sorry.'],lose:true,infamy:'cs_toohot_height',
+            news:{id:'cs_toohot_after',section:'Local',title:'HALF AN INCH: SUNFALL MAN CAUGHT ON TAPE',summary:'Too Hot to Be Real measures a local man’s height on live TV.',body:'Channel 4’s Too Hot to Be Real filmed in Sunfall last night and found that a local man whose profile says six foot two is six foot one and a half. Host Trent Gable played the moment the man rose onto his toes eleven times. The man was otherwise certified real. Gable says the half inch is what matters.',image:'tape-replay.png',fallbackImage:'local_ad'},
+            scene:[]},
+          declined:{msgs:['They ran the episode without you. Trent stamped your photo LIAR anyway.','He did it twice. Slowly.','Don’t message me again. I’m in enough trouble.'],lose:true,infamy:'cs_toohot_liar',
+            news:{id:'cs_toohot_after',section:'Local',title:'NO-SHOW STAMPED A LIAR ON LIVE TV',summary:'The man Too Hot to Be Real came to Sunfall for did not come.',body:'Channel 4’s Too Hot to Be Real filmed its Sunfall episode last night without its subject, a local man whose profile the show had called a statistical impossibility. Host Trent Gable stamped his photo PROBABLY A LIAR in front of the studio audience. Gable said real men show up.',image:'liar.png',fallbackImage:'local_ad'},
+            scene:[]}
+        },
+        good:{open:'Hi. It’s me. I’m calling, not texting, which on my show means you’re serious.',
+          picks:[
+            {id:'g:fun',label:'Tell her the lie detector was fun',you:'Honestly, the lie detector was fun.',her:'The needle liked you. So did the audience. So do I.'},
+            {id:'g:trent',label:'Ask if Trent is angry',you:'Is Trent angry?',her:'He’s been staring at your gold stamp for an hour. He’ll be fine. His ratings went up.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere with no cameras?',her:'Yes. Ask me again on Hinge so I can show my producer.'}]},
+        mock:{
+          liar:['trent','Trent Gable here, you’re on the after-show! (A studio audience laughs.) Folks, he says he’s real. Sir, how tall are you right now? Sitting down?'],
+          fibber:['trent','Trent Gable, the after-show! Six foot two, he says! (The audience roars.) Sir, we measured the GIF. Half an inch, every single time.'],
+          declined:['trent','Trent Gable here! The man who wouldn’t come on the show! (The audience boos and laughs.) Sir, real men show up. Fake men stay home. Which are you?']
+        },
+        closing:{'sx:why':{liar:'The needle said liar. Forty feet wide. My mom saw it.',fibber:'It’s not the height. It’s the half inch of lying. On TV.',declined:'You didn’t show up. On my show, that means fake.'},'sx:luck':'Thanks. Stand flat out there.','sx:wrong':'Maybe. Trent says that’s what liars always say. He says a lot of things.'},
+        infamy:{
+          cs_toohot_real:{good:true,lines:['Wait. You’re the guy who got certified real? On Channel 4?','My whole group chat watched you get the gold stamp. We screamed.','I’ve never met a certified real man before. Is it weird?','Okay, the lie detector part. Were you nervous? You looked so calm.']},
+          cs_toohot_liar:{good:false,lines:['Are you the guy Trent Gable called a liar? On TV?','My mom watched your episode. She says she always knew. She doesn’t know you.','I saw the red stamp. LIAR, forty feet wide. Is that a lot?','So. Are you real? Asking for me.']},
+          cs_toohot_height:{good:false,lines:['Are you the half inch guy? From the show?','My roommate has the GIF of your heels on loop. I’m sorry. It’s hypnotic.','Okay, honest question. How tall are you really?','I don’t care about height. I do care about the GIF.']}
+        }
+      },
+      // ===== Mogger: The Wingman =====
+      // Her lonely coworker Howard begs you to wingman his speed-dating night at the Lucky Cactus.
+      wingman:{cls:'mogger',dir:'wingman',clash:['Finch','Shaw'],
+        invite:{
+          open:'Okay, weird favor. There’s a guy at my work called Howard. Lovely. Lonely. He’s going speed dating tonight, and he asked if the handsome guy I matched with would come and help him.',
+          what:{label:'Ask what Howard needs',you:'Help him how?',her:'Sit behind him. Feed him lines. Make him look good. He likes a woman called Rosa, and he can’t say his own name around her.'},
+          yes:{label:'Say you’ll wingman Howard',you:'Sure. I’ll wingman Howard.',her:'You’re a good man. The Lucky Cactus, at sundown. He’ll be the one in the tie with ducks on it.'},
+          no:{label:'Say you don’t do speed dating',you:'I don’t do speed dating.',her:'You don’t need to. That’s why he asked you. Fine. Poor Howard.'},
+          text:'Weird favor. My lonely coworker Howard is going speed dating tonight and begged for you to be his wingman. Please? He has a duck tie.'
+        },
+        teaser:{id:'cs_wingman_teaser',section:'Community',title:'SPEED DATING RETURNS TO THE LUCKY CACTUS',summary:'Twenty tables, three minutes each, one brass bell.',body:'Speed dating is back at the Lucky Cactus tonight, hosted by Kimberly Shaw, who says she has made forty-one couples and one lawsuit. Men pay twenty dollars. Women drink free. Kimberly asks that nobody bring a friend who is better looking than them. Again.',image:'bar.png',fallbackImage:'local_ad'},
+        beats:[
+          {scene:[{image:'bar.png',caption:'Sundown. The Lucky Cactus. Twenty little tables, twenty candles, one brass bell, and Kimberly Shaw with a clipboard and a whistle.'},{image:'howard.png',caption:'Howard Finch, in a tie with ducks on it, sweating through a shirt his mother ironed. He grips your arm. She’s here. Rosa. Table nine.'},{image:'earpiece.png',caption:'You sit at the bar behind him with his notes. Every round, he looks back at you for a line.'}]},
+          {qte:'tap',key:'line1',image:'round.png',caption:'Round one. He’s frozen. Hand him a line before the bell.'},
+          {qte:'tap',key:'line2',image:'round.png',caption:'Round two. She asked what he does for fun. Quick.'},
+          {qte:'tap',key:'line3',image:'rosa.png',caption:'Table nine. Rosa. He looks back at you like a drowning man. Now.'},
+          {scene:[{image:'note.png',caption:'Between rounds, Howard writes his number on a napkin with a shaking hand. Give it to her. I can’t.'}]},
+          {qte:'swipe',key:'note',image:'host.png',caption:'Slip the napkin to Rosa. Swipe past Kimberly before she sees. No outside help at her tables.'},
+          {ask:{intro:[{image:'stage.png',caption:'Kimberly’s whistle. She has seen you. Ladies, she says, we have a ringer. Come on up, handsome. You’re my control group.'}],doubt:'stage-sweat.png',questions:[
+            {image:'stage.png',ask:'Kimberly: So, control group. Why are you here, if you don’t need the help?',answers:[
+              {label:'I’m here for Howard. He’s a great guy.',tag:'loyal',reply:'Forty eyes turn to Howard. He waves with his duck tie.'},
+              {label:'Honestly? The free nachos.',reply:'Kimberly: The nachos are for the women, hon. Men pay.'},
+              {label:'Look around. I’m here for everyone.',tag:'greedy',reply:'Three women write your name on their cards. Howard looks at the floor.'}]},
+            {image:'stage.png',ask:'Ladies, raise your card if you’d date the control group.',answers:[
+              {label:'Ask them to raise it for Howard instead',tag:'loyal',reply:'A long pause. Then Rosa, at table nine, raises her card for Howard. The room goes aww.'},
+              {label:'Wink at the room',tag:'greedy',reply:'Nineteen cards go up. Howard’s shoulders drop an inch.'},
+              {label:'Say you’re taken',reply:'Nineteen groans. {her} would have liked to hear that. She isn’t here.'}]},
+            {image:'stage.png',ask:'Last one. Pick a table, control group. Any table.',answers:[
+              {label:'Table nine. For Howard.',tag:'loyal',reply:'You walk Howard to table nine yourself. Rosa laughs. It’s a nice laugh.'},
+              {label:'All of them. One at a time.',tag:'greedy',reply:'Kimberly blows her whistle at you. Then she writes down her own number.'},
+              {label:'Take a chip off the cheese table instead',end:'cheese',reply:'You reach for the cheese table. A man in a cowboy shirt says that’s his cheese. Somebody shoves somebody.'}]}
+          ]},key:'stage'},
+          {when:c=>c.asks.stage?.end==='cheese',scene:[{image:'cheese.png',sound:'crash+crowd',caption:'It’s a fight. At the cheese table. There is fondue in the air.'}]},
+          {when:c=>c.asks.stage?.end==='cheese',qte:'swipe',key:'cheese',image:'cheese.png',caption:'A cheese plate comes spinning at your head. Duck.'}
+        ],
+        branch:c=>{if(c.asks.stage?.end==='cheese')return 'cheese';if(csTag(c,'stage','greedy')>=2)return 'numbers';return csTag(c,'stage','loyal')>=2&&csMisses(c,['line1','line2','line3','note'])<=1?'saved':'flop';},
+        quiet:'flop',
+        outro:{
+          saved:[{image:'howard-rosa.png',caption:'Howard and Rosa leave together, arguing happily about ducks. He mouths thank you at you across the bar.'}],
+          numbers:[{image:'cards.png',caption:'You leave with nineteen phone numbers. Howard leaves with a duck tie and nobody. He doesn’t look at you.'}],
+          cheese:[{image:'cheese-after.png',caption:'Kimberly throws everyone out. You’re wearing most of a fondue. Howard is under a table, holding Rosa’s shoe.'}],
+          flop:[{image:'howard-alone.png',caption:'The lines kept coming too late. Howard goes home alone, on the bus, in the duck tie. Rosa leaves with the man in the cowboy shirt.'}]
+        },
+        outroNotice:'Go home. Go to bed. Howard will be at work in the morning.',
+        after:{
+          saved:{msgs:['Howard came to work in a new tie. No ducks. He told everyone about you.','He and Rosa are getting breakfast. He bought a book about birds to impress her. She already has it.','You’re a good guy. I’m telling everyone, whether you like it or not.','So. Want to try a date with no bell?'],lose:false,infamy:'cs_wingman_good',
+            news:{id:'cs_wingman_after',section:'Community',title:'SPEED DATING NIGHT ENDS IN LOVE, AND DUCKS',summary:'Kimberly Shaw says her forty-second couple is her favorite.',body:'Speed dating at the Lucky Cactus last night produced what host Kimberly Shaw calls her forty-second couple, an office worker and a librarian who bonded over waterfowl. Shaw says the evening was nearly ruined by a handsome ringer at the bar, whom she has banned from all future events for the good of the other men. Her next night has sold out.',image:'howard-rosa.png',fallbackImage:'local_ad'},
+            scene:[]},
+          numbers:{msgs:['Howard came in this morning and didn’t say a word. To anyone.','You took every number in the room. Including Rosa’s.','I can’t believe I sent you. Don’t message me.'],lose:true,infamy:'cs_wingman_greedy',
+            news:{id:'cs_wingman_after',section:'Community',title:'RINGER TAKES NINETEEN NUMBERS AT SPEED DATING',summary:'Kimberly Shaw is starting a night for the men he left behind.',body:'Speed dating host Kimberly Shaw says a local man who came to the Lucky Cactus as a wingman left with the phone numbers of nineteen women, and one of hers. She is starting a men-only night for the men he left behind. Tickets are forty dollars.',image:'cards.png',fallbackImage:'local_ad'},
+            scene:[]},
+          cheese:{msgs:['The Lucky Cactus banned you. And Howard. And the cheese.','Howard has fondue in his ear. He says he’s fine. He is not fine.','I’m sorry. I can’t. Don’t message me.'],lose:true,infamy:'cs_wingman_cheese',
+            news:{id:'cs_wingman_after',section:'Crime',title:'FONDUE FIGHT CLOSES SPEED DATING NIGHT',summary:'Police were called to the Lucky Cactus over a chip.',body:'Police were called to the Lucky Cactus last night after a fight broke out at the cheese table during speed dating. No arrests were made. Host Kimberly Shaw has banned two men and the cheese. She has also sold the video to Channel 4.',image:'cheese.png',fallbackImage:'crime_motel'},
+            scene:[]},
+          flop:{msgs:['Howard went home on the bus. He said you tried.','Rosa left with a man in a cowboy shirt. Howard is taking a long lunch today.','Maybe this was my fault. Either way. Let’s not.'],lose:true,
+            news:{id:'cs_wingman_after',section:'Community',title:'SPEED DATING: ONE COUPLE, ONE COWBOY',summary:'Kimberly Shaw’s night at the Lucky Cactus.',body:'Speed dating at the Lucky Cactus last night produced one couple: a librarian and a man in a cowboy shirt. Host Kimberly Shaw says an office worker who brought a wingman was the bravest man in the room, and the slowest. She has offered him a discount.',image:'howard-alone.png',fallbackImage:'local_ad'},
+            scene:[]},
+          declined:{msgs:['Howard went alone. He said his own name wrong twice.','Rosa was nice to him. Then she left with a man in a cowboy shirt.','I told him you’d come. Don’t message me.'],lose:true,
+            news:{id:'cs_wingman_after',section:'Community',title:'SPEED DATING: ONE COUPLE, ONE COWBOY',summary:'Kimberly Shaw’s night at the Lucky Cactus.',body:'Speed dating at the Lucky Cactus last night produced one couple: a librarian and a man in a cowboy shirt. Host Kimberly Shaw says an office worker who came alone in a tie with ducks on it said his own name wrong twice, and that she admires the effort.',image:'howard-alone.png',fallbackImage:'local_ad'},
+            scene:[]}
+        },
+        good:{open:'Hi, it’s me. I’m calling. Howard says I have to say thank you properly, so. Thank you. Properly.',
+          picks:[
+            {id:'g:fun',label:'Tell her Howard did it himself',you:'Howard did it. I just handed him the lines.',her:'You handed him the right ones. That’s the whole job.'},
+            {id:'g:howard',label:'Ask how Howard is doing',you:'How’s Howard?',her:'He’s singing at his desk. Badly. It’s lovely.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere with no bell?',her:'Yes. Ask me again on Hinge so I can show Howard.'}]},
+        mock:{
+          numbers:['howard','Hi. It’s Howard. You’re on speaker in the break room. (The whole office laughs.) Everyone wanted to say thanks for coming. Rosa says hi. To you. Not to me.'],
+          cheese:['radio','You’re live on KSUN! It’s the fondue guy! (A splat sound effect. The studio howls.) Sir, the Lucky Cactus wants its cheese back.'],
+          flop:['kim','Kimberly Shaw, Speed Dating Sunfall, you’re on my podcast, hon! (Her cohost laughs.) The wingman! Your lines were so late Howard aged a year at table nine.'],
+          declined:['kim','Kimberly Shaw, you’re live on my podcast! The wingman who never showed! (Laughter.) Howard said his own name wrong twice, hon. Twice.']
+        },
+        closing:{'sx:why':{numbers:'You took Rosa’s number. Howard’s Rosa.',cheese:'You started a fight at a cheese table.',flop:'Honestly? I needed you to be on time. Just once.',declined:'I promised Howard. You made me a liar.'},'sx:luck':'Thanks. Be nice to the Howards out there.','sx:wrong':'Maybe. But Howard isn’t, and I sit next to him.'},
+        infamy:{
+          cs_wingman_good:{good:true,lines:['Are you the wingman from the Lucky Cactus? The one who helped the duck tie guy?','My friend Rosa says you’re a good guy. She never says that about anyone.','I heard you gave a whole night away to some guy called Howard. That’s kind of hot.','Okay, I have to know. Do you wingman for women too?']},
+          cs_wingman_greedy:{good:true,lines:['Did you really leave speed dating with nineteen numbers?','My friend was at table four. She says you winked at the whole room.','I heard about you and the control group. I’m not sure if I’m impressed.','Okay, I was there. Table twelve. You never called.']},
+          cs_wingman_cheese:{good:false,lines:['Are you the fondue guy?','I heard you started a fight at the cheese table. Over a chip.','My cousin works at the Lucky Cactus. You’re on a list now.','Was it really about the cheese?']}
+        }
+      },
+      // ===== Truecel: The Pity Date =====
+      // A girl finally says yes. Her friends are filming from the next booth. Humiliation whichever way you play it,
+      // but one woman who saw the video messages you for real the next morning.
+      pity:{cls:'truecel',dir:'pity',
+        invite:{
+          open:'Hi. Okay. Yes. I’ll go on a date with you. Tonight. The diner on Main. Don’t make it weird.',
+          what:{label:'Ask her why, suddenly',you:'Wait, really? Why?',her:'Because you asked nicely. Four times. Just come. At sundown.'},
+          yes:{label:'Say you’ll be there',you:'Yes. I’ll be there. I’ll wear a shirt.',her:'Okay. The booth by the window. Don’t be late, and don’t be early.'},
+          no:{label:'Ask if this is a joke',you:'Is this a joke?',her:'Wow. Okay. It was a little bit a joke. Now it’s a whole joke.'},
+          text:'Okay. Yes. I’ll go on a date with you. The diner on Main, at sundown. Don’t make it weird.'
+        },
+        beats:[
+          {scene:[{image:'diner.png',caption:'Sundown. The diner on Main. You’re early. You wait outside so you won’t be early.'},{image:'booth.png',caption:'She’s there. She’s really there. She smiles at you, then at the booth behind you, then at you again.'},{image:'booth.png',caption:'You order what she orders. You tell her about your keyboard. She laughs in the right places. Slightly too right.'}]},
+          {mini:'spotit',key:'camera',image:'spot.png',caption:'Something is off. Find the phone camera pointed at you. Fast.'},
+          {scene:[{image:'friends.png',sound:'laugh',caption:'The booth behind her. Three of her friends, a ring light and a phone on a stick. They’re live. Four thousand people are watching your date.'}]},
+          {choose:{caption:'They see you see them. One of them waves. What do you do?',image:'friends.png',options:[
+            {id:'along',label:'Play along',icon:'🙂',reply:'You wave back at the camera and keep talking about your keyboard. You are a good sport for forty minutes.'},
+            {id:'kitchen',label:'Slip out through the kitchen',icon:'🏃',reply:'You get up to use the bathroom and keep walking, straight into the kitchen.'},
+            {id:'table',label:'Go to their table',icon:'🗣️',reply:'You stand up and walk to the booth behind her. The ring light follows you.'}]},key:'move'},
+          {when:csPicked('move','along'),qte:'hold',key:'smile',image:'booth.png',caption:'Smile for the stream. Hold it. Don’t let it slip for forty minutes.'},
+          {when:csPicked('move','kitchen'),qte:'swipe',key:'waiters',image:'kitchen.png',caption:'Waiters with hot plates, coming both ways. Weave through.'},
+          {when:csPicked('move','kitchen'),qte:'mash',key:'door',image:'backdoor.png',caption:'The back door is stuck. Shove it. Shove it.'},
+          {when:csPicked('move','table'),ask:{doubt:'friends-close.png',questions:[
+            {image:'friends-close.png',ask:'The one holding the phone: Say hi to the stream! Are you having a nice date?',answers:[
+              {label:'I was. Thanks for asking.',reply:'Somebody in the chat types aww. Then forty people type lol.'},
+              {label:'Turn that off. Now.',bad:1,reply:'She turns it toward you instead. Your face fills four thousand screens.'},
+              {label:'Grab the phone',bad:2,reply:'You grab it. It’s on the stick, and the stick is attached to her. Everybody screams. The manager picks up the diner phone.'}]},
+            {image:'friends-close.png',ask:'Her friend: Be honest. Did you think she actually liked you?',answers:[
+              {label:'A little. That’s the sad part.',reply:'The friend stops laughing for a second. Only a second.'},
+              {label:'No. I never think anyone does.',reply:'Silence in the booth. The chat goes crazy. That one ends up being the clip.'},
+              {label:'You’re all going to be alone forever.',bad:1,reply:'The booth gasps. The chat cheers. The manager is already on the diner phone.'}]}
+          ]},key:'table'},
+          // In Sunfall a Truecel is one weird moment from the police. Here, a warning.
+          {when:c=>c.picks.move==='table'&&csBad(c,'table')>=2,scene:[{image:'officer.png',sound:'siren',caption:'An officer walks in with a coffee he did not pay for. He doesn’t arrest you. He tells you, very slowly, that in Sunfall a man like you does not get a second warning.'}]}
+        ],
+        branch:c=>c.picks.move==='kitchen'?(c.results.door==='miss'?'stuck':'escaped'):c.picks.move==='table'?(csBad(c,'table')>=2?'warned':'table'):'along',
+        quiet:'along',
+        outro:{
+          along:[{image:'booth.png',caption:'Forty minutes later she hugs you goodbye for the camera. Thanks for being such a good sport, she says. To the camera.'}],
+          escaped:[{image:'alley.png',caption:'You burst out into the alley behind the diner and keep walking. Behind you, through the window, the ring light is still pointed at your empty seat.'}],
+          stuck:[{image:'stuck.png',sound:'laugh',caption:'The door gives way halfway. You’re stuck in it, half in the kitchen and half in the alley. They film that too. From both sides.'}],
+          table:[{image:'friends-close.png',caption:'They thank you for the content. One of them tips you a dollar into the ring light. You walk home.'}],
+          warned:[{image:'walk-home.png',caption:'You walk home with the officer’s words in your ears. Your phone buzzes the whole way. The stream is still going.'}]
+        },
+        outroNotice:'Go home. Go to bed. Try not to look at the views.',
+        after:{
+          along:{msgs:['Okay so. Don’t be mad. It was for my channel.','You were really sweet about it, honestly. The comments are mostly nice. Mostly.','A million views. You’re kind of famous? Sorry.','I can’t actually date you, obviously. Good luck though!'],lose:true,infamy:'cs_pity',effects:['kindred'],
+            news:{id:'cs_pity_after',section:'Local',title:'PITY DATE VIDEO HITS A MILLION VIEWS',summary:'Three Sunfall women filmed their friend’s date with a local man.',body:'A livestream filmed in the diner on Main, in which three women watched their friend go on what they called a pity date with a local man, passed a million views overnight. The man stayed a good sport for forty minutes. The women have been offered a sponsorship by an energy drink. The man has not been offered anything.',image:'video.png',fallbackImage:'local_ad'},
+            scene:[{image:'video.png',caption:'By morning the video has a million views. They called it Pity Date, Part One.'}]},
+          escaped:{msgs:['You just left? The stream thought you got abducted.','My friends say you ran out through the kitchen. The cook says you were very fast.','A million views. Part Two is us looking for you.','Anyway. It wasn’t a real date. Good luck!'],lose:true,infamy:'cs_pity',effects:['kindred'],
+            news:{id:'cs_pity_after',section:'Local',title:'PITY DATE VIDEO HITS A MILLION VIEWS',summary:'The man left through the kitchen.',body:'A livestream filmed in the diner on Main, in which three women watched their friend go on what they called a pity date with a local man, passed a million views overnight. The man left through the kitchen halfway through. The women have been offered a sponsorship by an energy drink. The cook has been offered a cameo.',image:'video.png',fallbackImage:'local_ad'},
+            scene:[{image:'video.png',caption:'By morning the video has a million views. The last ten minutes are your empty seat.'}]},
+          stuck:{msgs:['You got stuck in the door. On camera. From both sides.','A million views. Somebody made it a sticker.','It wasn’t a real date. You probably guessed. Good luck!'],lose:true,infamy:'cs_pity_door',effects:['kindred'],
+            news:{id:'cs_pity_after',section:'Local',title:'MAN STUCK IN DINER DOOR ON LIVESTREAM',summary:'A pity date ends halfway through a door.',body:'A livestream from the diner on Main, in which three women watched their friend go on a pity date with a local man, passed a million views overnight after the man tried to leave through the kitchen and got stuck in the back door. The fire department was not needed. A sticker of the moment is already on sale.',image:'stuck.png',fallbackImage:'local_ad'},
+            scene:[{image:'video.png',caption:'By morning the video has a million views. The door part has been slowed down and set to music.'}]},
+          table:{msgs:['You came over to our table. Bold. The chat loved it.','A million views. The part where you said the sad part is the clip.','It wasn’t a real date. Obviously. Good luck!'],lose:true,infamy:'cs_pity',effects:['kindred'],
+            news:{id:'cs_pity_after',section:'Local',title:'PITY DATE VIDEO HITS A MILLION VIEWS',summary:'The man walked over to the camera.',body:'A livestream filmed in the diner on Main, in which three women watched their friend go on what they called a pity date with a local man, passed a million views overnight after the man walked over to their booth and spoke to the camera. The women have been offered a sponsorship by an energy drink.',image:'video.png',fallbackImage:'local_ad'},
+            scene:[{image:'video.png',caption:'By morning the video has a million views. The clip everyone shares is you, saying the sad part.'}]},
+          warned:{msgs:['A police officer came. On my stream. My mom saw.','You grabbed my friend’s phone stick. That’s assault on content.','I’m blocking you. Please don’t come to the diner again.'],lose:true,infamy:'cs_pity_cop',effects:['kindred'],
+            news:{id:'cs_pity_after',section:'Crime',title:'OFFICER WARNS MAN ON PITY DATE STREAM',summary:'A local man grabbed a selfie stick in the diner on Main.',body:'Police were called to the diner on Main last night after a local man grabbed a phone being used to livestream his date. The officer did not make an arrest. He issued what the department calls a verbal warning and what the stream calls the slowest sentence ever spoken. The video has a million views.',image:'officer.png',fallbackImage:'police_roadblock'},
+            scene:[{image:'video.png',caption:'By morning the video has a million views. The officer has a fan page.'}]},
+          declined:{msgs:['You didn’t come. My friends had the ring light up and everything.','We streamed your empty seat for an hour. It got a hundred thousand views anyway.','So. Good luck!'],lose:true,infamy:'cs_pity',
+            news:{id:'cs_pity_after',section:'Local',title:'EMPTY SEAT DRAWS A HUNDRED THOUSAND VIEWERS',summary:'A pity date that never happened.',body:'Three Sunfall women livestreamed an empty seat in the diner on Main for an hour last night after the man their friend had agreed to a pity date with did not show up. A hundred thousand people watched. The women say Part Two is already planned.',image:'booth.png',fallbackImage:'local_ad'},
+            scene:[]}
+        },
+        mock:{
+          along:['stream','Hiiii, you’re live! It’s the pity date guy, chat! (Three women and a lot of notifications laugh.) We’re doing Part Two. Do you want to be in it? Same booth?'],
+          escaped:['stream','You’re live! Chat, it’s the kitchen guy! (They laugh so hard the phone drops.) The cook wants to know if you’re okay. We want to know how you’re so fast.'],
+          stuck:['stream','You’re live! It’s door guy! (Screaming laughter.) Okay, real question from the chat. Which half of you got out first?'],
+          table:['stream','Hi, you’re live! It’s the sad part guy! (Laughter.) Say the sad part again. For the fans. Please.'],
+          warned:['radio','You’re live on KSUN! It’s the guy who grabbed the selfie stick! (A police siren sound effect. The studio laughs.) Sir, the officer says hi. He says it slowly.'],
+          declined:['stream','You’re live! It’s the empty seat guy! (Laughter.) Chat, say hi to the man who stood up a pity date.']
+        },
+        closing:{'sx:why':'It was never a real date. I thought you knew. I kind of hoped you didn’t.','sx:luck':'Aw. Thanks. Good luck to you too. Genuinely.','sx:wrong':{warned:'The officer said not to talk to you. So I’m not.',other:'It wasn’t a relationship, so. It can’t be a mistake.'}},
+        infamy:{
+          cs_pity:{good:false,lines:['Wait. Are you the pity date guy? From the video?','My little sister watched you talk about your keyboard for forty minutes. She says you seemed nice.','I saw Pity Date, Part One. Are you doing Part Two?','Okay, I have to ask. Did you know about the camera?']},
+          cs_pity_door:{good:false,lines:['Are you door guy?','I have the sticker of you in the door. On my water bottle. I’m sorry.','I saw you get stuck in the diner door. Which half got out first?','Okay, the door clip. Was it painful or just embarrassing?']},
+          cs_pity_cop:{good:false,lines:['Are you the selfie stick guy? From the diner?','My cousin says the police came for you on a livestream.','I saw the clip with the officer. He talked so slowly.','Is it true you grabbed a girl’s phone stick on camera?']}
+        }
+      },
+      // ===== Truecel: The Thesis =====
+      // A graduate student matched you to interview you for her thesis on involuntary celibacy.
+      thesis:{cls:'truecel',dir:'thesis',
+        fill:s=>({quote:['the dental hygienist','not wanting to answer','the pen'][s.asks?.interview?.picks?.[0]??1]||'not wanting to answer'}),
+        invite:{
+          open:'Hi! So, full honesty. I matched you for research. I’m writing my thesis on involuntary celibacy and you’d be a perfect subject. There’s a gift card.',
+          what:{label:'Ask what kind of research',you:'What kind of research?',her:'An interview. Some questions about your life. Then you sign a consent form and I present you anonymously. Mostly anonymously.'},
+          yes:{label:'Say you’ll be research',you:'Sure. I’ll be research.',her:'Amazing! The psychology building, room four, at sundown. Bring your feelings.'},
+          no:{label:'Say you’re not a lab rat',you:'I’m not a lab rat.',her:'You’d be a very well treated lab rat. Fine. I’ll use the forum posts instead. They’re worse.'},
+          text:'Hi! Full honesty: I matched you for research. My thesis is on involuntary celibacy and you’d be perfect. Interview tonight? There’s a gift card.'
+        },
+        teaser:{id:'cs_thesis_teaser',section:'Campus',title:'SUNFALL U STUDY ASKS WHY MEN ARE LONELY',summary:'A graduate thesis on involuntary celibacy is presented tonight.',body:'A graduate student at Sunfall University presents her thesis on involuntary celibacy to the psychology department tonight, supervised by Professor Vale. She has interviewed ten local men and is looking for an eleventh. She says nine of the ten asked her out during the interview.',image:'hall.png',fallbackImage:'political_briefing'},
+        beats:[
+          {scene:[{image:'office.png',caption:'Sundown. A tiny office in the psychology building. A recorder, a box of tissues and a twenty dollar gift card on the desk.'},{image:'interview.png',caption:'She clicks the recorder on. She’s friendly, and fast, and she writes down everything. Everything.'}]},
+          {ask:{doubt:'interview-close.png',laugh:null,questions:[
+            {image:'interview.png',ask:'Question one. When did a woman last touch you on purpose?',answers:[
+              {label:'A dental hygienist. She was very gentle.',tag:'sad',reply:'She writes for a long time. She underlines something twice.'},
+              {label:'I don’t want to answer that.',reply:'She writes: declined, visibly.'},
+              {label:'Right now, if you hand me that pen.',tag:'bold',reply:'She hands you the pen. Her fingers don’t touch yours. She notes that too.'}]},
+            {image:'interview.png',ask:'Question two. Who do you blame?',answers:[
+              {label:'Myself, mostly.',tag:'sad',reply:'She nods like a doctor. Classic, she says, under her breath.'},
+              {label:'The apps. They’re rigged.',reply:'She writes: blames the market. Then: correct, partly.'},
+              {label:'Women.',bad:1,reply:'She stops writing and looks at you over her glasses. Then she writes much faster.'}]},
+            {image:'interview.png',ask:'Last one. What would change everything for you?',answers:[
+              {label:'One person who actually liked me.',tag:'sad',reply:'She stops the recorder for a second. Then she starts it again.'},
+              {label:'Being taller.',reply:'She writes: height, again. Eleven out of eleven.'},
+              {label:'You, honestly.',tag:'bold',reply:'She smiles, a little. She writes: subject attempts rapport. Then she crosses it out.'}]}
+          ]},key:'interview'},
+          {scene:[{image:'form.png',caption:'Then the consent form. Four pages. You can be quoted, photographed and described. She hands you the pen.'}]},
+          {qte:'sequence',key:'sign',want:'trace',image:'form.png',caption:'Sign along the line. Don’t lift the pen.'},
+          {scene:[{image:'hall.png',caption:'Then she has to run. Her presentation is in the big lecture hall, now. You are not invited. You go anyway.'},{image:'hall-door.png',caption:'Professor Vale is at the lectern, introducing her. Every few seconds he turns and looks out at the room.'}]},
+          {qte:'tap',key:'sneak',want:'redlight',image:'sneak.png',caption:'Move while Professor Vale looks away. Freeze when he turns. Get to the back row.'},
+          {scene:[{image:'slides.png',caption:'The lights go down. Slide one: a man’s outline with a black bar over the eyes. Subject E. It is very obviously you.'},{image:'slides-quote.png',sound:'laugh',caption:'Slide four: your answer about {quote}. Two hundred students laugh. One of them types it into her laptop.'}]},
+          {choose:{caption:'She’s taking questions. Your hand is halfway up. Do you?',image:'slides.png',options:[{id:'quiet',label:'Stay quiet in the back',icon:'🤫',reply:'You sink into your seat. Subject E stays anonymous. Mostly.'},{id:'speak',label:'Stand up and speak',icon:'✋',reply:'You stand up in the back row. The whole hall turns around.'}]},key:'speak'},
+          {when:csPicked('speak','speak'),ask:{doubt:'speak-sweat.png',questions:[
+            {image:'speak.png',ask:'Professor Vale: Ah. Subject E, I presume. Do you have a question, or a correction?',answers:[
+              {label:'A correction. I’m not a case study. I’m a person.',tag:'good',reply:'A few students clap. Professor Vale writes something down. It might be your name.'},
+              {label:'A question. Did I pass?',tag:'good',reply:'The hall laughs, with you this time. Even Vale smiles, a very thin smile.'},
+              {label:'Can I have the gift card now?',reply:'The hall laughs, at you. She slides the gift card along the front row toward you.'}]},
+            {image:'speak.png',ask:'Professor Vale: Then perhaps you would like to take the next slide yourself.',answers:[
+              {label:'Take the clicker and explain it',tag:'good',reply:'You explain your own life for nine minutes. They take notes. They actually take notes.'},
+              {label:'Say no thank you and sit down',reply:'You sit down. She looks a little disappointed. In you, or for you.'},
+              {label:'Ask why the professor never married',bad:1,reply:'Silence. Professor Vale looks at you for a long time. Then he moves on to the next slide.'}]}
+          ]},key:'speakup'}
+        ],
+        branch:c=>c.picks.speak==='speak'?(csTag(c,'speakup','good')>=2&&!csBad(c,'speakup')?'lecturer':'casestudy'):(c.results.sneak==='miss'?'casestudy':'footnote'),
+        quiet:'footnote',
+        outro:{
+          footnote:[{image:'slides.png',caption:'You stay in the dark until the end. Your life gets one slide and a footnote. She gets a standing ovation.'}],
+          casestudy:[{image:'spotlight.png',sound:'laugh',caption:'Professor Vale points the clicker straight at you. Ladies and gentlemen, Subject E has joined us. The lights come up. Two hundred heads turn.'}],
+          lecturer:[{image:'lecturer.png',sound:'crowd',caption:'When you finish, the hall applauds. Professor Vale shakes your hand with two fingers and invites you back to his seminar, for one day only.'}]
+        },
+        outroNotice:'Go home. Go to bed. You’re data now.',
+        after:{
+          footnote:{msgs:['Thank you so much for your data!','The presentation went really well. You’re footnote eleven. It’s a long footnote.','Your gift card code is in your email. It’s for the campus bookstore.','I don’t date my subjects. Ethics. Good luck!'],lose:true,
+            news:{id:'cs_thesis_after',section:'Campus',title:'THESIS ON LONELY MEN WINS PRAISE',summary:'Eleven local men took part. One gets a very long footnote.',body:'A graduate student’s thesis on involuntary celibacy won a standing ovation at Sunfall University last night. Her supervisor, Professor Vale, called it fieldwork of real courage, and has applied for a grant to continue it under his own name. Eleven local men took part anonymously. Footnote eleven is said to be very long.',image:'slides.png',fallbackImage:'political_briefing'},
+            scene:[]},
+          casestudy:{msgs:['So you were there. Professor Vale says Subject E is the main case study now.','He wants to publish. You’re going in a journal. With the black bar.','I can’t date a published case study. It’s an ethics thing. I’m truly sorry.'],lose:true,infamy:'cs_thesis_case',
+            news:{id:'cs_thesis_after',section:'Campus',title:'SUBJECT E: LOCAL MAN BECOMES A CASE STUDY',summary:'He was in the back row of his own lecture.',body:'A thesis presentation on involuntary celibacy at Sunfall University took a turn when Professor Vale paused it to point out that one of its anonymous subjects, Subject E, was sitting in the back row. The department now plans to publish him. He was given a twenty dollar gift card. Professor Vale’s grant has been approved.',image:'spotlight.png',fallbackImage:'political_briefing'},
+            scene:[]},
+          lecturer:{msgs:['Okay. That was amazing. You took the clicker.','Professor Vale says you’re a guest lecturer for a day. He has never said that about anyone.','I got an A. You got a round of applause. I think we should get a coffee about it. Not as research.'],lose:false,infamy:'cs_thesis_lecturer',
+            news:{id:'cs_thesis_after',section:'Campus',title:'LONELY MAN TAKES OVER UNIVERSITY LECTURE',summary:'Subject E gave nine minutes of the talk himself.',body:'A graduate student’s thesis presentation on involuntary celibacy took an unexpected turn last night when one of her anonymous subjects stood up in the back row and gave nine minutes of the lecture himself. Professor Vale, who supervised the thesis, called it a remarkable piece of fieldwork and has applied for a grant to study it further.',image:'lecturer.png',fallbackImage:'political_briefing'},
+            scene:[{image:'lecturer.png',caption:'Somebody posted the nine minutes. The comments are mostly kind. That is new.'}]},
+          declined:{msgs:['I used the forum posts instead. They were so much worse.','The presentation went fine. Nobody laughed in the right places.','Good luck, honestly.'],lose:true,
+            news:{id:'cs_thesis_after',section:'Campus',title:'THESIS ON LONELY MEN WINS PRAISE',summary:'Ten local men took part, and a lot of forum posts.',body:'A graduate student’s thesis on involuntary celibacy won applause at Sunfall University last night. Ten local men took part anonymously, and the eleventh chapter was built from posts on an online forum, which Professor Vale called the darkest data he had ever seen. He has applied for a grant.',image:'slides.png',fallbackImage:'political_briefing'},
+            scene:[]}
+        },
+        good:{open:'Hi, it’s me. I’m calling, which in my field is a significant behavior.',
+          picks:[
+            {id:'g:fun',label:'Tell her you liked the clicker',you:'I liked having the clicker.',her:'You were good with it. Better than Vale. Don’t tell him.'},
+            {id:'g:vale',label:'Ask if Professor Vale meant it',you:'Did Professor Vale mean it? Guest lecturer?',her:'For one day. He has already written the grant. He’ll take the credit. You take the coffee.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere? Not as research.',her:'Yes. Ask me again on Hinge. I need it in writing, for ethics.'}]},
+        mock:{
+          footnote:['campus','You’re live on campus radio! Are you footnote eleven? (A room of students laughs.) The footnote is longer than the thesis, man.'],
+          casestudy:['campus','You’re live on campus radio! It’s Subject E! (The studio laughs.) Quick question from the psych majors. When did a woman last touch you on purpose?'],
+          declined:['campus','You’re live on campus radio! You’re the guy who said no to being research! (Laughter.) Man, the forum posts she used instead were so bad.']
+        },
+        closing:{'sx:why':{footnote:'You’re my data. I can’t date my data. It’s in the rules.',casestudy:'You’re about to be published. With a black bar. I’m in the acknowledgments.',declined:'You said no to science. I can’t be with a man who says no to science.'},'sx:luck':'Thanks. And thank you for your data. Really.','sx:wrong':'I’ll footnote that.'},
+        infamy:{
+          cs_thesis_case:{good:false,lines:['Are you Subject E? From the lonely men talk?','My roommate is in psych. She says you’re the main case study now.','I saw the slide with the black bar. It was very obviously you.','Okay, the slide with your quote. Was that real?']},
+          cs_thesis_lecturer:{good:true,lines:['Wait. You’re the guy who took over the lecture? The lonely men one?','My friend was in the hall. She said you were funny. Like, actually funny.','I heard Professor Vale shook your hand. With two fingers, but still.','Okay. Guest lecturer. That’s a weirdly good look.']}
+        }
+      },
+      // ===== Truecel: The Loneliness Registry =====
+      // The council launches a voluntary register for at-risk single men, with an ankle-monitor app. She works the desk.
+      registry:{cls:'truecel',dir:'registry',clash:['Doyle'],
+        invite:{
+          open:'Hi. So I work at City Hall, and today we launched a thing, and I thought of you. In a nice way. It’s called the Loneliness Registry.',
+          what:{label:'Ask what a Loneliness Registry is',you:'What’s a Loneliness Registry?',her:'It’s voluntary! Single men sign up and the city checks on them. With an app. And a small ankle monitor. It’s mostly the app.'},
+          yes:{label:'Say you’ll come down',you:'Okay. I’ll come down.',her:'Great! The office is open late tonight for the launch. Take a number. There will be cookies.'},
+          no:{label:'Say no to the ankle monitor',you:'I’m not wearing an ankle monitor.',her:'It’s voluntary. For now. Councilwoman Doyle says for now a lot.'},
+          text:'Hi. I work at City Hall and we just launched the Loneliness Registry. It’s voluntary! I thought of you. Nicely. Come down tonight?'
+        },
+        teaser:{id:'cs_registry_teaser',section:'Politics',title:'COUNCIL LAUNCHES LONELINESS REGISTRY',summary:'At-risk single men can now sign up to be checked on.',body:'Councilwoman Patrice Doyle launched Sunfall’s Loneliness Registry today, a voluntary list of what the council calls at-risk single men. Men who register get a wellness app and a small ankle monitor, which Doyle says is mostly decorative. The office stays open late tonight for the launch. There will be cookies.',image:'office.png',fallbackImage:'political_briefing'},
+        beats:[
+          {scene:[{image:'office.png',caption:'Sundown. The Registry office at City Hall. A ticket machine, a plate of cookies, and forty men in a line that goes out of the door.'},{image:'ticket.png',caption:'You take a number. Ninety-four. They’re on nine.'},{image:'form.png',caption:'A clerk slides you a form with eleven boxes. Fill it in before your number comes up, or you go to the back.'}]},
+          {qte:'sequence',key:'form',want:'sort',image:'form.png',caption:'Fill in the boxes, fast. Name, age, feelings, more feelings.'},
+          {scene:[{image:'desk.png',caption:'Number ninety-four. {her} is at the desk, in a lanyard, with a very supportive smile.'},{image:'monitor.png',caption:'She holds up a small gray ankle monitor and a pamphlet with a sad cartoon man on it. Or, she says, you could go and join the protest outside.'}]},
+          {choose:{caption:'Register, protest outside, or tell her you have a girlfriend, actually.',image:'monitor.png',options:[
+            {id:'register',label:'Register',icon:'📋',reply:'You put your foot up on the desk. She is very professional about it.'},
+            {id:'protest',label:'Join the protest outside',icon:'📣',reply:'You walk out past the line and join twelve men with signs on the steps.'},
+            {id:'fake',label:'Say you have a girlfriend',icon:'💍',reply:'You say you have a girlfriend. She asks you to bring her in. You say tonight.'}]},key:'path'},
+          {when:csPicked('path','register'),mini:'rewire',key:'pair',image:'pair.png',caption:'Pair the ankle monitor with the app. Match each colored wire to its socket.'},
+          {when:csPicked('path','register'),scene:[{image:'app.png',caption:'The app opens with a chime. Hello! How are your feelings today? There are five faces to choose from. All of them are sad.'}]},
+          {when:csPicked('path','protest'),scene:[{image:'steps.png',caption:'The steps of City Hall. Twelve men, four signs, one bullhorn. Channel 4 has sent a camera.'}]},
+          {when:csPicked('path','protest'),qte:'sequence',key:'chant',want:'rhythm',image:'chant.png',caption:'Lead the chant. Get it right, and keep the beat.'},
+          {when:csPicked('path','protest'),scene:[{image:'doyle.png',caption:'Councilwoman Doyle comes out onto the steps, smiling for Channel 4, and hands every protester a cookie and a form.'}]},
+          {when:csPicked('path','fake'),ask:{intro:[{image:'phone.png',caption:'Outside, you search for a girlfriend for hire. Plus One Sunfall. They pick up on the first ring.'}],doubt:'phone.png',questions:[
+            {image:'phone.png',ask:'Plus One Sunfall! What kind of evening are we planning?',answers:[
+              {label:'A girlfriend. For one night. For the government.',reply:'Sure, hon. That’s our City Hall package. Very popular this week.'},
+              {label:'Someone who looks like she likes me.',reply:'That’s our premium tier, hon.'},
+              {label:'Anyone. Fast.',reply:'We can do fast.'}]},
+            {image:'phone.png',ask:'And how will you be paying?',answers:[
+              {label:'Gift card',reply:'We take gift cards. We take anything this week.'},
+              {label:'Can I pay in installments?',reply:'A long pause. We’ll send Crystal.'},
+              {label:'Cash. I’ve been saving.',reply:'Wonderful. Crystal is on her way.'}]}
+          ]},key:'call'},
+          {when:csPicked('path','fake'),scene:[{image:'crystal.png',caption:'Crystal arrives. She is very professional. She calls you babe in the voice people use for parking attendants.'},{image:'crystal-desk.png',caption:'At the desk, {her} asks Crystal how you met. Crystal checks her phone. At the gym, she says. You have never been to the gym.'},{image:'crystal-leaves.png',caption:'Crystal leaves after eleven minutes, her minimum. She gives you two stars on the app. Then one.'}]}
+        ],
+        branch:c=>({register:'listed',protest:'news',fake:'reviewed'})[c.picks.path]||'listed',
+        quiet:'listed',
+        outro:{
+          listed:[{image:'ankle.png',caption:'You walk home with a small gray light blinking on your ankle. Every few minutes your phone asks how you are feeling.'}],
+          news:[{image:'news-tv.png',caption:'You get home in time to see yourself on Channel 4, leading the chant, your face next to the word LONELY in very big letters. Then Councilwoman Doyle, eating a cookie.'}],
+          reviewed:[{image:'review.png',caption:'In bed, you check Plus One Sunfall. Crystal has left you a review. It is four paragraphs long. It has a title.'}]
+        },
+        outroNotice:'Go home. Go to bed. The registry will check on you.',
+        after:{
+          listed:{msgs:['Hi! It’s me. From the desk. You were very brave last night.','You’re registrant ninety-four. The app says you’re feeling sad face number three today.','I’m assigned to your check-ins. So, technically, I have to talk to you.','Honestly, I don’t mind.'],lose:false,effects:['pings'],
+            news:{id:'cs_registry_after',section:'Politics',title:'LONELINESS REGISTRY SIGNS UP NINETY-FOUR MEN ON FIRST NIGHT',summary:'Councilwoman Doyle calls it a historic night.',body:'Ninety-four men signed up to Sunfall’s Loneliness Registry on its first night. Councilwoman Patrice Doyle called it a historic night for the lonely men of Sunfall, and announced that the ankle monitors will now also count how often the men leave the house. Her approval rating rose six points.',image:'ankle.png',fallbackImage:'political_briefing'},
+            scene:[{image:'app.png',caption:'The app wakes you up. Good morning! How are your feelings today? You pick the least sad face.'}]},
+          news:{msgs:['You were on Channel 4. Leading a chant. Against my registry.','Councilwoman Doyle says the protest tripled sign-ups. She gave you a cookie on camera and her numbers went up.','I can’t date the face of the protest. I work for her.'],lose:true,infamy:'cs_registry_news',
+            news:{id:'cs_registry_after',section:'Politics',title:'PROTEST TRIPLES REGISTRY SIGN-UPS',summary:'Councilwoman Doyle thanks the man who led the chant.',body:'A protest on the steps of City Hall against Sunfall’s new Loneliness Registry was led by a local man and shown on Channel 4. By morning, sign-ups had tripled. Councilwoman Patrice Doyle thanked the protesters, gave each of them a cookie, and mailed the man who led the chant a form with his name already on it.',image:'news-tv.png',fallbackImage:'political_briefing'},
+            scene:[]},
+          reviewed:{msgs:['So. Crystal.','I looked her up. She works for Plus One Sunfall. She left you a review.','One star. The title is The Worst Night of My Career.','I have to flag you for that. Sorry.'],lose:true,infamy:'cs_registry_review',
+            news:{id:'cs_registry_after',section:'Local',title:'HIRED DATE’S REVIEW OF LOCAL MAN GOES VIRAL',summary:'The Worst Night of My Career, in four paragraphs.',body:'A one-star review posted by an employee of Plus One Sunfall, a company that rents out pretend partners for weddings and office parties, has been shared forty thousand times. Titled The Worst Night of My Career, it describes eleven minutes at the City Hall Loneliness Registry with a local man trying to prove he had a girlfriend. Councilwoman Doyle has asked the company to sponsor the registry.',image:'review.png',fallbackImage:'local_ad'},
+            scene:[]},
+          declined:{msgs:['We had two hundred sign-ups. Councilwoman Doyle got a standing ovation.','I saved you a cookie. Then I ate it.','Good luck out there.'],lose:true,
+            news:{id:'cs_registry_after',section:'Politics',title:'LONELINESS REGISTRY SIGNS UP TWO HUNDRED MEN',summary:'Councilwoman Doyle calls it a historic night.',body:'Two hundred men signed up to Sunfall’s Loneliness Registry on its first night, and Councilwoman Patrice Doyle received a standing ovation from the line. She says the ankle monitors are mostly decorative and will soon also be mandatory.',image:'office.png',fallbackImage:'political_briefing'},
+            scene:[]}
+        },
+        good:{open:'Hi. It’s me. This is your first official wellness check. Also an unofficial one.',
+          picks:[
+            {id:'g:fun',label:'Tell her you’re feeling face number two',you:'Today I’m a face number two.',her:'Up from three! That’s the best news I’ve had at work all week.'},
+            {id:'g:app',label:'Ask her to make the app stop',you:'Can you make the app stop asking about my feelings?',her:'No. But I can make it ask more nicely. I wrote some of the questions.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere? The ankle monitor can come.',her:'Ask me on Hinge. I need it in writing, for compliance.'}]},
+        mock:{
+          news:['radio','You’re live on KSUN! It’s the chant guy! (Somebody plays the chant back. The studio laughs.) Sir, Councilwoman Doyle wants to thank you personally. Hold for the councilwoman.'],
+          reviewed:['plus','Plus One Sunfall, this is Crystal. (Her coworkers laugh in the background.) I’m calling to let you know my review won employee of the month. I’m reading it at our party. You’re on speaker.'],
+          declined:['radio','You’re live on KSUN! The man who wouldn’t sign up! (The studio laughs.) Sir, the councilwoman says your form is waiting. It already has your name on it.']
+        },
+        closing:{'sx:why':{news:'You protested my job on Channel 4. In front of my boss.',reviewed:'You hired a girlfriend to lie to me. At my desk.',declined:'You didn’t come. I saved you a cookie and everything.'},'sx:luck':'Thanks. Look after your feelings.','sx:wrong':'The registry says that’s a very common feeling.'},
+        infamy:{
+          cs_registry_news:{good:false,lines:['Were you the guy leading the chant at City Hall? On Channel 4?','They put your face next to the word lonely. In really big letters.','My mom saw you protest and signed my brother up for the registry.','Okay, honest question. Did you get a cookie?']},
+          cs_registry_review:{good:false,lines:['Are you the guy from the one-star review? The Worst Night of My Career?','My friend read Crystal’s review out loud at brunch. All four paragraphs.','I read the review. Did you really say you met at the gym?','Okay. Was it really eleven minutes?']}
+        }
+      },
+      // ===== Looksmaxxer: Rate Me Live =====
+      // Stacey's sorority rates men on a charity livestream. A thirty-one. Then what you do about it. No looks points:
+      // the training montage is for your pride (the Looksmaxxer's ninety is only ever bought or earned the usual way).
+      rateme:{cls:'looksmaxxer',dir:'rateme',clash:['Vandermeer'],
+        fill:s=>({clipLine:{heckled:'speech to the judges',laughed:'speech about his mom',cried:'four minutes of crying',dodged:'dodge into the sprinkler',broken:'broken nose'}[s.branch]||'walk'}),
+        invite:{
+          open:'Okay, don’t hate me. Alpha Rho Xi are doing Rate Me Live tonight, for charity. Men walk out, the sisters give you a score, live. I signed you up.',
+          what:{label:'Ask why you’d do that',you:'Why would I ever do that?',her:'Because Stacey Vandermeer is judging. And every man who walks gets a free protein bar. And it’s for charity.'},
+          yes:{label:'Say they can rate you',you:'Fine. Let them rate me.',her:'Yes! The sorority house lawn, at sundown. Wear something that shows your arms.'},
+          no:{label:'Say you know what they’d give you',you:'I know what they’d give me.',her:'That’s the saddest thing you’ve ever said to me. Okay. I’ll take you off the list.'},
+          text:'Don’t hate me. The sorority is doing Rate Me Live tonight, for charity, and I signed you up. Stacey is judging. Come?'
+        },
+        teaser:{id:'cs_rateme_teaser',section:'Society',title:'ALPHA RHO XI RATES SUNFALL’S MEN FOR CHARITY',summary:'Rate Me Live comes to Greek Row tonight.',body:'The sisters of Alpha Rho Xi host Rate Me Live tonight on their front lawn, a charity livestream in which local men walk a short runway and are scored out of a hundred. Last year’s highest score was a sixty-one. The money goes to the dog shelter. The dogs are not being rated.',image:'lawn.png',fallbackImage:'charity_gala'},
+        beats:[
+          {scene:[{image:'lawn.png',caption:'Sundown. The Alpha Rho Xi lawn. A short runway, string lights, a phone on a tripod, and a table of judges in matching sweaters.'},{image:'judges.png',caption:'Stacey Vandermeer in the middle, scorecards in her lap, not smiling. Twelve thousand people are watching the stream.'},{image:'runway.png',sound:'crowd',caption:'Your turn. The music is very loud. Walk.'}]},
+          {qte:'sequence',key:'walk',image:'runway.png',caption:'Walk, turn, pose. Don’t trip on the sprinkler.'},
+          {scene:[{image:'score.png',sound:'laugh',caption:'The cards go up. Thirty-one. Stacey holds hers a little longer than the others, so the camera can get it.'},{image:'stacey.png',caption:'Stacey, into the microphone: Thirty-one. And honestly, that’s generous. It’s for charity.'}]},
+          {choose:{caption:'Twelve thousand people are watching. What do you do?',image:'stacey.png',options:[
+            {id:'heckle',label:'Heckle back',icon:'🎤',reply:'You walk back up the runway and ask for the microphone.'},
+            {id:'cry',label:'Cry',icon:'😢',reply:'You don’t decide to. It just happens.'},
+            {id:'flex',label:'Flex your one surgery',icon:'💪',reply:'You plant your feet and show them the work.'}]},key:'move'},
+          {when:csPicked('move','heckle'),ask:{doubt:'heckle-sweat.png',questions:[
+            {image:'heckle.png',ask:'Stacey: Go on, then. Tell us why you’re a sixty.',answers:[
+              {label:'Because I’m working on it, every day.',tag:'good',reply:'A few people in the chat type respect. Stacey rolls her eyes.'},
+              {label:'Because you’re a thirty-one on the inside.',bad:1,tag:'swing',reply:'The lawn goes ooh. A big guy in a tank top at the back stands up.'},
+              {label:'Because my mom says so.',reply:'The whole lawn laughs. Stacey writes something on her card.'}]},
+            {image:'heckle.png',ask:'Stacey: Anything else? We have other men waiting.',answers:[
+              {label:'Thank you for your time.',tag:'good',reply:'You hand the microphone back. Stacey looks almost surprised.'},
+              {label:'Rate yourself, Stacey.',bad:1,tag:'swing',reply:'The sisters gasp. The big guy in the tank top starts walking toward you.'},
+              {label:'Can I have my protein bar?',reply:'They throw it at you. It’s a good throw.'}]}
+          ]},key:'heckle'},
+          {when:csPicked('move','cry'),scene:[{image:'cry.png',sound:'laugh',caption:'You cry on the runway. The stream goes wild. Stacey hands you a tissue for the camera, and a second one for the thumbnail.'}]},
+          {when:csPicked('move','flex'),qte:'hold',key:'flex',image:'flex.png',caption:'Hold the pose. Jaw out, chin up. Don’t shake.'},
+          // A rival looksmaxxer takes it badly: if you mouthed off, or flexed on his lawn.
+          {when:c=>c.picks.move==='flex'||csTag(c,'heckle','swing')>0,scene:[{image:'rival.png',caption:'Jaxon, a rival looksmaxxer with a jaw like a cinder block, shoves through the crowd. You think you can mog me? On my lawn?'}]},
+          {when:c=>c.picks.move==='flex'||csTag(c,'heckle','swing')>0,qte:'swipe',key:'dodge',image:'rival-swing.png',caption:'He swings. Dodge.',
+            then:c=>{if(c.results.dodge==='miss')c.hospital=[{image:'nose-break.png',sound:'crash+crowd',caption:'You don’t dodge. Your nose goes one way, and the rest of you goes the other.'}];}},
+          {when:c=>!c.hospital,scene:[{image:'montage-night.png',caption:'That night you can’t sleep. Thirty-one. You get down on the floor of your room.'}]},
+          {when:c=>!c.hospital,qte:'mash',key:'montage',image:'montage.png',caption:'Push-ups until the sun comes up. Go.'}
+        ],
+        branch:c=>c.hospital?'broken':c.picks.move==='cry'?'cried':(c.picks.move==='flex'||csTag(c,'heckle','swing')>0)?'dodged':csTag(c,'heckle','good')>=1?'heckled':'laughed',
+        quiet:'cried',
+        outro:{
+          heckled:[{image:'montage-dawn.png',caption:'By sunrise your arms are shaking and the stream has a million views. Thirty-one. You say it out loud, once, and start again.'}],
+          laughed:[{image:'montage-dawn.png',caption:'By sunrise your arms are shaking and the stream has a million views. Your mom has texted. She still says sixty.'}],
+          cried:[{image:'montage-dawn.png',caption:'By sunrise your arms are shaking and the stream has a million views. Thirty-one. You say it out loud, once, and start again.'}],
+          dodged:[{image:'montage-dawn.png',caption:'By sunrise your arms are shaking. Jaxon is in the comments. So is the sprinkler he fell into. Thirty-one. You start again.'}],
+          broken:[{image:'splint.png',caption:'They let you out with a splint on your nose. In the stream’s comments somebody has updated your score. Twenty-six.'}]
+        },
+        outroNotice:'Go to bed. Thirty-one is not a number. Well, it is. But not forever.',
+        after:{
+          heckled:{msgs:['Okay. You were kind of great last night.','You told Stacey Vandermeer you’re working on it, to her face. Nobody does that.','The stream raised four thousand dollars for the dogs. Your clip is the most shared part.','Coffee? I’d rate it a hundred.'],lose:false,infamy:'cs_rateme_heckle',
+            news:{id:'cs_rateme_after',section:'Society',title:'RATE ME LIVE RAISES FOUR THOUSAND FOR DOGS',summary:'Alpha Rho Xi’s charity stream drew twelve thousand viewers.',body:'Alpha Rho Xi’s Rate Me Live raised four thousand dollars for the Sunfall dog shelter last night. The highest score went to a man called Jaxon, who received a ninety-four from Stacey Vandermeer. The lowest, a thirty-one, went to a local looksmaxxer, whose {clipLine} is now the most shared clip of the night.',image:'score.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          cried:{msgs:['Are you okay? You cried for four minutes. Stacey timed it.','The stream raised four thousand dollars for the dogs. They’re calling your clip the tear-jerker.','I feel terrible. I can’t really be seen with you right now, though. Sorority stuff. Sorry.'],lose:true,infamy:'cs_rateme_cry',
+            news:{id:'cs_rateme_after',section:'Society',title:'RATE ME LIVE RAISES FOUR THOUSAND FOR DOGS',summary:'Alpha Rho Xi’s charity stream drew twelve thousand viewers.',body:'Alpha Rho Xi’s Rate Me Live raised four thousand dollars for the Sunfall dog shelter last night. The highest score went to a man called Jaxon, who received a ninety-four from Stacey Vandermeer. The lowest, a thirty-one, went to a local looksmaxxer, whose {clipLine} is now the most shared clip of the night.',image:'cry.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          laughed:{msgs:['You told twelve thousand people your mom says you’re a sixty.','The stream raised four thousand dollars for the dogs. The mom clip is the most shared part.','I can’t be seen with the mom guy right now. Sorority stuff. Sorry.'],lose:true,infamy:'cs_rateme_score',
+            news:{id:'cs_rateme_after',section:'Society',title:'RATE ME LIVE RAISES FOUR THOUSAND FOR DOGS',summary:'Alpha Rho Xi’s charity stream drew twelve thousand viewers.',body:'Alpha Rho Xi’s Rate Me Live raised four thousand dollars for the Sunfall dog shelter last night. The highest score went to a man called Jaxon, who received a ninety-four from Stacey Vandermeer. The lowest, a thirty-one, went to a local looksmaxxer, whose {clipLine} is now the most shared clip of the night.',image:'heckle.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          dodged:{msgs:['You dodged Jaxon! He fell into the sprinkler.','Stacey gave him a ninety-two anyway. For the fall.','You’re still a thirty-one on the stream, though. I’m sorry. I can’t be the girl who brought the thirty-one.'],lose:true,infamy:'cs_rateme_score',
+            news:{id:'cs_rateme_after',section:'Society',title:'RATE ME LIVE RAISES FOUR THOUSAND FOR DOGS',summary:'Alpha Rho Xi’s charity stream drew twelve thousand viewers.',body:'Alpha Rho Xi’s Rate Me Live raised four thousand dollars for the Sunfall dog shelter last night. The highest score went to a man called Jaxon, who received a ninety-two from Stacey Vandermeer despite falling into a sprinkler. The lowest, a thirty-one, went to a local looksmaxxer, whose {clipLine} is now the most shared clip of the night.',image:'rival.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          broken:{msgs:['Oh my gosh. Your nose.','Jaxon got a ninety-four for the punch. Stacey said it showed confidence.','I signed you up. This is my fault. But I can’t be seen with you. I’m sorry.'],lose:true,infamy:'cs_rateme_score',effects:['nose','voss'],
+            news:{id:'cs_rateme_after',section:'Society',title:'RATE ME LIVE RAISES FOUR THOUSAND FOR DOGS',summary:'One man left the stream for Sunfall General.',body:'Alpha Rho Xi’s Rate Me Live raised four thousand dollars for the Sunfall dog shelter last night. The highest score, a ninety-four, went to a man called Jaxon, for what Stacey Vandermeer called a confident punch. The lowest, a thirty-one, went to the man he punched, who was treated at Sunfall General. His {clipLine} is now the most shared clip of the night.',image:'nose-break.png',fallbackImage:'charity_gala'},
+            scene:[]},
+          declined:{msgs:['We found another guy. He got a twelve. He framed it.','Stacey asked where you were. By name. Then she laughed.','Good luck.'],lose:true,
+            news:{id:'cs_rateme_after',section:'Society',title:'RATE ME LIVE RAISES FOUR THOUSAND FOR DOGS',summary:'Alpha Rho Xi’s charity stream drew twelve thousand viewers.',body:'Alpha Rho Xi’s Rate Me Live raised four thousand dollars for the Sunfall dog shelter last night. The highest score went to a man called Jaxon. The lowest, a twelve, went to a last-minute volunteer, who has framed it.',image:'lawn.png',fallbackImage:'charity_gala'},
+            scene:[]}
+        },
+        good:{open:'Hi, it’s me. I’m calling. You told Stacey Vandermeer you’re working on it, and I keep thinking about it.',
+          picks:[
+            {id:'g:fun',label:'Tell her the runway was fun',you:'The runway was fun. The score wasn’t.',her:'The score was a lie. The speech was the real thing.'},
+            {id:'g:stacey',label:'Ask what Stacey said after',you:'What did Stacey say after?',her:'Nothing, for a whole minute. That’s the highest score she gives.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere with no scorecards?',her:'Yes. Ask me again on Hinge so I can show the sisters.'}]},
+        mock:{
+          laughed:['axo','Hi! You’re on speaker at the house! (Laughter.) We have a question for your mom. Is he really a sixty?'],
+          cried:['axo','Hi! You’re on speaker at the Alpha Rho Xi house! (A room full of girls laughs.) We’re doing a recap stream. Can you cry again? For the recap?'],
+          dodged:['axo','Hi! You’re on speaker at the house! (Laughter.) Jaxon is here. He says he wants a rematch. He says it with his whole jaw.'],
+          broken:['axo','Hi! You’re on speaker at the house! (Laughter.) We want to rate you again, with the splint. The girls are saying twenty-six.'],
+          declined:['axo','Hi! You’re on speaker at the house! (Laughter.) Stacey wants to know if you stayed home because of the thirty-one you were going to get.']
+        },
+        closing:{'sx:why':{laughed:'Your mom says you’re a sixty. On the biggest stream of the year.',cried:'You cried for four minutes on the biggest stream of the year. In front of my friends.',dodged:'You’re a thirty-one on the internet. Forever. And I brought you.',broken:'I brought a man to a lawn and he left on a stretcher.',declined:'You didn’t come. Stacey noticed. Now she notices me.'},'sx:luck':'Thanks. Keep at it. Really.','sx:wrong':'Stacey says men who say that are a twenty, max.'},
+        infamy:{
+          cs_rateme_heckle:{good:true,lines:['Wait. Are you the guy who talked back to Stacey Vandermeer? On Rate Me Live?','You said you were working on it. To her face. I respect that so much.','My sister was on the lawn. She said you were the only real person there.','Okay, thirty-one. But the speech was a hundred.']},
+          cs_rateme_cry:{good:false,lines:['Are you the tear-jerker guy? From Rate Me Live?','I watched you cry for four minutes. Stacey timed it. I timed it too. Sorry.','My friend sent me your clip with nine crying faces.','So. Thirty-one. Are you okay?']},
+          cs_rateme_score:{good:false,lines:['Are you the thirty-one? From the sorority stream?','Thirty-one is trending. It’s you. I’m so sorry.','I saw you on Rate Me Live. The score was harsh. The sprinkler was worse.','Okay, honest question. Would you go back?']}
+        }
+      },
+      // ===== Looksmaxxer: The Bonesmashing Club =====
+      // Her little brother has joined a forum that meets in a parking garage to tap their cheekbones with hammers.
+      bonesmash:{cls:'looksmaxxer',dir:'bonesmash',clash:['Vance'],
+        invite:{
+          open:'Okay, this is weird. My little brother joined a forum. Tonight they’re meeting in a parking garage to hit their cheekbones with hammers. He says you’d get it.',
+          what:{label:'Ask what she needs you to do',you:'What do you need me to do?',her:'Go with him. Make sure he comes home with the same face he left with. I’ll owe you one.'},
+          yes:{label:'Say you’ll keep an eye on him',you:'Sure. I’ll keep an eye on him.',her:'Thank you. Level four of the downtown garage, at sundown. He’s called Dylan. He’ll be the one with the ice pack.'},
+          no:{label:'Say you’re not going near a hammer',you:'I’m not going near a hammer.',her:'Smart. Dylan isn’t. Okay. I’ll go myself, I guess.'},
+          text:'Weird one. My little brother is going to a bonesmashing meetup in a parking garage tonight. Hammers. Could you go with him? Please?'
+        },
+        teaser:{id:'cs_bonesmash_teaser',section:'Local',title:'DOCTORS WARN OF FACE HAMMER CRAZE',summary:'Tapping your cheekbones with a hammer does not work, says Sunfall General.',body:'Doctors at Sunfall General have warned about an online trend in which young men tap their own cheekbones with hammers to make their faces wider. It does not work, they say. A local forum says it does, and meets on level four of the downtown garage. Police say they are aware of the forum.',image:'garage.png',fallbackImage:'police_roadblock'},
+        beats:[
+          {scene:[{image:'garage.png',caption:'Sundown. Level four of the downtown parking garage. Thirty men in a circle under a flickering light, every one of them holding a hammer.'},{image:'brick.png',caption:'Brick Vance, the Bone King, cheekbones like door handles, stands on the roof of a minivan. Gentlemen, he says. Tap. Don’t whack. Tap.'},{image:'dylan.png',caption:'Dylan, her brother, twenty-one, an ice pack taped to his face, hands you a hammer. You go first. For me.'}]},
+          {qte:'hold',key:'tap1',image:'hammer.png',caption:'Your turn with the hammer. Wind it up and let go in the green. Too hard is very bad.'},
+          {choose:{caption:'Brick: Not bad, rookie. Again? Harder? The second tap is where the bone listens.',image:'brick.png',options:[{id:'again',label:'Go again, harder',icon:'🔨',reply:'You raise the hammer again. Dylan covers his eyes.'},{id:'stop',label:'Put the hammer down',icon:'✋',reply:'You hand the hammer back. Then you take Dylan’s away too.'}]},key:'again'},
+          {when:csPicked('again','again'),qte:'hold',key:'tap2',image:'hammer.png',caption:'Harder. Let go in the green. The green is smaller now.',
+            then:c=>{if(c.results.tap2==='miss')c.hospital=[{image:'hammer-hit.png',sound:'crash',caption:'Too hard. There is a noise like a dropped cereal bowl. Then the ceiling of the garage, spinning.'}];}},
+          {when:c=>!c.hospital,scene:[{image:'mewing.png',caption:'Then the mewing contest. Tongue on the roof of your mouth, jaw set, for as long as you can. Brick walks the line with a stopwatch.'}]},
+          {when:c=>!c.hospital,qte:'hold',key:'mew',image:'mewing.png',caption:'Hold it. Hold it. Don’t let your jaw drop.'},
+          {when:c=>!c.hospital,scene:[{image:'raid.png',sound:'siren+radio',caption:'Blue lights on every level. SUNFALL POLICE. EVERYBODY DROP THE HAMMERS.'}]},
+          {when:c=>!c.hospital,choose:{caption:'Thirty men scatter. Hide behind the cars, or run for the stairs?',image:'raid.png',options:[{id:'hide',label:'Hide behind a car',icon:'🚗',reply:'You crouch behind a minivan with Dylan. Brick is already gone.'},{id:'run',label:'Run for the stairs',icon:'🏃',reply:'You grab Dylan and run, weaving between the cars.'}]},key:'raid'},
+          {when:c=>!c.hospital&&c.picks.raid==='run',qte:'swipe',key:'dodge',image:'run.png',caption:'Weave through the cars. Left, right, left.'},
+          {when:c=>!c.hospital&&c.picks.raid==='hide',qte:'tap',key:'still',image:'hide.png',caption:'A flashlight sweeps the cars. Duck the moment it comes your way.'}
+        ],
+        branch:c=>c.hospital?'smashed':csMisses(c,['dodge','still'])?'arrested':(c.picks.again==='again'||c.results.mew==='perfect')?'course':'bruise',
+        quiet:'bruise',
+        outro:{
+          bruise:[{image:'stairs.png',caption:'You get Dylan down four flights and out of the side door, both of you with all your bones where they started. One of yours is slightly purple.'}],
+          course:[{image:'brick-card.png',caption:'On the stairs, Brick Vance presses a card into your hand. You mew like a king, rookie. Module one is free. The rest is nine hundred dollars.'}],
+          arrested:[{image:'cuffed.png',caption:'They sit you on the curb in cuffs next to Dylan and a pile of hammers. At the station they take your photo, and let you both go before sunrise.'}],
+          smashed:[{image:'swollen.png',caption:'They let you out with your cheek the size of a grapefruit. Wider, technically. Dr. Hale says it will go down. Brick Vance has already posted your x-ray.'}]
+        },
+        outroNotice:'Go home. Go to bed. Put some ice on it.',
+        after:{
+          bruise:{msgs:['Dylan got home. With his face. Thank you.','He says you took his hammer away. He’s furious. I love you for it. Not love. You know what I mean.','How’s the bruise? Let me buy you an ice pack. And a drink.'],lose:false,
+            news:{id:'cs_bonesmash_after',section:'Crime',title:'POLICE BREAK UP HAMMER MEETUP IN GARAGE',summary:'Thirty hammers seized on level four.',body:'Police raided level four of the downtown garage last night and broke up a meeting of a forum whose members tap their cheekbones with hammers to make their faces wider. Thirty hammers were seized. The organizer, Brick Vance, was not found, and his online course has since sold out. Doctors at Sunfall General repeat that it does not work.',image:'raid.png',fallbackImage:'police_roadblock'},
+            scene:[]},
+          course:{msgs:['Dylan says you were the best mewer there. He says it like it’s a good thing.','He also says you’re both doing Brick’s course now. Module one is free.','I asked you to bring him home, not to join. Please don’t message me.'],lose:true,infamy:'cs_bone_course',
+            news:{id:'cs_bonesmash_after',section:'Crime',title:'POLICE BREAK UP HAMMER MEETUP IN GARAGE',summary:'The Bone King got away, and so did his course.',body:'Police raided level four of the downtown garage last night and broke up a meeting of a forum whose members tap their cheekbones with hammers. Thirty hammers were seized. The organizer, Brick Vance, escaped down the stairs, and his online course sold out by breakfast. He thanked his newest student by name on his stream.',image:'brick-card.png',fallbackImage:'police_roadblock'},
+            scene:[]},
+          arrested:{msgs:['You and Dylan got arrested. In a parking garage. With hammers.','My mom picked him up from the station. She asked who you were. I said nobody.','Please don’t message me.'],lose:true,infamy:'cs_bone_arrest',
+            news:{id:'cs_bonesmash_after',section:'Crime',title:'HAMMER MEN ARRESTED IN GARAGE RAID',summary:'Two men were held overnight and released.',body:'Police raided level four of the downtown garage last night and broke up a meeting of a forum whose members tap their cheekbones with hammers. Two men were held overnight and released without charge. The organizer, Brick Vance, was not found. His course sold out by breakfast.',image:'cuffed.png',fallbackImage:'police_roadblock'},
+            scene:[]},
+          smashed:{msgs:['You hit yourself with a hammer. On purpose. Twice.','Dylan saw it and quit the forum. So thank you, I guess? In a horrible way.','But I can’t. I’m sorry.'],lose:true,infamy:'cs_bone_xray',
+            news:{id:'cs_bonesmash_after',section:'Crime',title:'HAMMER MEETUP SENDS MAN TO HOSPITAL',summary:'Doctors at Sunfall General say it still does not work.',body:'A man was treated at Sunfall General last night after a meeting of a forum whose members tap their cheekbones with hammers. Police raided the downtown garage shortly afterward and seized thirty hammers. The organizer, Brick Vance, has posted the man’s x-ray on his course page as proof that the method works.',image:'swollen.png',fallbackImage:'police_roadblock'},
+            scene:[]},
+          declined:{msgs:['I went myself. Dylan has a black eye and a certificate.','Brick Vance asked for my number. I said no. Then I said maybe.','Don’t message me.'],lose:true,
+            news:{id:'cs_bonesmash_after',section:'Crime',title:'POLICE BREAK UP HAMMER MEETUP IN GARAGE',summary:'Thirty hammers seized on level four.',body:'Police raided level four of the downtown garage last night and broke up a meeting of a forum whose members tap their cheekbones with hammers. Thirty hammers were seized. The organizer, Brick Vance, was not found. His course has sold out.',image:'raid.png',fallbackImage:'police_roadblock'},
+            scene:[]}
+        },
+        good:{open:'Hi. It’s me. I’m calling because Dylan is home, with his own face, and I wanted to say thank you out loud.',
+          picks:[
+            {id:'g:fun',label:'Tell her Dylan did great',you:'Dylan did great. He put the hammer down.',her:'You put it down for him. He’ll work that out in about ten years.'},
+            {id:'g:brick',label:'Ask if Brick got away',you:'Did Brick Vance get away?',her:'Of course. His course sold out by breakfast. Men like him always land on their feet.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere? No hammers.',her:'Yes. Ask me again on Hinge so I can show Dylan.'}]},
+        mock:{
+          course:['brick','Rookie! You’re live on the Bone King stream! (Thirty men laugh.) Module two drops tonight. It’s just more hammer. Nine hundred dollars.'],
+          arrested:['brick','Rookie! You’re live on the stream! (Thirty men laugh.) The brothers saw your police photo. Great cheekbones in it, honestly. Cops know a wide face.'],
+          smashed:['brick','Rookie! You’re live, brother! (Thirty men howl.) We put your x-ray on the course page. Before and after. You’re the after.'],
+          declined:['brick','Is this the guy who stayed home? (Thirty men laugh.) Brothers, a narrow face, a narrow mind. Her brother says hi. With his black eye.']
+        },
+        closing:{'sx:why':{course:'I asked you to bring him home, not to join.',arrested:'My little brother has a record now. With you in it.',smashed:'You hit your own face with a hammer, twice. I can’t unsee it.',declined:'Dylan has a black eye and I had to go to a garage full of hammers alone.'},'sx:luck':'Thanks. Leave the hammers alone.','sx:wrong':'Brick Vance says that too. About everything.'},
+        infamy:{
+          cs_bone_course:{good:false,lines:['Are you one of the hammer guys? From the garage?','My cousin says you were the best mewer at the bonesmashing thing. Is that a compliment?','I saw you on the Bone King stream. You looked very serious about your jaw.','Okay. Does the course work?']},
+          cs_bone_arrest:{good:false,lines:['Were you arrested in the downtown garage? With the hammers?','My brother saw your photo on the police page. Your cheekbones looked great, honestly.','Okay, I have to ask. Why the hammers?','I heard thirty men got caught with hammers. And you.']},
+          cs_bone_xray:{good:false,lines:['Are you the guy with the x-ray? On the Bone King’s page?','I saw your x-ray online. I didn’t know a cheekbone could do that.','My friend is a nurse at Sunfall General. She told me about the grapefruit. Not your name. Just the grapefruit.','Okay, your face. Is it okay?']}
+        }
+      },
+      // ===== Looksmaxxer: The Before Picture =====
+      // Dr. Gus wants a before for his billboard, and she shoots it. A free consultation, which is nine seconds and
+      // the word yeah. No free surgery. Then you fight back, the honest way, or you hide.
+      before:{cls:'looksmaxxer',dir:'before',
+        invite:{
+          open:'Hi. Okay, work thing. I shoot ads, and Dr. Gus wants a before picture for his new billboard. You’d get a free consultation. I thought of you, which I’m realizing is mean.',
+          what:{label:'Ask what a before picture is',you:'A before picture?',her:'You know. The guy on the left. Before the veneers, before everything. A model is the after. It pays in a free consultation.'},
+          yes:{label:'Say you’ll be the before',you:'Fine. I’ll be the before.',her:'Thank you! My studio, at sundown. Don’t shower. I’m kidding. Mostly.'},
+          no:{label:'Say you’re nobody’s before',you:'I’m nobody’s before.',her:'Honestly, good for you. He’ll find someone else. There’s a waiting list.'},
+          text:'Work thing: Dr. Gus wants a before picture for his billboard. Free consultation. I thought of you, which sounds mean. Studio tonight?'
+        },
+        beats:[
+          {scene:[{image:'studio.png',caption:'Sundown. Her studio. A gray backdrop, two big lights, and Dr. Gus himself, in a lab coat over a tracksuit, eating a sandwich.'},{image:'gus.png',caption:'Dr. Gus: Okay, buddy. Before. Sad. Like your dog died and then came back worse.'}]},
+          {qte:'hold',key:'ugly',image:'ugly.png',caption:'Make the ugliest face you can. Hold it until the flash.'},
+          {scene:[{image:'consult.png',caption:'Then the free consultation. Dr. Gus looks at you for nine seconds. Yeah, he says. Then he finishes his sandwich.'}]},
+          {scene:[{image:'billboard.png',caption:'Then the unveiling. That same night they put it up over the highway by Desert Plaza: you, forty feet wide, on the left. A model with impossible teeth on the right.'},{image:'billboard-close.png',caption:'Under you, a big gray frown. Under him, a big gold star. Between you, Dr. Gus’s phone number, eleven feet tall.'},{image:'convertible.png',sound:'laugh',caption:'A convertible full of Alpha Rho Xi sisters slows down underneath it. They see you standing there, looking up at yourself. They take a lot of pictures.'}]},
+          {choose:{caption:'Go home and hide, or fight back?',image:'billboard.png',options:[{id:'fight',label:'Fight back',icon:'🏋️',reply:'You drive straight to the all-night gym.'},{id:'hide',label:'Go home and hide',icon:'🛏️',reply:'You go home and put a towel over the mirror.'}]},key:'fight'},
+          {when:csPicked('fight','hide'),qte:'tap',key:'duck',image:'convertible.png',caption:'On the way home the convertible pulls up next to you at a red light. Duck down before they see you.'},
+          {when:csPicked('fight','fight'),qte:'mash',key:'gym',image:'gym.png',caption:'The gym montage. Push. Push. Push.'},
+          {when:csPicked('fight','fight'),qte:'sequence',key:'barber',image:'barber.png',caption:'The all-night barber. Fade, line-up, left, right. Tell him exactly what you want.'},
+          {when:csPicked('fight','fight'),qte:'hold',key:'photo',image:'after-shoot.png',caption:'Back at her studio, a new photo. Your best face this time. Hold it for the flash.'}
+        ],
+        branch:c=>c.picks.fight!=='fight'?'stays':csMisses(c,['gym','barber','photo'])>=2?'tried':'after',
+        quiet:'stays',
+        outro:{
+          stays:[{image:'towel.png',caption:'You lie in bed with the towel over the mirror. Out on the highway, your face is lit up all night.'}],
+          tried:[{image:'after-bad.png',caption:'The new photo is worse. The barber went too high. The gym made you red. She deletes it gently, like a vet.'}],
+          after:[{image:'after-billboard.png',sound:'crowd',caption:'By sunrise she has pasted your new photo on the empty billboard next door. Before, on Dr. Gus’s. After, on yours. The traffic slows down for a different reason.'}]
+        },
+        outroNotice:'Go to bed. The billboard is lit all night.',
+        after:{
+          after:{msgs:['Okay. Your after photo is getting more attention than Dr. Gus’s after.','He called me screaming. Then he asked if you’d be his after next year. I said you’re busy.','I’m kind of proud of you. Want to celebrate? I’ll bring my camera. Kidding.'],lose:false,infamy:'cs_before_after',
+            news:{id:'cs_before_after',section:'Business',title:'DR. GUS’S BILLBOARD STOPS TRAFFIC',summary:'A before, an after, and a second after nobody paid for.',body:'A new billboard for Dr. Gus’s walk-in clinic at Desert Plaza, showing a local man as the before and a model as the after, slowed the highway to a crawl last night. By morning someone had pasted a second photo of the same local man on the empty billboard next door, looking considerably better. Dr. Gus says bookings are up three hundred percent anyway.',image:'after-billboard.png',fallbackImage:'local_ad'},
+            scene:[]},
+          stays:{msgs:['So the billboard is up. Forty feet. By the highway.','Dr. Gus says bookings are up three hundred percent. He sent you a fruit basket. It’s mostly bananas.','I can’t date the before. My boss would kill me. Sorry.'],lose:true,infamy:'cs_before_board',
+            news:{id:'cs_before_after',section:'Business',title:'DR. GUS’S BILLBOARD STOPS TRAFFIC',summary:'Bookings at the walk-in clinic are up three hundred percent.',body:'A new billboard for Dr. Gus’s walk-in clinic at Desert Plaza, showing a local man as the before and a model as the after, slowed the highway to a crawl last night. Dr. Gus says bookings are up three hundred percent. Asked whether the model had ever been his patient, he said the model was very busy.',image:'billboard.png',fallbackImage:'local_ad'},
+            scene:[{image:'billboard.png',caption:'On the way to the store you drive under yourself. Twice.'}]},
+          tried:{msgs:['I saw you tried. The barber thing. I’m so sorry.','The billboard is still up. Dr. Gus says bookings are up three hundred percent.','I can’t be seen with the before. It’s my job. Sorry.'],lose:true,infamy:'cs_before_board',
+            news:{id:'cs_before_after',section:'Business',title:'DR. GUS’S BILLBOARD STOPS TRAFFIC',summary:'Bookings at the walk-in clinic are up three hundred percent.',body:'A new billboard for Dr. Gus’s walk-in clinic at Desert Plaza, showing a local man as the before and a model as the after, slowed the highway to a crawl last night. Dr. Gus says bookings are up three hundred percent. Asked whether the model had ever been his patient, he said the model was very busy.',image:'billboard.png',fallbackImage:'local_ad'},
+            scene:[]},
+          declined:{msgs:['Dr. Gus found another before. He’s even more before than you. No offense.','The billboard went up anyway. Bookings are up three hundred percent.','Good luck!'],lose:true,
+            news:{id:'cs_before_after',section:'Business',title:'DR. GUS’S BILLBOARD STOPS TRAFFIC',summary:'Bookings at the walk-in clinic are up three hundred percent.',body:'A new billboard for Dr. Gus’s walk-in clinic at Desert Plaza, showing a local man as the before and a model as the after, slowed the highway to a crawl last night. Dr. Gus says bookings are up three hundred percent and that there is a waiting list to be his next before.',image:'billboard.png',fallbackImage:'local_ad'},
+            scene:[]}
+        },
+        good:{open:'Hi! It’s me. I’m calling because your after is going viral and I wanted to tell you before you see it.',
+          picks:[
+            {id:'g:fun',label:'Tell her the barber was worth it',you:'The barber was worth it.',her:'The barber was a genius. I already booked him for my next shoot.'},
+            {id:'g:gus',label:'Ask if Dr. Gus is angry',you:'Is Dr. Gus angry?',her:'He’s furious, and his bookings went up again. He wins either way. That’s Dr. Gus.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere? No backdrop.',her:'Yes. Ask me again on Hinge. I want it in writing.'}]},
+        mock:{
+          stays:['gus','Buddy! Dr. Gus. You’re on speaker in my waiting room. (A full waiting room laughs.) Everybody, this is the before! From the billboard! He’s real!'],
+          tried:['gus','Buddy! Dr. Gus. You’re on speaker. (The waiting room laughs.) I saw your little photo shoot. With the barber. Come in. I can fix that. Cash.'],
+          declined:['radio','You’re live on KSUN! The man who turned down being Dr. Gus’s before! (Laughter.) Sir, the guy they got instead is famous now. Does that hurt?']
+        },
+        closing:{'sx:why':{stays:'You’re forty feet tall by the highway as the before. I took the picture.',tried:'I watched you try. I can’t date somebody I feel this sorry for. I’m sorry.',declined:'You turned down my client. He’s a bad client, but he’s mine.'},'sx:luck':'Thanks. You’ll get there. The real way.','sx:wrong':'Dr. Gus says nobody is ever wrong about a before.'},
+        infamy:{
+          cs_before_board:{good:false,lines:['Are you the before? On the billboard by Desert Plaza?','I drive past your face every morning. The gray frown is a lot.','My friend got veneers from Dr. Gus because of your billboard. They fell out. I’m telling you because it’s kind of your fault.','Okay. Is that really you, or is it makeup?']},
+          cs_before_after:{good:true,lines:['Wait. Are you the after? On the billboard next to Dr. Gus’s?','I saw both of your billboards. The after one. Wow.','My whole office is talking about your before and after. Mostly the after.','Okay, real question. What changed?']}
+        }
+      },
+      // ===== Divorcé: The Dance Recital =====
+      // Your daughter's recital; her dance teacher is the woman you matched. Denise and her trainer are in the front
+      // row. Your daughter is only ever seen on stage, far away, among the other children in costume. Alimony untouched.
+      recital:{cls:'divorce',dir:'recital',clash:['Cole'],
+        fill:s=>({film:s.results?.film==='miss'?'You filmed most of it. Mostly Brayden’s shoulder. She doesn’t care.':'You filmed the whole thing. Third from the left.',
+          lobbyLine:{runs:'One father was seen filming the whole thing.',teacher:'A short argument in the lobby was noticed by staff.',scene:'An argument in the lobby between two parents ended with one of them being walked out by a volunteer.'}[s.branch]||'One seat in the front row was empty.'}),
+        invite:{
+          open:'Hi. So this is awkward. I just realized I teach your daughter. Tap and ballet, on Fourth Street. The recital is tonight. Are you coming?',
+          what:{label:'Ask if she’s really her teacher',you:'Wait. You’re her teacher?',her:'Small town. She talks about you. She says you’re funny and your car smells like soup. It starts at sundown.'},
+          yes:{label:'Say you wouldn’t miss it',you:'I wouldn’t miss it.',her:'Good. She’ll look for you. Fair warning: her mom has front row seats. With a friend.'},
+          no:{label:'Say Denise doesn’t want you there',you:'Denise doesn’t want me there.',her:'Denise doesn’t run the recital. I do. But okay. I’ll tell her you said hi.'},
+          text:'Hi. Awkward, but I teach your daughter dance. The recital is tonight at sundown, at the Fourth Street hall. Are you coming?'
+        },
+        beats:[
+          {scene:[{image:'car.png',caption:'Sundown. Your car, which smells like soup. The recital starts in a quarter of an hour, across town. Every light on Main is red.'}]},
+          {qte:'tap',key:'drive',want:'drive',image:'lights.png',caption:'Go on the green. Tap the moment each light changes.'},
+          {scene:[{image:'hall.png',caption:'The Fourth Street hall. Folding chairs, paper stars on strings, and a hundred parents already holding their phones up.'},{image:'seat.png',caption:'One empty seat left. Front row. Between Denise and a man whose neck is as wide as his head.'},{image:'brayden.png',caption:'Brayden, her personal trainer. He shakes your hand too hard and asks what you bench. Denise doesn’t look at you.'}]},
+          {scene:[{image:'stage.png',sound:'crowd',caption:'The lights go down. Twelve little bumblebees in yellow tutus come out onto the stage. One of them is yours. Third from the left.'}]},
+          {qte:'aim',key:'film',image:'stage-film.png',caption:'Film her. Keep your phone on the third bumblebee from the left. Brayden keeps leaning into your shot.'},
+          {scene:[{image:'bow.png',sound:'crowd',caption:'They bow. The third bumblebee from the left waves at the front row with both hands. You wave back. So does Brayden.'}]},
+          {ask:{intro:[{image:'lobby.png',caption:'The lobby, after. Paper cups of juice. Denise finds you by the coat rack. Brayden stands behind her, flexing at nobody.'}],doubt:'lobby-close.png',questions:[
+            {image:'lobby-close.png',ask:'Denise: What are you doing here? This is my night with her.',answers:[
+              {label:'She’s my daughter too.',reply:'Denise breathes in through her nose. The temper meter moves a little.'},
+              {label:'Your night? I paid for the tutu.',bad:1,reply:'Denise: You paid for half a tutu. Brayden laughs. A couple of parents turn around.'},
+              {label:'I was invited. By her teacher.',bad:1,reply:'Denise looks across the lobby at the teacher. The teacher looks at the juice.'}]},
+            {image:'lobby-close.png',ask:'Denise: And you couldn’t wear a shirt that fits?',answers:[
+              {label:'It’s the one you bought me.',reply:'A tiny pause. Something almost like a laugh, from Denise, quickly put away.'},
+              {label:'At least I’m not dating my trainer.',bad:1,reply:'Brayden: Hey. I’m right here. I’m a certified coach.'},
+              {label:'Say nothing',reply:'You say nothing. It’s the hardest rep you have ever done.'}]},
+            {image:'lobby-close.png',ask:'Denise: Your payment is due. Don’t think tonight changes that.',answers:[
+              {label:'I know. It’ll be there.',reply:'Denise: It had better be. She turns to go.'},
+              {label:'Take it out of Brayden’s protein budget.',bad:1,reply:'Denise’s voice goes up a whole octave. The whole lobby can hear it now.'},
+              {label:'You’re making a scene, Denise.',bad:2,reply:'Now she is. That was the wrong thing to say, at the right volume.'}]}
+          ]},key:'lobby'}
+        ],
+        // The temper meter: every bad answer moves it.
+        branch:c=>{const t=csBad(c,'lobby');return t>=3?'scene':t===2?'teacher':'runs';},
+        quiet:'runs',
+        outro:{
+          runs:[{image:'phone-video.png',caption:'Then a small yellow blur crosses the lobby at full speed and hits your knees. Did you see me? You saw. {film}'},{image:'car-night.png',caption:'You drive home with the window down. The car still smells like soup. You don’t mind.'}],
+          teacher:[{image:'teacher.png',caption:'Across the lobby, her teacher has seen all of it. She gives you a small, tired smile and goes back to helping with the tutus.'}],
+          scene:[{image:'security.png',sound:'laugh',caption:'A dad in a security T-shirt walks you out past the juice table. Denise is still talking. Brayden films it for his followers.'}]
+        },
+        outroNotice:'Go home. Go to bed. Watch the video again first.',
+        after:{
+          runs:{msgs:['She hasn’t stopped talking about you seeing her. The bumblebee thing.','I saw you with Denise. You kept your cool. That’s rarer than you’d think in that lobby.','Can I say something? I’d like to see you somewhere without juice boxes.'],lose:false,
+            news:{id:'cs_recital_after',section:'Community',title:'BUMBLEBEES BRING THE HOUSE DOWN ON FOURTH STREET',summary:'Twelve bumblebees, one standing ovation.',body:'The Fourth Street dance school’s recital drew a full hall last night, and its twelve bumblebees in yellow tutus earned a standing ovation. {lobbyLine} Personal trainer Brayden Cole, who attended, says his new client list is now full.',image:'bow.png',fallbackImage:'charity_volunteers'},
+            scene:[{image:'phone-video.png',caption:'You watch the video again over breakfast. Third from the left. A little late on every turn. Perfect.'}]},
+          teacher:{msgs:['I saw the lobby. All of it.','Your daughter didn’t, thank goodness. She was eating a cookie.','I can’t date a parent who argues in my lobby. It’s policy. My own policy.'],lose:true,infamy:'cs_recital_scene',
+            news:{id:'cs_recital_after',section:'Community',title:'BUMBLEBEES BRING THE HOUSE DOWN ON FOURTH STREET',summary:'Twelve bumblebees, one standing ovation.',body:'The Fourth Street dance school’s recital drew a full hall last night, and its twelve bumblebees in yellow tutus earned a standing ovation. {lobbyLine} Personal trainer Brayden Cole, who attended, says his new client list is now full.',image:'bow.png',fallbackImage:'charity_volunteers'},
+            scene:[]},
+          scene:{msgs:['Denise posted the lobby video. Brayden filmed it.','It has forty thousand views. Brayden got two hundred new clients.','I can’t. I teach your daughter. Please don’t message me.'],lose:true,infamy:'cs_recital_scene',
+            news:{id:'cs_recital_after',section:'Community',title:'BUMBLEBEES BRING THE HOUSE DOWN ON FOURTH STREET',summary:'Twelve bumblebees, one standing ovation, one argument.',body:'The Fourth Street dance school’s recital drew a full hall last night, and its twelve bumblebees in yellow tutus earned a standing ovation. {lobbyLine} Personal trainer Brayden Cole, who filmed it, says his new client list is now full.',image:'security.png',fallbackImage:'charity_volunteers'},
+            scene:[]},
+          declined:{msgs:['She looked for you. The whole time. Third from the left.','Denise’s friend sat in your seat. He waved for her.','I’m sorry. I can’t.'],lose:true,
+            news:{id:'cs_recital_after',section:'Community',title:'BUMBLEBEES BRING THE HOUSE DOWN ON FOURTH STREET',summary:'Twelve bumblebees, one standing ovation.',body:'The Fourth Street dance school’s recital drew a full hall last night, and its twelve bumblebees in yellow tutus earned a standing ovation. Personal trainer Brayden Cole, who sat in the front row, says his new client list is now full.',image:'bow.png',fallbackImage:'charity_volunteers'},
+            scene:[]}
+        },
+        good:{open:'Hi. It’s her teacher. And, well, me. I’m calling because she told the whole class you came.',
+          picks:[
+            {id:'g:fun',label:'Tell her the bumblebees were perfect',you:'The bumblebees were perfect.',her:'Third from the left was a little late on every turn. Perfect.'},
+            {id:'g:denise',label:'Ask how Denise took it',you:'How did Denise take it?',her:'The way she takes everything. Out on Brayden. He seemed fine.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere? No juice boxes.',her:'Yes. Ask me on Hinge. Teachers like things in writing.'}]},
+        mock:{
+          teacher:['brayden','Bro! Brayden. You’re on speaker at the gym. (Twenty men laugh over the clank of weights.) The guys saw the lobby clip. They want to know what you bench. Honestly.'],
+          scene:['brayden','Bro! You’re live on my stream! (The gym laughs.) Forty thousand views, bro. You’re my best client and you don’t even pay.'],
+          declined:['brayden','Bro! Brayden. You’re on speaker. (Laughter.) I sat in your seat, bro. Third from the left, right? Great kid. Great seat.']
+        },
+        closing:{'sx:why':{teacher:'I saw the lobby. I teach your daughter. That’s the why.',scene:'Brayden’s video. Forty thousand views. My school is in the background.',declined:'She looked for you. I watched her look.'},'sx:luck':'Thanks. Come to the next one. She’ll look for you.','sx:wrong':'Maybe. But not in my lobby.'},
+        infamy:{
+          cs_recital_scene:{good:false,lines:['Were you the dad who got walked out of the recital?','I saw Brayden’s video. The lobby one. Juice everywhere.','My niece dances at Fourth Street. Everyone is talking about the lobby.','Okay. What did you say to her? The part where her voice went up.']}
+        }
+      },
+      // ===== Divorcé: Adopt-a-Dad =====
+      // The cheer squad's charity car wash: dads bid to get their car washed. You can only bid what you have left over
+      // after Denise's next payment. Denise and her lawyer bid against you.
+      adoptadad:{cls:'divorce',dir:'adoptadad',clash:['Pike'],
+        invite:{
+          open:'Hi! So the university cheer squad is doing Adopt-a-Dad tonight. Dads bid, and the whole squad washes the winner’s car. I’m running it. You have a car, right?',
+          what:{label:'Ask what Adopt-a-Dad is',you:'Adopt-a-Dad?',her:'It’s a charity car wash. The highest bid gets the whole squad on his car. It’s wholesome. Mostly. Bring cash.'},
+          yes:{label:'Say you’ll bring the car',you:'I’ll bring the car.',her:'Yay! The stadium parking lot, at sundown. Warning: it gets competitive. Some dads bring lawyers.'},
+          no:{label:'Say your car doesn’t deserve it',you:'My car doesn’t deserve that.',her:'Every car deserves that. Okay. Another dad will get adopted.'},
+          text:'Hi! The cheer squad’s Adopt-a-Dad car wash is tonight at the stadium lot. Dads bid, the squad washes your car. Come? Bring cash.'
+        },
+        teaser:{id:'cs_adoptadad_teaser',section:'Sports',title:'CHEER SQUAD HOLDS ADOPT-A-DAD CAR WASH',summary:'Dads bid to have the squad wash their cars.',body:'Sunfall University’s cheer squad holds its Adopt-a-Dad car wash at the stadium parking lot tonight. Dads bid, and the highest bidder has his car washed by the whole squad. Last year’s winner paid four hundred dollars and cried. Proceeds go to new uniforms.',image:'lot.png',fallbackImage:'local_sports'},
+        beats:[
+          {scene:[{image:'lot.png',caption:'Sundown. The stadium parking lot. Buckets, hoses, a hand-painted sign, and the Alpha Rho Xi cheer squad in team sweatshirts.'},{image:'dads.png',caption:'Twenty dads in a line with their cars. Yours is the one with the bumper held on by a bungee cord.'}]},
+          {qte:'mash',key:'bid',image:'paddle.png',caption:'The bidding opens. Raise your paddle. Ten dollars a tap. You can only bid what you’ll have left after Denise’s next payment.',
+            then:c=>{const cl=walletOn()?classState():null,spare=cl?cl.cash-(deniseAlive()?cl.owed:0):0;c.picks.spare=Math.max(0,Math.round(spare));c.picks.won=c.results.bid!=='miss'&&spare>=ADOPT_BID?'yes':'no';}},
+          {scene:[{image:'denise-lawyer.png',caption:'A white SUV pulls in. Denise, sunglasses on her head. Next to her, her lawyer, Gordon Pike, holding a paddle of his own.'},{image:'outbid.png',caption:'Mr. Pike raises without looking at you. Denise smiles for the first time in years. It isn’t for you.'}]},
+          {choose:{caption:'Mr. Pike is ten dollars ahead of you. Raise again, or let Denise have it?',image:'outbid.png',options:[{id:'raise',label:'Raise your paddle again',icon:'🙋',reply:'You raise it again. The squad goes ooh. Denise lowers her sunglasses.'},{id:'fold',label:'Let her have it',icon:'🏳️',reply:'You lower your paddle. Denise doesn’t even look over.'}]},key:'raise',
+            then:c=>{if(c.picks.raise==='fold')c.picks.won='no';}},
+          {when:csPicked('won','yes'),scene:[{image:'won.png',sound:'crowd',caption:'The bidding stops at sixty dollars, yours. Mr. Pike has a limit, and Denise won’t pay a cent over it. SOLD, to the man with the bungee cord. The squad cheers.'}]},
+          {when:csPicked('won','yes'),qte:'swipe',key:'wash',image:'wash.png',caption:'Help with the windshield. Swipe it clean before the timer runs out.'},
+          {when:csPicked('won','no'),scene:[{image:'denise-wins.png',sound:'laugh',caption:'SOLD, to Mr. Pike, for Denise. The whole squad washes her white SUV. Twice. She sits inside it the whole time.'}]},
+          {when:csPicked('won','no'),qte:'swipe',key:'wash',image:'wash-own.png',caption:'You wash your own car at the end of the lot with a bucket somebody left. Swipe it clean before they turn the hose off.'}
+        ],
+        branch:c=>c.picks.won!=='yes'?'outbid':c.results.wash==='miss'?'soaked':'washed',
+        quiet:'outbid',
+        // You pay what you bid, out of what is left after Denise. Never the payment itself.
+        apply:(c,s)=>{if(c.picks.won==='yes'&&walletOn()&&!s.paidBid){cashMove(-ADOPT_BID,'Adopt-a-Dad car wash');s.paidBid=ADOPT_BID;}},
+        outro:{
+          washed:[{image:'clean-car.png',caption:'Your car has never been this clean. One of the cheerleaders writes a number on the windshield in soap. It’s the squad’s donation line. Still.'}],
+          soaked:[{image:'soaked.png',sound:'laugh',caption:'Somebody turns the hose on you instead of the car. The whole squad laughs. You laugh too. Your car is still dirty. You don’t care.'}],
+          outbid:[{image:'denise-drives.png',caption:'Denise drives off in a gleaming SUV, honking twice. You drive home in a car that is clean on one side.'}]
+        },
+        outroNotice:'Go home. Go to bed. Mind the bungee cord.',
+        after:{
+          washed:{msgs:['Thank you for bidding! We raised two thousand dollars.','The girls voted you favorite dad. Don’t let it go to your head. It went to mine.','Want to grab a drink sometime? Not at a car wash.'],lose:false,effects:['cheer'],
+            news:{id:'cs_adoptadad_after',section:'Sports',title:'CHEER SQUAD’S CAR WASH RAISES TWO THOUSAND',summary:'The top bid went to a car held together with a bungee cord.',body:'Sunfall University’s cheer squad raised two thousand dollars at its Adopt-a-Dad car wash last night. The winning bid went to a local divorced father whose car is held together with a bungee cord. Family lawyer Gordon Pike made the evening’s most bids, on behalf of a client, and stopped at his limit.',image:'clean-car.png',fallbackImage:'local_sports'},
+            scene:[]},
+          soaked:{msgs:['You were such a good sport about the hose. The girls loved it.','Your car is still dirty, by the way. I saw it this morning.','Drink sometime? I’ll keep the hose away.'],lose:false,effects:['cheer'],
+            news:{id:'cs_adoptadad_after',section:'Sports',title:'CHEER SQUAD’S CAR WASH RAISES TWO THOUSAND',summary:'The winning dad got washed instead of his car.',body:'Sunfall University’s cheer squad raised two thousand dollars at its Adopt-a-Dad car wash last night. The winning bid went to a local divorced father, who was hosed down by mistake while his car stayed dirty. Family lawyer Gordon Pike made the evening’s most bids, on behalf of a client.',image:'soaked.png',fallbackImage:'local_sports'},
+            scene:[]},
+          outbid:{msgs:['Denise’s lawyer outbid you for her car. On purpose. I saw his face.','She tipped the girls a dollar each. They washed it twice anyway.','I can’t really get involved in all that. I’m sorry.'],lose:true,infamy:'cs_adopt_outbid',
+            news:{id:'cs_adoptadad_after',section:'Sports',title:'CHEER SQUAD’S CAR WASH RAISES TWO THOUSAND',summary:'A lawyer won the top bid for a client.',body:'Sunfall University’s cheer squad raised two thousand dollars at its Adopt-a-Dad car wash last night. The top bid was made by family lawyer Gordon Pike on behalf of a client, who sat in her white SUV while it was washed twice. A local divorced father who was outbid washed his own car at the end of the lot.',image:'denise-wins.png',fallbackImage:'local_sports'},
+            scene:[]},
+          declined:{msgs:['Denise came. With her lawyer. They won.','The girls washed her SUV twice. She sat inside the whole time.','Good luck.'],lose:true,
+            news:{id:'cs_adoptadad_after',section:'Sports',title:'CHEER SQUAD’S CAR WASH RAISES TWO THOUSAND',summary:'A lawyer won the top bid for a client.',body:'Sunfall University’s cheer squad raised two thousand dollars at its Adopt-a-Dad car wash last night. The top bid was made by family lawyer Gordon Pike on behalf of a client, who sat in her white SUV while it was washed twice.',image:'denise-wins.png',fallbackImage:'local_sports'},
+            scene:[]}
+        },
+        good:{open:'Hi! It’s me, from the car wash. I’m calling because the girls made me. They say hi to their favorite dad.',
+          picks:[
+            {id:'g:fun',label:'Tell her it was the best car wash ever',you:'Best car wash of my life.',her:'Your car agrees. It looked shocked.'},
+            {id:'g:denise',label:'Ask if Denise was angry',you:'Was Denise angry?',her:'She stayed in her car the whole time. Her lawyer billed her for the wait.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you for a drink? Somewhere dry.',her:'Yes. Ask me on Hinge so the girls can see.'}]},
+        mock:{
+          outbid:['pike','Gordon Pike, family law. You’re on speaker in my office. (Denise and three paralegals laugh.) My client wanted to thank you for warming up the bidding. The car looks wonderful.'],
+          declined:['pike','Gordon Pike. You’re on speaker. (Denise laughs.) My client noticed you didn’t come. She asked me to bill you for noticing.']
+        },
+        closing:{'sx:why':{outbid:'Your ex-wife’s lawyer outbid you at my charity event. I don’t want to be in the middle of that.',declined:'Denise came. You didn’t. It got weird.'},'sx:luck':'Thanks. Look after the car.','sx:wrong':'Maybe. Mr. Pike would bill you for saying it.'},
+        infamy:{
+          cs_adopt_outbid:{good:false,lines:['Were you the dad who got outbid by his ex-wife’s lawyer? At the car wash?','My little sister is on the cheer squad. She said you washed your own car at the end of the lot.','I heard Denise’s SUV got washed twice. Is Denise your ex?','Okay. Is the bungee cord on purpose?']}
+        }
+      },
+      // ===== Divorcé: The Mediation =====
+      // Mediation about the dog, Biscuit, with Denise's personal-trainer boyfriend in the room. Your answers nudge the
+      // next payment a little, up or down; it never goes away. Then the dog decides.
+      mediation:{cls:'divorce',dir:'mediation',clash:['Cole'],
+        fill:s=>({dogLine:s.branch==='dog'?'He chose his father.':s.branch==='photo'?'He chose the trainer, who had a chicken strip in his pocket.':'The father did not attend.'}),
+        invite:{
+          open:'Hi. Small problem. I’m a family mediator, and I just got tonight’s list. Your case is on it. Something about a dog?',
+          what:{label:'Ask what happens at mediation',you:'What happens at mediation?',her:'We sit at a table and talk about Biscuit. You, Denise and me. And apparently her trainer, as emotional support. I can’t date you. But I can be fair.'},
+          yes:{label:'Say you’ll be there',you:'I’ll be there.',her:'Good. The county building, at sundown. Bring treats. The dog decides more than you’d think.'},
+          no:{label:'Say Denise can have the dog',you:'Denise can have the dog.',her:'I’ll write that down. She’ll get the dog, and probably the leash money. Okay.'},
+          text:'Hi. Awkward: I’m a family mediator and your case is on my list tonight. About Biscuit the dog? County building, sundown. Coming?'
+        },
+        beats:[
+          {scene:[{image:'room.png',caption:'Sundown. A beige room in the county building. A table, a box of tissues, a water jug, and Biscuit, a small fat dog, asleep under the table.'},{image:'brayden.png',caption:'Denise, and Brayden, her personal trainer, who has come as emotional support. He is doing calf raises behind her chair.'},{image:'mediator.png',caption:'{her} opens a folder. Okay. Biscuit. Let’s be adults about this. Let’s try.'}]},
+          {ask:{doubt:'table-close.png',questions:[
+            {image:'table.png',ask:'{her}: Who walks Biscuit, usually?',answers:[
+              {label:'I did. Every morning, for six years.',tag:'good',nudge:-25,reply:'Denise doesn’t argue. {her} writes it down. The next payment goes down a little.'},
+              {label:'Brayden, now, I assume.',reply:'Brayden: I run with him. Biscuit doesn’t really run. Denise kicks his chair.'},
+              {label:'Nobody walks Biscuit. Biscuit walks us.',bad:1,nudge:25,reply:'Denise: See? This is what I lived with. {her} writes it down. The next payment goes up a little.'}]},
+            {image:'table.png',ask:'{her}: What does Biscuit eat?',answers:[
+              {label:'Chicken and rice. He has a sensitive stomach.',tag:'good',nudge:-25,reply:'Denise looks surprised that you remembered. So does {her}. The next payment goes down a little.'},
+              {label:'Whatever falls off the table.',reply:'Brayden: That’s actually a solid bulking plan.'},
+              {label:'Ask Denise. She feeds him lasagna.',bad:1,nudge:25,reply:'Denise: Once. One time. {her} writes it down anyway. The next payment goes up a little.'}]},
+            {image:'table.png',ask:'{her}: Last one. What do you want, really?',answers:[
+              {label:'Just to see him sometimes.',tag:'good',nudge:-25,reply:'The room goes quiet. Even Brayden stops the calf raises. The next payment goes down a little.'},
+              {label:'Half of everything. Including Brayden.',bad:1,nudge:25,reply:'Brayden: Bro. Her lawyer is going to love that one. The next payment goes up a little.'},
+              {label:'Whatever is fair.',reply:'{her}: That’s my line. But okay.'}]}
+          ]},key:'table'},
+          {scene:[{image:'call-dog.png',caption:'Then {her} does something mediators do. Okay. Both of you, at opposite ends of the room. Call him. Whoever he goes to sees him every few days.'}]},
+          {choose:{caption:'What do you hold out for him?',image:'call-dog.png',options:[{id:'treat',label:'A chicken treat',icon:'🍗',reply:'You brought chicken. So, it turns out, did Brayden.'},{id:'toy',label:'His old squeaky toy',icon:'🧸',reply:'The one he chewed for six years. It still squeaks. Just.'},{id:'hand',label:'Just your hand',icon:'✋',reply:'You hold out your empty hand. It’s all you’ve got.'}]},key:'lure'},
+          {qte:'tap',key:'treat',image:'treat.png',caption:'Biscuit wakes up and looks around. Hold it out at the right moment.'},
+          {scene:[{image:'flex.png',caption:'Brayden takes his shirt off. He says it is to show Biscuit he is a safe space. Biscuit watches him for a while.'}]}
+        ],
+        branch:c=>c.picks.lure==='hand'||c.results.treat==='miss'?'photo':c.picks.lure==='toy'||csTag(c,'table','good')>=1?'dog':'photo', // the old toy beats the chicken; chicken needs a good word at the table too
+        quiet:'photo',
+        // The next payment moves a little with what you said at the table, and never below most of the usual amount.
+        apply:(c,s)=>{
+          if(s.nudged!=null||selectedDifficulty!=='divorce'||!walletOn()||!deniseAlive())return;
+          const qs=CSQ.mediation.beats.find(b=>b.ask).ask.questions,picks=c.asks.table?.picks||[];
+          const n=Math.max(-MEDIATION_NUDGE,Math.min(MEDIATION_NUDGE,picks.reduce((sum,k,i)=>sum+(qs[i]?.answers[k]?.nudge||0),0)));
+          const cl=classState();if(!cl.owed){s.nudged=0;return;}
+          const before=cl.owed;cl.owed=Math.max(Math.round(ALIMONY*.8),cl.owed+n);s.nudged=cl.owed-before;
+        },
+        outro:{
+          dog:[{image:'dog-you.png',caption:'Biscuit waddles across the room, ignores Brayden’s abs and sits on your foot. {her} writes: every few days, with the father. Denise says nothing. Brayden puts his shirt back on.'}],
+          photo:[{image:'dog-brayden.png',caption:'Biscuit waddles straight past you to Brayden, who has a chicken strip in his pocket. {her} writes it down. You get a photo every few days, by text.'}]
+        },
+        outroNotice:'Go home. Go to bed. The next payment is in the Bank app.',
+        after:{
+          dog:{msgs:['Officially, I can’t say this. Unofficially: Biscuit picked you, and it was the best part of my week.','The paperwork says every few days. Bring him back fed.','Also. Now that the case is closed. I’d like to see you somewhere that isn’t beige.'],lose:false,effects:['dog'],
+            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'Biscuit was allowed to choose.',body:'A family mediation in the county building last night ended when Biscuit, a small and very overweight dog, was allowed to choose who he would see more of. {dogLine} Personal trainer Brayden Cole, who attended as emotional support, has started a fitness class for dogs. It is fully booked.',image:'dog-you.png',fallbackImage:'political_briefing'},
+            scene:[]},
+          photo:{msgs:['Denise sent the first photo of Biscuit. He’s on Brayden’s shoulders. At the gym.','I’m sorry. The dog decides. It’s the one rule I can’t mediate.','I can’t see you while your file is open. It will be open for a while.'],lose:true,infamy:'cs_mediation_photo',effects:['photos'],
+            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'Biscuit was allowed to choose.',body:'A family mediation in the county building last night ended when Biscuit, a small and very overweight dog, was allowed to choose who he would see more of. {dogLine} Brayden Cole has started a fitness class for dogs. It is fully booked.',image:'dog-brayden.png',fallbackImage:'political_briefing'},
+            scene:[]},
+          declined:{msgs:['Denise got Biscuit. And she asked for leash money.','Brayden carried him out like a trophy.','I’m sorry. The file is closed.'],lose:true,
+            news:{id:'cs_mediation_after',section:'Courts',title:'DOG DECIDES IN COUNTY MEDIATION',summary:'One party did not attend.',body:'A family mediation in the county building last night over Biscuit, a small and very overweight dog, ended quickly. {dogLine} Personal trainer Brayden Cole carried the dog out over his head. He has started a fitness class for dogs.',image:'dog-brayden.png',fallbackImage:'political_briefing'},
+            scene:[]}
+        },
+        good:{open:'Hi. It’s me. Off the record. I’m calling about Biscuit, and also not about Biscuit.',
+          picks:[
+            {id:'g:fun',label:'Tell her Biscuit has good taste',you:'Biscuit has good taste.',her:'He walked past twelve-pack abs for a man with a chicken treat. He has excellent taste.'},
+            {id:'g:denise',label:'Ask if Denise is angry',you:'Is Denise angry?',her:'Denise is Denise. Brayden is teaching her a breathing exercise. It isn’t going well.'},
+            {id:'g:out',label:'Ask her out properly',you:'Can I take you somewhere that isn’t beige?',her:'Yes. Ask me on Hinge. Off the record.'}]},
+        mock:{
+          photo:['brayden','Bro! Brayden. You’re on speaker at the gym! (Twenty men laugh.) Biscuit is on the treadmill, bro. He chose the gains.'],
+          declined:['brayden','Bro! You’re on speaker! (Laughter.) Biscuit says thanks for not showing up. I’m his dad now, bro. Kidding. Unless.']
+        },
+        closing:{'sx:why':{photo:'Your file is open. I can’t. It’s the rules, and I wrote some of them.',declined:'You didn’t come to your own mediation. That tells me something.'},'sx:luck':'Thanks. Biscuit will be okay. Dogs are.','sx:wrong':'I’ll note that for the record.'},
+        infamy:{
+          cs_mediation_photo:{good:false,lines:['Is it true your ex’s trainer won your dog? With a chicken strip?','I saw Brayden’s post. Biscuit on his shoulders. At the gym. Is that your dog?','My cousin was in the county building. She said the dog walked right past you.','Okay. Do you still get the photos?']}
+        }
+      }
+    };
+    var ADOPT_BID=60,MEDIATION_NUDGE=75; // the car wash costs sixty dollars, from what's left after Denise; mediation moves the next payment by at most seventy-five
+    for(const Q of Object.values(CSQ))Object.assign(INFAMY,Q.infamy||{}); // everybody saw: their lines join the Normie's
 
     // ===== Local hero (6 November 2026) =====
     // Finish a side quest the right way (not a quest that wins the game) and, where it makes sense, the Sunfall Daily
@@ -12057,6 +13354,7 @@
       stopRinging();
       if(isStranger(id)){strangerMissed(id);if(currentApp==='calls')renderCalls();return;} // they leave a message
       if(stMissed(id)){if(currentApp==='calls')renderCalls();return;} // the starting quest: she texts the invitation instead
+      if(csMissed(id)){if(currentApp==='calls')renderCalls();return;} // the other classes' too
       if(stxMissed(id)){if(currentApp==='calls')renderCalls();return;} // the morning after it: she texts instead
       callerMissed(id); // Mogger: she noticed
       const thread=hingeThreads.get(id),profile=hingeProfile(id),kit=talkKit();
@@ -12092,6 +13390,7 @@
       stopRinging();
       if(isStranger(id)){strangerMissed(id);renderCalls();return;}
       if(stxMissed(id)){renderCalls();return;} // the morning after the starting quest: she texts instead
+      if(csMissed(id)){renderCalls();return;} // the other classes' invitation: she texts it
       callerMissed(id); // Mogger: she noticed
       const thread=hingeThreads.get(id);
       if(thread){thread.callLog.push({who:'you',text:'Declined call'});warmBy(thread,-1);}
@@ -12107,6 +13406,7 @@
       if(isStranger(id)){herCall=strangerAnswer(id);saveRun(true);renderCalls();return;} // Theon, or her dad
       if(!profile||!kit)return renderCalls();
       if(stInviteCall(id))return; // the starting quest: she invites you out
+      if(csInviteCall(id))return; // the other classes' starting quests
       if(stxHerCall(id))return; // the morning after it: she rings because it went well
       const sister=profile.factionId==='sisters_of_mercy',wasSpurned=spurnForgiven(id); // you picked up
       {const picked=hingeThreads.get(id);if(picked)picked.calledDay=world.day;} // a call counts as talking to her
@@ -12162,6 +13462,7 @@
       if(call.step==='bye')return [{id:'hangup',label:'☎ Hang up'}];
       if(call.stranger)return strangerChoices(call);
       if(call.kind==='invite')return stCallChoices(call); // the starting quest
+      if(call.kind==='csinv')return csCallChoices(call); // the other classes' starting quests
       if(call.kind==='stx')return stxCallChoices(call); // the morning after it
       if(call.exMenu&&!call.explained){const m=explainButtons(call.id,true);if(m.length>1)return m.map(([id,label])=>({id,label}));} // she's asked what about: pick one
       if(call.kind==='lavinia')return [{id:'l:listen',label:'Tell her you’re listening'},{id:'l:like',label:'Tell her you like her'},{id:'l:laugh',label:'Tell her something stupid'}];
@@ -12206,6 +13507,7 @@
       if(choice==='hangup'){endHerCall();return;}
       if(!herCallChoices().some(item=>item.id===choice))return;
       if(call.kind==='invite'){stChooseCall(choice,call,thread);return;} // the starting quest
+      if(call.kind==='csinv'){csChooseCall(choice,call,thread);return;} // the other classes' starting quests
       if(call.kind==='stx'){stxChooseCall(choice,call,thread);return;} // the morning after it
       if(choice.startsWith('ex:')){if(!['ex:menu','ex:back'].includes(choice))call.explained=true;explainChoose(choice,call.id,thread,call);renderCalls();return;} // she explains it: the dream
       const faction=profile.factionId;
