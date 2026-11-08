@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="37c2fd43e7">
+<html lang="en" data-build="e17a8e73fd">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -989,11 +989,11 @@
     @media(max-width: 730px) { .workbench { display: flex; flex-direction: column; gap: 16px; padding: 17px; } aside { padding: 2px; } h1 { font-size: 32px; } .settings { margin-top: 12px; } .preview-area { padding-top: 0; } }
   </style>
   <!-- Task 2: Chapel at Midnight quest engine. The standalone build inlines it. -->
-  <script src="chapel_at_midnight.js?v=37c2fd43e7"></script>
+  <script src="chapel_at_midnight.js?v=e17a8e73fd"></script>
   <!-- Marriage: the Sisters of Mercy (and the Bluebird wedding), the only victories. The standalone build inlines it. -->
-  <script src="marriage.js?v=37c2fd43e7"></script>
+  <script src="marriage.js?v=e17a8e73fd"></script>
   <!-- Professor Vale: "The Professor Who Won't Disappear". The standalone build inlines it. -->
-  <script src="quests/professor-vale.js?v=37c2fd43e7"></script>
+  <script src="quests/professor-vale.js?v=e17a8e73fd"></script>
 </head>
 <body>
   <main class="workbench">
@@ -1751,6 +1751,9 @@
     }
     function advanceToNextDay(){
       if(dayTransitionInFlight||world.policeArrested)return;
+      if(eveningOn)return; // the evening is still going: bed comes after it
+      if(!eveningSleep&&eveningDue()){eveningSleep=true;eveningOn=true;eveningStart();return;} // you said yes to tonight: it happens now, then you sleep
+      eveningSleep=false;
       touchThreads(); // a chat closed today leaves the list tomorrow
       dayTransitionInFlight=true;
       stopRinging();
@@ -5109,6 +5112,24 @@
 
     try{if(typeof document!=='undefined'&&document.addEventListener)document.addEventListener('click',e=>{if(e.target?.closest?.('#dream-next')){e.preventDefault();dreamNext();}});}catch{}
 
+    // ===== Quests happen after time passes (8 November 2026) =====
+    // Saying yes to a starting quest's evening used to start it a few seconds later, in the middle of the afternoon.
+    // Now it is tonight: when you go to bed, the evening plays first, and then you sleep and wake up to the morning
+    // after. A starting quest's first call comes the morning after she is picked, not seconds after you match her.
+    var eveningOn=false,eveningSleep=false; // not saved: a reload mid-evening goes back to the ordinary flow
+    function eveningDue(){return (world?.st?.stage==='going'&&world.st.inviteDay===world.day)||(world?.cs?.stage==='going'&&(world.cs.goingDay??world.cs.inviteDay)===world.day);} // today's yes: an old save's stale one is standing her up, as before
+    function eveningStart(){
+      stopRinging();closeCupboard();
+      if(world.st?.stage==='going'&&world.st.inviteDay===world.day){stEvent();return;}
+      if(world.cs?.stage==='going'){csEvent();return;}
+      eveningOn=false;eveningSleep=false;advanceToNextDay();
+    }
+    function eveningOver(){
+      if(!eveningSleep)return;
+      eveningOn=false;
+      if(window.MATCH_EVENING_NO_SLEEP){eveningSleep=false;return;} // the older tests go to bed themselves afterwards
+      window.setTimeout(()=>{if(eveningSleep)advanceToNextDay();},2200); // the walk home, then bed
+    }
     // ===== Starting quests (7 November 2026): the Normie's first days on the guided tour =====
     // When the tour starts, the run rolls one of three, one in three each: The Boyfriend, The Town Hall, Alpha Sunfall.
     // Each is guided by the tour's arrow and branches on what you choose. Each has a choice that would kill you or get
@@ -5697,7 +5718,7 @@
     }
     function stAnswer(yes){
       const s=stState();
-      if(yes){s.stage='going';stEventSoon(4000);}
+      if(yes){s.stage='going';showGameNotice('Tonight, at sundown. Tap the bed when you’re ready to head out.');} // the evening plays when you go to bed (eveningDue)
       else{s.stage='declined';s.branch='declined';s.eventDay=world.day;}
       saveRun(true);
     }
@@ -5751,7 +5772,7 @@
       const extra=(fx,r,then)=>{const x=fx?fx(r):null;if(x?.tag)d.tags.push(x.tag);const steps=Array.isArray(x)?x:x?.steps;if(steps&&steps.length)playScene(steps.map(step),then,{keep:true,gap:2600,read:true});else then();};
       const finish=end=>{
         const F=end?K.fatal[end]:null;clearInvasion();
-        if(F){s.fatal=end;s.branch=F.branch;s.hospital=end;saveRun(true);starterHospital(F.steps.map(step),()=>{});return;} // you live, and you lose her
+        if(F){s.fatal=end;s.branch=F.branch;s.hospital=end;saveRun(true);starterHospital(F.steps.map(step),()=>eveningOver());return;} // you live, and you lose her
         stOutro(K.branch(d));
       };
       const ask=i=>{
@@ -5769,12 +5790,13 @@
     function stOutro(branch){
       const s=stState(),K=stKit();
       s.branch=branch;saveRun(true);
-      playScene((K.outro[branch]||[]).map(stStep()),()=>{setLowered(false);showGameNotice(K.outroNotice);saveRun(true);},{gap:2600,read:true});
+      playScene((K.outro[branch]||[]).map(stStep()),()=>{setLowered(false);showGameNotice(K.outroNotice);saveRun(true);eveningOver();},{gap:2600,read:true});
     }
     function stGoal(){
       const s=world?.st;if(!s||!stKit()||selectedDifficulty!=='normie')return null;
       if(herCall?.kind==='invite')return {call:true,text:'She’s inviting you somewhere. Pick what to say. What you choose matters.'};
       if(s.stage==='invite'&&s.texted)return {chat:s.her,choice:'st:yes',text:'She invited you out. Answer her.'};
+      if(s.stage==='going')return {bed:true,text:'Tonight, at sundown. Tap the bed when you’re ready to head out.'};
       if(['event','declined'].includes(s.stage)&&world.day===s.eventDay)return {bed:true,text:stKit().outroNotice};
       if(s.stage==='done'&&!s.swiped){
         if(s.lost){
@@ -6017,6 +6039,7 @@
     function csMaybeStart(){
       if(!csOn())return;
       const s=csState();if(s.stage!=='none'||world.day<2)return; // the morning after
+      if(!dayTransitionInFlight&&!window.MATCH_CS_ANYTIME)return; // mornings only: she rings the day after you match her, not seconds after
       const id=starterId(),Q=CSQ[id];if(!Q||Q.cls!==selectedDifficulty)return;
       const her=csGiver(Q);if(!her)return;
       const t=hingeThreads.get(her);
@@ -6061,7 +6084,7 @@
     }
     function csAnswer(yes){
       const s=csState();
-      if(yes){s.stage='going';s.goingDay=world.day;csEventSoon(4000);}
+      if(yes){s.stage='going';s.goingDay=world.day;showGameNotice('Tonight, at sundown. Tap the bed when you’re ready to head out.');} // the evening plays when you go to bed (eveningDue)
       else{s.stage='declined';s.branch='declined';s.eventDay=world.day;}
       saveRun(true);
     }
@@ -6102,7 +6125,7 @@
         if(Q.apply)Q.apply(ctx,s); // what the evening changed right away (a small payment nudge, a car wash)
         saveRun(true);
         const step=csStep(Q,s);
-        const outro=()=>playScene((Q.outro[s.branch]||[]).map(step),()=>{setLowered(false);showGameNotice(Q.outroNotice||'Go home. Go to bed. Somebody will be talking about this in the morning.');saveRun(true);},{gap:2600,read:true});
+        const outro=()=>playScene((Q.outro[s.branch]||[]).map(step),()=>{setLowered(false);showGameNotice(Q.outroNotice||'Go home. Go to bed. Somebody will be talking about this in the morning.');saveRun(true);eveningOver();},{gap:2600,read:true});
         if(ctx.hospital){s.hospital=true;saveRun(true);starterHospital(ctx.hospital.map(step),outro);return;} // you live
         outro();
       });
@@ -12932,7 +12955,7 @@
       if(!world||world.victory||!revampOn())return false;
       const q=qtState();if(q.day!==world.day){q.day=world.day;q.n=0;}
       if(q.n>=3)return false;
-      const due=qtEvents().filter(ev=>(q.told[ev.key]||[]).length<(ev.win?1:2)&&world.day>=ev.day&&world.day<=ev.day+(sameDay?0:4)).sort((a,b)=>a.day-b.day)[0];
+      const due=qtEvents().filter(ev=>(q.told[ev.key]||[]).length<(ev.win?1:2)&&world.day>ev.day&&world.day<=ev.day+4).sort((a,b)=>a.day-b.day)[0]; // from the morning after
       if(!due)return false;
       const K=QTALK[due.key],t=qtPick(due,K);if(!t)return false;
       const p=hingeProfile(t.id),asks=K.asks||[];if(!asks.length)return false;
@@ -12945,10 +12968,7 @@
       return true;
     }
     function qtalkNewDay(){qtDeliver(false);qtDeliver(false);} // the mornings after: up to two
-    function qtalkSoon(){ // during the day, once a story has just ended
-      if(!world||callBusy?.()||doorNow||stage.classList.contains('lowered'))return;
-      qtDeliver(true);
-    }
+    function qtalkSoon(){} // (8 November 2026) quest talk waits for the morning after, like everything else
     function qtalkChoices(follow){
       const K=QTALK[follow.id];
       return (K?.answers||[]).map((a,i)=>({id:String(i),label:a.label,player:a.player,tags:[],qt:true}));
@@ -15115,6 +15135,7 @@
     const LOOKS_TIERS=[[65,'mogger'],[35,'normie'],[0,'truecel']];
     const LOOKS_START=12,PAYDAY_EVERY=7,ALIMONY=450,ALIMONY_EVERY=5,ALIMONY_STEP=50,LATE_FEE=100,FLOWERS=40,LOOKS_CASH=900,SORORITY_CASH=800; // the support goes up $50 a payment; the Looksmaxxer starts with $900 (veneers on Day 1 made every game the same)
     const EX={name:'Denise',portrait:'assets/contacts/ex-wife.png',
+      due:['It’s Denise. It’s today. ${amount}. Today means today, not when you feel like it.','Denise. You know what day it is. ${amount}, by tonight, or the next person who calls you is my lawyer.','It’s me. ${amount}, today. Brayden says hi. He doesn’t, but he would.'],
       remind:['It’s Denise. The money’s due tomorrow. ${amount}. Don’t make me call my lawyer, he bills me too.','Hi. It’s me. The payment, tomorrow. ${amount}. I saw you’re on a dating app now. Bold. Pay me first.','Denise. Tomorrow. ${amount}. And no, the dog still doesn’t miss you.'],
       angry:['You missed it. My lawyer says the word for you is arrears. I have other words. ${amount}, and soon.','No payment. Again. You know what happens next, right? Because the judge does. ${amount}.'],
       garnish:['Second time. My lawyer is taking it straight out of your paycheck now. Enjoy your half. You still owe me ${amount}.'],
@@ -15206,7 +15227,7 @@
       const int=(v,lo,hi,d=null)=>Number.isInteger(v)?Math.max(lo,Math.min(hi,v)):d;
       const out={cash:int(o.cash,-99999,999999,0),looks:int(o.looks,0,100,LOOKS_START),streak:int(o.streak,0,99,0),lastGym:int(o.lastGym,0,9999),tripDay:int(o.tripDay,0,9999),laidUntil:int(o.laidUntil,0,9999),bedLine:typeof o.bedLine==='string'?o.bedLine.slice(0,80):null,
         cool:{},did:{},gifts:{},giftsN:{},payDue:int(o.payDue,0,9999),owed:int(o.owed,0,99999,ALIMONY),misses:int(o.misses,0,9,0),paid:int(o.paid,0,999,0),cycle:int(o.cycle,0,999,0),
-        lawyerFor:int(o.lawyerFor,0,999),askedFor:int(o.askedFor,0,999),remindFor:int(o.remindFor,0,9999),contested:int(o.contested,0,999,0),reviewDay:int(o.reviewDay,0,9999),lastReview:int(o.lastReview,0,999),angry:o.angry===true,lastMode:['remind','angry','garnish','review'].includes(o.lastMode)?o.lastMode:null,garnish:o.garnish===true,arrestDay:int(o.arrestDay,0,9999),dead:null,ledger:[]};
+        lawyerFor:int(o.lawyerFor,0,999),askedFor:int(o.askedFor,0,999),remindFor:int(o.remindFor,0,9999),dueRang:int(o.dueRang,0,9999),contested:int(o.contested,0,999,0),reviewDay:int(o.reviewDay,0,9999),lastReview:int(o.lastReview,0,999),angry:o.angry===true,lastMode:['remind','due','angry','garnish','review'].includes(o.lastMode)?o.lastMode:null,garnish:o.garnish===true,arrestDay:int(o.arrestDay,0,9999),dead:null,ledger:[]};
       if(Array.isArray(o.ledger))out.ledger=o.ledger.filter(r=>r&&Number.isInteger(r.d)&&typeof r.l==='string'&&Number.isInteger(r.a)&&Number.isInteger(r.b)).slice(-LEDGER_MAX).map(r=>({d:Math.max(1,Math.min(9999,r.d)),l:r.l.slice(0,60),a:Math.max(-999999,Math.min(999999,r.a)),b:Math.max(-999999,Math.min(999999,r.b))}));
       for(const k of ['barber','skin','tony','salon'])if(Number.isInteger(o.cool?.[k]))out.cool[k]=o.cool[k];
       for(const k of ['teeth','height','cheap','face','cactus','brakes'])if(o.did?.[k]===true)out.did[k]=true;
@@ -16319,15 +16340,17 @@
       }
       if(denisePlanNewDay())return; // the plan: Denise's night, the police, the arrest
       if(c.arrestDay!==null&&world.day>=c.arrestDay){classDie('sheriff');return;}
-      if(deniseAlive()&&c.payDue!==null&&world.day>=c.payDue){ // nothing is due once she is gone
-        if(c.cash>=c.owed){const amount=c.owed;exPaid();achToast(c.paid===1?`${EX.name} got her ${money(amount)}. Every five days, and it goes up. Unless.`:`${EX.name} got her ${money(amount)}.`);}
-        else{
-          c.misses++;c.owed+=LATE_FEE;c.payDue=world.day+3;c.angry=true;
-          if(c.misses===2)c.garnish=true;
-          if(c.misses>=3)c.arrestDay=world.day+1;
-          achToast(c.misses===1?`You couldn’t pay ${EX.name}. She will not let this go. There has to be a way out of this.`:`You couldn’t pay ${EX.name}. She will not let this go.`);
-        }
+      // You pay her yourself (8 November 2026: it used to come out on its own, so missing her, the late fees and the
+      // grudge behind Biscuit could only happen when you were broke): pick up when she rings and pay her, or drive the
+      // check to her house, any time up to the end of the due day. The morning after an unpaid due day, it's a miss.
+      if(deniseAlive()&&c.payDue!==null&&world.day>c.payDue){ // nothing is due once she is gone
+        const broke=c.cash<c.owed;
+        c.misses++;c.owed+=LATE_FEE;c.payDue=world.day+2;c.angry=true;
+        if(c.misses===2)c.garnish=true;
+        if(c.misses>=3)c.arrestDay=world.day+1;
+        achToast(`You ${broke?'couldn’t pay':'didn’t pay'} ${EX.name}. She will not let this go.${c.misses===1?' There has to be a way out of this.':''} ${money(c.owed)} now, by Day ${c.payDue}.`);
       }
+      else if(deniseAlive()&&c.payDue===world.day)achToast(`${EX.name}’s ${money(c.owed)} is due today. Pay her when she rings, or drive the check to her house.`);
     }
     function exPaid(){
       const c=classState();
@@ -16337,7 +16360,7 @@
       checkAchievements();
     }
     // ---- Denise rings ----
-    function exMode(){const c=classState();return c.angry?(c.garnish&&c.misses===2?'garnish':'angry'):c.reviewDay===world.day&&c.lastReview!==c.cycle?'review':'remind';}
+    function exMode(){const c=classState();return c.angry?(c.garnish&&c.misses===2?'garnish':'angry'):c.reviewDay===world.day&&c.lastReview!==c.cycle?'review':world.day===c.payDue?'due':'remind';}
     function exLine(mode){
       const c=classState(),lines=EX[mode]||EX.remind;
       return lines[hashSeed(world.seed+'|ex|'+mode+'|'+world.day)%lines.length].replace('${amount}',money(c.owed));
@@ -16345,14 +16368,14 @@
     function exCallerDue(){
       if(selectedDifficulty!=='divorce'||!world.cls||world.cls.dead||!deniseAlive())return false; // she never rings again once she is gone
       const c=world.cls;
-      return c.angry||(c.reviewDay===world.day&&c.lastReview!==c.cycle)||(c.payDue!==null&&world.day===c.payDue-1&&c.remindFor!==c.payDue);
+      return c.angry||(c.reviewDay===world.day&&c.lastReview!==c.cycle)||(c.payDue!==null&&world.day===c.payDue-1&&c.remindFor!==c.payDue)||(c.payDue!==null&&world.day===c.payDue&&c.dueRang!==c.payDue); // the day before, and again on the day
     }
-    function exRang(){const c=classState();c.lastMode=exMode();if(c.angry)c.angry=false;else if(c.lastMode==='review')c.lastReview=c.cycle;else c.remindFor=c.payDue;} // the call she is making is kept, so answering it later still hears it
+    function exRang(){const c=classState();c.lastMode=exMode();if(c.angry)c.angry=false;else if(c.lastMode==='review')c.lastReview=c.cycle;else{c.remindFor=c.payDue;if(world.day===c.payDue)c.dueRang=c.payDue;}} // the call she is making is kept, so answering it later still hears it
     function exChoices(call){
       const c=classState(),out=[];
       if(call.step==='open'){
         if(c.cash>=c.owed)out.push({id:'ex:pay',label:`Pay her now (${money(c.owed)})`});
-        if(call.mode==='remind'&&c.askedFor!==c.cycle)out.push({id:'ex:time',label:'Ask for two more days'});
+        if(['remind','due'].includes(call.mode)&&c.askedFor!==c.cycle)out.push({id:'ex:time',label:'Ask for two more days'});
       }
       out.push({id:'ex:hang',label:'Hang up'});
       return out;
