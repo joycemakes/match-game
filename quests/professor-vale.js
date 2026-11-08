@@ -13,7 +13,7 @@
  * Two ways through:
  *   PROTECT   Piece together when and where the Back Row will strike. Then tip off
  *             Detective Graves (Police) and/or warn the Bluebirds, who adore Vale.
- *             Best ending: Graves rings you back and you tell her it was you; or Alice
+ *             Best ending: Graves calls you back and you tell her it was you; or Alice
  *             Beaumont invites you to the gala ball; or ask any Police or Bluebird
  *             match on a date. They all say yes now. The Bluebird endings are a win:
  *             they vote you in and marry you off (host.bride picks her, host.win plays it).
@@ -138,7 +138,7 @@
             { image: 'assets/quests/professor/visit-lot.png', stand: 'room', caption: 'The faculty parking lot. Rows of bays with names painted on them, a security booth, and one barrier at the exit.' }
           ] },
           { mini: 'spotit', key: 'car', title: 'WHICH ONE IS HIS?', crowd: ['🚗', '🚕', '🛻', '🚘'], crowdArt: ['car-1', 'car-2', 'car-3', 'car-4'], odd: '🚙', oddArt: 'car-vale', image: 'assets/quests/professor/visit-lot.png', caption: 'Find Vale’s car. It is the one that looks like it reads.' },
-          { qte: 'swipe', key: 'cart', dirs: ['left', 'right'], image: 'assets/quests/professor/visit-lot.png', caption: 'A security cart comes round the corner. Get out of its way.' },
+          { qte: 'swipe', key: 'cart', dirs: ['left', 'right'], image: 'assets/quests/professor/visit-lot.png', caption: 'A security cart comes around the corner. Get out of its way.' },
           { mini: 'rewire', key: 'barrier', image: 'assets/quests/professor/visit-barrier.png', caption: 'The exit barrier is stuck down and the booth is empty. Rewire the panel and get out.' },
           { scene: [ { image: 'assets/quests/professor/visit-barrier.png', stand: 'room', caption: 'The barrier lifts. You walk out like you work here.' } ] }
         ]
@@ -148,7 +148,7 @@
         desc: 'His office hours. He might talk to you. Once.',
         beats: [
           { scene: [
-            { image: 'assets/quests/professor/visit-hours.png', stand: 'room', caption: 'Office hours. A queue of two students and a man with a petition. Vale waves you in first, because you are not either of those.' }
+            { image: 'assets/quests/professor/visit-hours.png', stand: 'room', caption: 'Office hours. A line of two students and a man with a petition. Vale waves you in first, because you are not either of those.' }
           ] },
           { ask: { key: 'talk', questions: [
             { image: 'assets/quests/professor/visit-hours.png', ask: 'Vale: So. You are the one who keeps asking about my car. Why?', answers: [
@@ -161,7 +161,7 @@
               { label: 'I think your diary is leaking.', tag: 'sharp', reply: 'He looks at the door to the next office for a second too long.' }] }
           ] }, key: 'talk' },
           { qte: 'tap', key: 'shake', label: 'SHAKE', image: 'assets/quests/professor/visit-hours.png', caption: 'He stands and offers his hand. Take it before it gets awkward.' },
-          { scene: [ { image: 'assets/quests/professor/visit-hours.png', stand: 'room', caption: 'He writes his number on the back of a lecture flyer. If you are right, ring me. If you are wrong, also ring me. I get bored.' } ] }
+          { scene: [ { image: 'assets/quests/professor/visit-hours.png', stand: 'room', caption: 'He writes his number on the back of a lecture flyer. If you are right, call me. If you are wrong, also call me. I get bored.' } ] }
         ]
       }
     },
@@ -176,7 +176,7 @@
       vanessa: 'Vanessa Greer. She runs the Back Row. Everyone does what she says. Be careful who you ask about her.',
       rule: 'Read the Sunfall Daily again. His brakes went the day after Paglia. His house burned the day after Houellebecq. It’s always the day after.',
       car_plan: 'They’re going to do his car. Faculty parking lot, bay fourteen, on Day {A}, the day after the Cofnas lecture. I can’t go to the police. You can.',
-      graves: 'You know everything I know. Detective Eleanor Graves is the one who listens. Ring her before Day {A} and give her Vanessa’s name and the plan. Here’s her direct line.',
+      graves: 'You know everything I know. Detective Eleanor Graves is the one who listens. Call her before Day {A} and give her Vanessa’s name and the plan. Here’s her direct line.',
       later_reply: 'Okay. You have my number now. Please don’t wait too long.'
     },
     hints: {
@@ -233,8 +233,8 @@
       rosaPanic: { from: 'rosa', text: 'It’s Rosa. I can’t sleep. I keep thinking about walking into the police station. Please call me.' },
       valeBrick: { from: 'vale', text: '' },
       fakeGraves: { from: 'fake', text: '' },
-      valeVm1: { from: 'vale', text: 'Adrian Vale. Lorraine in the office says someone keeps asking about my car. If that’s you, ring me back on this number. I’m curious. I’m always curious.' },
-      valeVm2: { from: 'vale', text: 'Adrian again. They threw eggs. Organic. Tomorrow I read the complaints in my car, the way I always do. Ring me if you’re still worried. You won’t. Nobody does.' },
+      valeVm1: { from: 'vale', text: 'Adrian Vale. Lorraine in the office says someone keeps asking about my car. If that’s you, call me back on this number. I’m curious. I’m always curious.' },
+      valeVm2: { from: 'vale', text: 'Adrian again. They threw eggs. Organic. Tomorrow I read the complaints in my car, the way I always do. Call me if you’re still worried. You won’t. Nobody does.' },
       valeThanks: { from: 'vale', text: 'Adrian Vale. My car went up in bay fourteen with nobody in it. I took a cab, like you said. I don’t know how you knew and I don’t think I want to. Thank you. Don’t tell the faculty. They’ll be so disappointed.' }
     },
 
@@ -316,10 +316,10 @@
       device: { name: 'The number on the masking tape', portrait: 'assets/quests/professor/item-phone.png', greeting: 'It’s ringing.' },
       alice: { name: 'Alice Beaumont', portrait: 'assets/quests/professor/alice-line.png', greeting: 'Alice Beaumont. Oh, it’s you. Darling.' },
       vale: { name: 'Professor Adrian Vale', portrait: 'assets/quests/professor/vale.png', greeting: 'Vale. Who is this? Ah. You.' },
-      fake: { name: 'Detective Graves (mobile)', portrait: 'assets/quests/professor/unknown-caller.png', greeting: 'The number you have dialed is not in service.' }
+      fake: { name: 'Detective Graves (cell)', portrait: 'assets/quests/professor/unknown-caller.png', greeting: 'The number you have dialed is not in service.' }
     },
 
-    // ----- Vale himself (2 November 2026: he should be a person, not a portrait). He rings you
+    // ----- Vale himself (2 November 2026: he should be a person, not a portrait). He calls you
     // once someone tells him you've been asking, and again on the night of the lecture. What you say
     // decides whether he goes near his car. Taking a cab saves him, unless Pemberton borrows it.
     vale: {
@@ -337,12 +337,12 @@
         choices: { car: 'Tell him not to go near his car tomorrow', stay: 'Tell him to spend the night with the Bluebirds', luck: 'Wish him luck', hang: 'Hang up' },
         carYes: 'Not my car. A long breath. Fine. I’ll take a cab and read the complaints in the back of it, and the driver will hate me too. You’ll owe me an explanation.',
         carNo: 'Not my car? You sound like my insurer. Goodnight, whoever you are.',
-        stayYes: 'Alice has been begging me to stay at theirs since the fire. I’ll ring her now. If nothing happens, I’m blaming you at dinner.',
+        stayYes: 'Alice has been begging me to stay at theirs since the fire. I’ll call her now. If nothing happens, I’m blaming you at dinner.',
         stayNo: 'Hide with the Bluebirds? They’d make me wear a ribbon. Goodnight.',
         luck: 'Luck is for people without tenure. Goodnight.'
       },
-      chat: 'Alive, against the odds and the faculty. I’m reading. Ring me when you have something interesting to say.',
-      // A real conversation (4 November 2026: he wasn't helpful at all). On his calls and when you ring him,
+      chat: 'Alive, against the odds and the faculty. I’m reading. Call me when you have something interesting to say.',
+      // A real conversation (4 November 2026: he wasn't helpful at all). On his calls and when you call him,
       // you can talk: Cofnas, his guests, the right, the students, Allison, philosophy. Talking builds his trust
       // (he listens to your warning about the car at 2), and some of what he says goes in your notebook.
       talk: {
@@ -380,7 +380,7 @@
         'Camille says nature is not our friend. Civilization is the long argument we have with it. Everything good, the cathedral, the sonnet, the vaccine, was built against nature, which is why it is so easy to knock down.',
         'Hannah Arendt watched a man on trial for helping murder millions and found him ordinary, a clerk who never thought about what he signed. Most harm is done by people who never asked a single question. Ask yours.'
       ],
-      lessonsDone: 'That’s the syllabus. Read the books, and ring me when you disagree with one of them.'
+      lessonsDone: 'That’s the syllabus. Read the books, and call me when you disagree with one of them.'
     },
 
     // ----- The University Office has a person on the desk. Lorraine notices who keeps ringing about Vale,
@@ -405,11 +405,11 @@
         reply: 'Lorraine puts you through. Wrong extension. A woman’s voice, low and fast: …bay fourteen, the day after, he always does. Yes. I know. Then she hears you breathing, and the line goes dead.' },
       fake: {
         name: 'Detective Graves', open: 'Detective Graves. I hear you’ve been asking about Professor Vale. Tell me everything you know, and I mean everything. Who, where and when.',
-        choices: { tell: 'Tell her everything you know', callback: 'Ask her to ring you back on the station line', hang: 'Hang up' },
+        choices: { tell: 'Tell her everything you know', callback: 'Ask her to call you back on the station line', hang: 'Hang up' },
         tell: 'Thank you. A pause. That’s very helpful. She hangs up without saying goodbye. Graves always says goodbye.',
         callback: 'A long pause. Then the line goes dead. Nobody rings back from the station.',
-        clue: 'Somebody calling herself Detective Graves rang from a mobile number and asked what you know about Vale.',
-        vm: 'Detective Graves. Ring me back on this number. It’s about Professor Vale. Don’t ring the station.'
+        clue: 'Somebody calling herself Detective Graves called from a cell number and asked what you know about Vale.',
+        vm: 'Detective Graves. Call me back on this number. It’s about Professor Vale. Don’t ring the station.'
       },
       how: {
         open: 'Graves writes it down. Then: Now tell me how you know all this.',
@@ -418,15 +418,15 @@
         friend: 'A friend. Fine. Your friend should be careful who else they tell.',
         secret: 'Have it your way. I’ll remember you didn’t say.'
       },
-      brickVm: 'Adrian Vale. Someone put a brick through my study window. With a note. It said: Third time. The police say it’s a threat. I think it’s a pun. Ring me if you know something I don’t.'
+      brickVm: 'Adrian Vale. Someone put a brick through my study window. With a note. It said: Third time. The police say it’s a threat. I think it’s a pun. Call me if you know something I don’t.'
     },
 
     // ----- The wiretap (2 November 2026). Give Graves Vanessa’s name without the plan and she asks
     // you to ring Vanessa while she listens. Get Vanessa to say when and where without making her
     // suspicious. Too careful, too pushy or too strange, and she hangs up knowing.
     wiretap: {
-      setup: '{name}? A name isn’t a case. Graves is quiet for a moment. Ring her. I’ll be on the line, and she won’t know. Get her to say when and where, in her own words. Then hang up and leave the rest to me.',
-      open: 'Vanessa. …You never ring me. What do you want?',
+      setup: '{name}? A name isn’t a case. Graves is quiet for a moment. Call her. I’ll be on the line, and she won’t know. Get her to say when and where, in her own words. Then hang up and leave the rest to me.',
+      open: 'Vanessa. …You never call me. What do you want?',
       burnAt: 4,
       steps: [
         { choices: {
@@ -443,7 +443,7 @@
           soft: { label: 'Tell her you’re scared', sus: -1, reply: 'Good. Scared people are careful. Careful people are useful.' } } }
       ],
       win: 'Vanessa hangs up first. A second later, a click, and Graves’s voice, very close: That’s her, in her own words. Day {A}, bay fourteen. Go to bed. Don’t ring anyone.',
-      partial: 'Vanessa hangs up. A click, then Graves: Not enough. She never said it straight. We’ll keep an eye on her, but don’t ring her again.',
+      partial: 'Vanessa hangs up. A click, then Graves: Not enough. She never said it straight. We’ll keep an eye on her, but don’t call her again.',
       burned: 'Who else is on this line? Silence. Then the dial tone, and somewhere a long way off, Graves swearing.',
       hungUp: 'You. Don’t ring this number again. Click.'
     },
@@ -1175,7 +1175,7 @@
           if (id.startsWith('pv_g_how_')) {
             const k = id.slice(9); s.gravesAsk = null;
             if (k === 'friend') risk(s, 10, day);
-            if (k === 'secret') s.gravesCold = true; // she won't ring you back when it's over
+            if (k === 'secret') s.gravesCold = true; // she won't call you back when it's over
             return ok(s, D.tricks.how[k]);
           }
           if (id.startsWith('tip_')) {
@@ -1184,7 +1184,7 @@
             if (D.cell.includes(n)) {
               if (s.cellAtLarge) { s.cellArrested = true; s.cellAtLarge = false; s.silencedDay = null; s.favour.police = true; news(s, day + 1, 'cell_arrested_late'); return ok(s, D.gravesLines.tipEvidence, { name: name(n) }); }
               if (has(s, 'car_plan')) { s.tip = { name: n, day, withPlan: true }; s.gravesAsk = day; return ok(s, D.gravesLines.tipPlan + ' ' + D.tricks.how.open, { name: name(n) }); }
-              if (n === 'vanessa' && s.numbers.vanessa && !s.wireDone && s.stage === 'open' && day < s.attackDay) { // ring her, I'll listen
+              if (n === 'vanessa' && s.numbers.vanessa && !s.wireDone && s.stage === 'open' && day < s.attackDay) { // call her, I'll listen
                 s.wireSet = day; s.wireStep = 0; s.wireSus = 0; s.wireGot = [];
                 s.accused = s.accused.filter(x => x !== 'vanessa');
                 return ok(s, D.wiretap.setup, { name: name(n) });
@@ -1276,7 +1276,7 @@
       }
     }
 
-    // ----- Vale rings you -----
+    // ----- Vale calls you -----
     // 1: the first time, once someone has told him you've been asking (before the lecture).
     // 2: the night of the lecture, whatever happened before. Returns 0 when he isn't due.
     function valePhase(s, day) {
@@ -1876,7 +1876,7 @@ body>.pv-overlay{position:fixed}
       hingeTopics, chooseHingeTopic,
       serviceTopics, chooseServiceTopic, contactForNumber,
       isOpen: () => state().stage !== 'dormant',
-      // Vale rings you (the host's incoming-call screen): due, ring, answer, choices, choose, missed.
+      // Vale calls you (the host's incoming-call screen): due, ring, answer, choices, choose, missed.
       valeCallerDue: () => (E.valeDue(state(), day()) ? 'x:vale' : E.fakeDue(state(), day()) ? 'x:pv-fake' : null),
       fakeCallCard: () => { const s = state(); return { name: DATA.tricks.fake.name, portrait: DATA.contacts.fake.portrait, number: s.numbers.fake || null }; },
       fakeRang: () => { E.fakeRang(state(), day()); if (host.save) host.save(); },

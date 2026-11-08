@@ -1651,9 +1651,9 @@
             "id": "g1",
             "about": "MATCH-047",
             "warmth": 0,
-            "says": "Abigail Porter fixes everything. The station coffee machine twice, a sergeant’s lamp, my car door. She comes from money and would rather be under a sink with a spanner.",
+            "says": "Abigail Porter fixes everything. The station coffee machine twice, a sergeant’s lamp, my car door. She comes from money and would rather be under a sink with a wrench.",
             "note": "Eleanor Graves says Abigail Porter fixes everything at the station.",
-            "ask": "Eleanor says you’d rather be under a sink with a spanner than at a fancy table.",
+            "ask": "Eleanor says you’d rather be under a sink with a wrench than at a fancy table.",
             "answer": "It’s true. My family’s tables are lovely and nobody at them can change a fuse. A toaster tells you exactly what’s wrong if you listen. People never do. Eleanor’s car door, for the record, was held on with optimism.",
             "mood": 1
           },
@@ -1889,7 +1889,7 @@
         "life": [
           {
             "feel": "good",
-            "news": "Found a coffee today I’d rate eight out of ten. Eight! I nearly rang the paper.",
+            "news": "Found a coffee today I’d rate eight out of ten. Eight! I nearly called the paper.",
             "more": "A little van by the reservoir path. The woman makes it like she’s angry at the beans, which is correct. I ran four miles on the bad knee to get there and it was worth every limp. Don’t tell anyone where it is. Sources are sacred, and so is this."
           },
           {
@@ -2574,7 +2574,7 @@
           {
             "feel": "odd",
             "news": "Biscuit ate a lipstick AND a tax letter today. He has range.",
-            "more": "Terrier, no impulse control, eats anything lower than my knees. The lipstick was coral. The tax letter was red, which feels right. I had to ring the tax office and explain that my dog had paid their letter the ultimate respect. The woman laughed so hard she put me on hold."
+            "more": "Terrier, no impulse control, eats anything lower than my knees. The lipstick was coral. The tax letter was red, which feels right. I had to call the tax office and explain that my dog had paid their letter the ultimate respect. The woman laughed so hard she put me on hold."
           },
           {
             "feel": "good",
@@ -8007,7 +8007,7 @@
           {
             "feel": "bad",
             "news": "My dad’s old stationery shop is a vape shop now. I walked past and didn’t go in.",
-            "more": "He printed programs and invitations for thirty years, until his biggest customer went elsewhere. It took him six years to die of it, slowly. I spent them at university being brilliant at a man who didn’t notice. Sorry. That’s a lot. Ask me something easy."
+            "more": "He printed programs and invitations for thirty years, until his biggest customer went elsewhere. It took him six years to die of it, slowly. I spent them in college being brilliant at a man who didn’t notice. Sorry. That’s a lot. Ask me something easy."
           },
           {
             "feel": "good",
@@ -8805,7 +8805,7 @@
           }
         ],
         "views": {
-          "dispute": "I printed the Sisters’ letter and the chancery rang me the same afternoon to say the dispute was about liturgical traditions. I ran that word for word. Readers can hear a man clearing his throat."
+          "dispute": "I printed the Sisters’ letter and the chancery called me the same afternoon to say the dispute was about liturgical traditions. I ran that word for word. Readers can hear a man clearing his throat."
         },
         "calls": [
           {
@@ -9232,7 +9232,7 @@
           },
           {
             "feel": "bad",
-            "news": "My cousin rang the shop again. He never rings unless something’s wrong.",
+            "news": "My cousin called the shop again. He never rings unless something’s wrong.",
             "more": "He’s working up on the ridge with men I don’t like and he sounds like someone who wants to be told to come home. I told him to come home. He laughed. That’s my whole family. We laugh when we mean help."
           },
           {
@@ -12105,7 +12105,7 @@
           {
             "feel": "odd",
             "news": "A diner out on the state road had its sign dark for a week. The staff said it was broken. It wasn’t broken. Somebody unplugged it.",
-            "more": "I know because I went round the back, which I should not have done, and the plug was lying in the dust like someone had been tidying. I plugged it back in. It came on. OPEN. I don’t know whose night I ruined, or saved."
+            "more": "I know because I went around the back, which I should not have done, and the plug was lying in the dust like someone had been tidying. I plugged it back in. It came on. OPEN. I don’t know whose night I ruined, or saved."
           }
         ],
         "gossip": [
@@ -13971,7 +13971,7 @@
           {
             "feel": "good",
             "news": "Found a new path up the ridge. Two hours of goat track and a view all the way to the border. Nobody else up there.",
-            "more": "The road to the top has a gate and a sign, so I go round. There’s always a way round if you’re patient and don’t mind thorns. I sat at the top with a sandwich and photographed absolutely nothing, which is my favorite kind of photograph. Nobody dead in it."
+            "more": "The road to the top has a gate and a sign, so I go around. There’s always a way around if you’re patient and don’t mind thorns. I sat at the top with a sandwich and photographed absolutely nothing, which is my favorite kind of photograph. Nobody dead in it."
           },
           {
             "feel": "bad",
@@ -16526,7 +16526,7 @@
             "id": "g1",
             "about": "MATCH-140",
             "warmth": 1,
-            "says": "Willow Greene repairs watches in the back room of the collective, with a little mirror angled over her bench so she can see the street without turning round. She says it’s for the light. It isn’t for the light.",
+            "says": "Willow Greene repairs watches in the back room of the collective, with a little mirror angled over her bench so she can see the street without turning around. She says it’s for the light. It isn’t for the light.",
             "note": "Lara Newsome says Willow Greene keeps a mirror over her watch bench to watch the street.",
             "ask": "Lara says you keep a mirror over your bench to watch the street, and it isn’t for the light.",
             "answer": "It’s a little for the light. Mostly it’s because I don’t like having my back to a door. Lara dances like she’s storming a council meeting and thinks everybody else should be braver. Some of us are brave sitting down, with a loupe in one eye.",
@@ -18877,7 +18877,7 @@
         "life": [
           {
             "feel": "good",
-            "news": "A woman rang the late show to say her cat came home after nine days. The whole switchboard cheered.",
+            "news": "A woman called the late show to say her cat came home after nine days. The whole switchboard cheered.",
             "more": "The phone-in callers are the loneliest people in town and the best part of the show. She’d rung every night for nine nights to ask if anyone had seen him. Tonight he walked in while she was on air. She cried. Chuck cried. I cried. Local radio. Lovely and doomed."
           },
           {
@@ -19438,7 +19438,7 @@
             "id": "bike",
             "label": "Ask about the bicycle",
             "player": "How’s the bike coming along?",
-            "reply": "It has two wheels now. Neither of them goes round. I’ve watched forty videos about chains and I understand less than when I started."
+            "reply": "It has two wheels now. Neither of them goes around. I’ve watched forty videos about chains and I understand less than when I started."
           },
           {
             "id": "cowboy",
@@ -19500,7 +19500,7 @@
         "life": [
           {
             "feel": "odd",
-            "news": "The bike has two wheels now. Neither of them goes round. Progress.",
+            "news": "The bike has two wheels now. Neither of them goes around. Progress.",
             "more": "I’ve watched forty videos about chains and I understand less than when I started. A man in one of them said a bike is a conversation. Mine isn’t speaking to me. I’m thinking of giving it a name so we can start again."
           },
           {
@@ -19730,7 +19730,7 @@
             "id": "c_crossing",
             "label": "Ask about her dad",
             "player": "What happened to your dad?",
-            "reply": "He was a signalman. He died on the line when I was nine. I saved a voicemail from the week before: he’d be late because the Foundation’s truck was on the crossing again and he had to log it. I rang the Foundation. They said there was no truck. I remember everything.",
+            "reply": "He was a signalman. He died on the line when I was nine. I saved a voicemail from the week before: he’d be late because the Foundation’s truck was on the crossing again and he had to log it. I called the Foundation. They said there was no truck. I remember everything.",
             "note": "Moira Bell’s late father logged a Foundation truck on the railway crossing the week before he died; the Foundation denies it."
           }
         ],
@@ -20527,7 +20527,7 @@
           {
             "feel": "good",
             "news": "Reviewed a band at the Furnace that nobody had heard of. Five stars. They called me crying. I hung up before I cried too.",
-            "more": "Three girls with one amp and a drum machine held together with tape, playing to twenty people like it was a stadium. I gave them five stars and said exactly why, sentence by sentence. Their bassist rang the Night Wire’s phone and couldn’t speak. I said good night, quickly. I don’t do feelings on the phone."
+            "more": "Three girls with one amp and a drum machine held together with tape, playing to twenty people like it was a stadium. I gave them five stars and said exactly why, sentence by sentence. Their bassist called the Night Wire’s phone and couldn’t speak. I said good night, quickly. I don’t do feelings on the phone."
           },
           {
             "feel": "bad",
@@ -20624,7 +20624,7 @@
           },
           {
             "feel": "odd",
-            "news": "An old friend rang me from the club’s press office. She wants a favor. She wouldn’t say what over the phone.",
+            "news": "An old friend called me from the club’s press office. She wants a favor. She wouldn’t say what over the phone.",
             "more": "We were assistants together twenty years ago. She went to the club and wears silk now and gets her hair done every week. I stayed and got forearms. She said, I need you to look at some pictures for me, not here. I said where. She said I’ll tell you. She hasn’t."
           }
         ],
@@ -20643,7 +20643,7 @@
             "id": "g2",
             "about": "MATCH-168",
             "warmth": 1,
-            "says": "Celina Rojas is the youngest on the photo desk. She carries everything and gets blamed for the weather. She rides a bicycle neither wheel of which goes round. I’m teaching her everything I know except how to stay.",
+            "says": "Celina Rojas is the youngest on the photo desk. She carries everything and gets blamed for the weather. She rides a bicycle neither wheel of which goes around. I’m teaching her everything I know except how to stay.",
             "note": "Rosie Nolan says she’s teaching Celina Rojas everything except how to stay an assistant.",
             "ask": "Rosie says she’s teaching you everything except how to stay.",
             "answer": "She means she wants me to leave and be a real photographer. She says it like it’s a threat. Rosie carries more bags than I do and she’s twice my age and she never once complains about the weather. I’m going to name my first exhibition after her. She’ll hate it.",
@@ -22633,7 +22633,7 @@
             "id": "g1",
             "about": "MATCH-202",
             "warmth": 1,
-            "says": "Selene Ward mends watches at the jewelers’ bench and doesn’t laugh easily, but when she does the whole room turns round. She had a boyfriend on the drama course once. She doesn’t talk about him.",
+            "says": "Selene Ward mends watches at the jewelers’ bench and doesn’t laugh easily, but when she does the whole room turns around. She had a boyfriend on the drama course once. She doesn’t talk about him.",
             "note": "Nyx Calder says Selene Ward mends watches at the bench and had a boyfriend on the drama course once.",
             "ask": "Nyx says you had a boyfriend on the drama course and you don’t talk about him.",
             "answer": "Because there’s nothing to say that would help. He was funny and kind and then he wasn’t either. Nyx climbs stairs I wouldn’t climb, every week, with a lamp, and she thinks it’s a job. It isn’t a job. Tell her to leave the envelope at the bottom.",
@@ -23204,7 +23204,7 @@
           {
             "feel": "good",
             "news": "The band sold out a night in Denver. I booked it from a pay phone in a truck stop. Still got it.",
-            "more": "I’m the tour manager for a band that’s always somewhere else, and I’m home between legs, which means I do the whole job from my kitchen with a road atlas. Tonight a five-hundred-cap room sold out and the singer rang me screaming. I said great, eat a vegetable. I’m very proud of them."
+            "more": "I’m the tour manager for a band that’s always somewhere else, and I’m home between legs, which means I do the whole job from my kitchen with a road atlas. Tonight a five-hundred-cap room sold out and the singer called me screaming. I said great, eat a vegetable. I’m very proud of them."
           },
           {
             "feel": "bad",
@@ -23283,7 +23283,7 @@
             "id": "b_sister",
             "label": "Ask about her family",
             "player": "Do you have family?",
-            "reply": "A younger sister. We didn’t speak for ten years. Then one night she rang me out of nowhere and asked me something only I could answer. Now we’re close the way two knives in a drawer are close.",
+            "reply": "A younger sister. We didn’t speak for ten years. Then one night she called me out of nowhere and asked me something only I could answer. Now we’re close the way two knives in a drawer are close.",
             "needsWarmth": 2
           },
           {
@@ -23648,7 +23648,7 @@
             "id": "b_bike",
             "label": "Ask why she won’t drive",
             "player": "Why the bicycle? Don’t you drive?",
-            "reply": "Not in this town. Not with what cars are here. I’m rebuilding a bike from a skip instead. It mostly goes forward.",
+            "reply": "Not in this town. Not with what cars are here. I’m rebuilding a bike from a dumpster instead. It mostly goes forward.",
             "needsWarmth": 1
           },
           {
@@ -23678,8 +23678,8 @@
           },
           {
             "feel": "good",
-            "news": "Got the back wheel on the bicycle I’m rebuilding from a skip. It goes round. It goes round!",
-            "more": "I won’t have a car. Not in this town, not with what cars are here. So I pulled a bicycle out of a skip and I’m rebuilding it on my living room floor. Yvette Palmer comes round with a spanner and tells me what I’m doing wrong. Tonight the wheel went round and we both cheered."
+            "news": "Got the back wheel on the bicycle I’m rebuilding from a dumpster. It goes around. It goes around!",
+            "more": "I won’t have a car. Not in this town, not with what cars are here. So I pulled a bicycle out of a dumpster and I’m rebuilding it on my living room floor. Yvette Palmer comes around with a wrench and tells me what I’m doing wrong. Tonight the wheel went around and we both cheered."
           },
           {
             "feel": "odd",
@@ -27788,7 +27788,7 @@
           "A review is routine. That’s what the chancery told the committee, and the committee repeated it, and now I’m repeating it to you.",
           "The flower committee is with the Latin and the treasurer is with the bishop, and I sit between them at lunch. Pass the salt.",
           "Augustus plays golf with the new priest every week. Draw your own conclusions. I’ve drawn mine and I keep them in a drawer.",
-          "My grandmother would have rung the bishop and told him to leave those women alone. My mother rings the bishop about other things."
+          "My grandmother would have rung the bishop and told him to leave those women alone. My mother calls the bishop about other things."
         ],
         "police": [
           "The Sisters feed half the people we pick up overnight. If the bishop closes that pantry he can come and work the night shift.",
@@ -28373,7 +28373,7 @@
         ],
         "police": [
           "One case. I’d go back and knock on one more door.",
-          "I’d have taken a holiday. Ever. Just once."
+          "I’d have taken a vacation. Ever. Just once."
         ],
         "progressives": [
           "I’d worry less about being right and more about being kind. Don’t tell my group chat.",
@@ -30422,7 +30422,7 @@
           "fourth_estate": [
             "Every quote he gives us is a headline. Every headline is half true. It’s exhausting and it sells.",
             "My editor wants a profile of him every week. He always says yes. That should worry us more than it does.",
-            "He calls the paper the Sunfall Daily Lie on air and then rings me with tips.",
+            "He calls the paper the Sunfall Daily Lie on air and then calls me with tips.",
             "He’s the best copy in Sunfall and the worst source. Both at once."
           ],
           "goth_girls": [
@@ -32567,7 +32567,7 @@
           },
           {
             "line": "If you ever need us, don’t text. Ring 911, say exactly where you are, then stay put.",
-            "note": "A police officer says to ring 911 and stay put if you’re ever in danger."
+            "note": "A police officer says to call 911 and stay put if you’re ever in danger."
           }
         ],
         "progressives": [
@@ -32593,7 +32593,7 @@
         "fourth_estate": [
           {
             "line": "The editor killed my piece on the gala seating plan. Someone called him first. I want to know who.",
-            "note": "A reporter says her piece on the gala seating plan was killed after someone rang the editor.",
+            "note": "A reporter says her piece on the gala seating plan was killed after someone called the editor.",
             "fromDay": 2
           },
           {
@@ -33347,7 +33347,7 @@
             },
             {
               "id": "police",
-              "label": "Tell her to ring the police",
+              "label": "Tell her to call the police",
               "player": "Ring the police. Let them deal with the car.",
               "now": "He’ll never forgive me. But okay.",
               "next": "The police went to the motel. My brother is furious with me. He’ll be fine. He’ll be alive, anyway.",
@@ -35187,7 +35187,7 @@
         "MATCH-168": {
           "muse": "Fixing the bike chain with grease up to my elbows. I need someone to tell me where to put my hands.",
           "caption": "Today I held the reflector. Tonight I hold the camera.",
-          "melt": "Neither wheel goes round on my bike, but you just got everything else spinning."
+          "melt": "Neither wheel goes around on my bike, but you just got everything else spinning."
         },
         "MATCH-169": {
           "muse": "Nine seconds of silence in court today before a witness answered. You learn to hear what people don’t say. Here’s what I’m not saying: come over.",
@@ -36434,7 +36434,7 @@
       },
       "story": {
         "section": "Crime",
-        "title": "STUDENT IN HOSPITAL AFTER PILLS FROM A CAR PARK",
+        "title": "STUDENT HOSPITALIZED AFTER PILLS IN A PARKING LOT",
         "summary": "A 20-year-old student is recovering. Police want to know where the pills came from.",
         "body": "A university student, 20, is recovering in Sunfall General after taking pills bought in a supermarket parking lot. Detectives believe the pills came from a local pharmacy and are asking pharmacy staff to come forward.",
         "image": "pills_student",
@@ -36632,7 +36632,7 @@
         "reply": "The ridge. Right. We’ll have a word with the agency. Thank you, love."
       },
       "handIn": {
-        "label": "Hand in a ring you were sold",
+        "label": "Hand in a call you were sold",
         "reply": "Hand it in? Good man. Leave it in an envelope by the door and an officer will collect it. Nobody needs to know where it came from."
       },
       "handedNotice": "An officer collected the ring. Doreen says the Ashworths will be very glad.",
@@ -36713,8 +36713,8 @@
         "truecel": "Don’t read anything into this. I’m at the end of my twelve-seat table, I’m drunk, and you’re the only man on this app who answers at this hour. I was married twice: Tommy for love, Walter for the house. Both gone. I need a man’s voice on the telephone saying Tommy’s things. In the dark you could be anyone. Would you do it?"
       },
       "yes": {
-        "label": "Tell her to ring you tonight",
-        "player": "Ring me tonight. I’ll be whoever you need.",
+        "label": "Tell her to call you tonight",
+        "player": "Call me tonight. I’ll be whoever you need.",
         "reply": {
           "mogger": "Oh, you angel. Tonight, then. My number is {number}, so you know it’s me.",
           "normie": "Tonight, then. My number is {number}, so you know it’s me. Don’t laugh at me.",
@@ -36828,8 +36828,8 @@
         "truecel": "Don’t show anyone. I mean it."
       },
       "missedVm": {
-        "mogger": "It’s Diana. I sat at his end of the table for an hour with the robe over the chair. Ring me, darling.",
-        "normie": "It’s Diana. I sat at his end of the table for an hour. Ring me tomorrow.",
+        "mogger": "It’s Diana. I sat at his end of the table for an hour with the robe over the chair. Call me, darling.",
+        "normie": "It’s Diana. I sat at his end of the table for an hour. Call me tomorrow.",
         "truecel": "It’s Diana. You didn’t pick up. Nobody ever does."
       },
       "celeste": {
@@ -36870,8 +36870,8 @@
         },
         "after": {
           "not": {
-            "mogger": "Celeste rang you. I’m sorry. I still want Tommy’s voice tonight. Yours, I mean.",
-            "normie": "Celeste rang you, didn’t she. I’m so sorry. Let’s stop for a while.",
+            "mogger": "Celeste called you. I’m sorry. I still want Tommy’s voice tonight. Yours, I mean.",
+            "normie": "Celeste called you, didn’t she. I’m so sorry. Let’s stop for a while.",
             "truecel": "You told Celeste you’re not my husband. As if anyone would think you were. Goodnight."
           },
           "hang": {
@@ -36879,7 +36879,7 @@
             "normie": "Did you hang up on Celeste? Darling, nobody hangs up on Celeste. Be careful.",
             "truecel": "You hung up on Celeste. Now I have to hear about it at lunch for a year. Thanks."
           },
-          "joke": "Celeste told the whole club. They’re calling you my charity case. Don’t ring me."
+          "joke": "Celeste told the whole club. They’re calling you my charity case. Don’t call me."
         },
         "deathCause": "THE FAMILY",
         "deaths": [
@@ -37169,9 +37169,9 @@
         "label": "Tell her to train you",
         "player": "Train me.",
         "reply": {
-          "normie": "Rules. Three mornings. I ring early. You answer, or you ring me straight back. You call me Coach. My number is {number}. Good piggy.",
-          "mogger": "Rules. Three mornings. I ring early. You answer, or you ring me straight back. You call me Coach. My number is {number}. Good boy. Piggy.",
-          "truecel": "Rules. Three mornings. I ring early. You answer, or you ring me straight back. You call me Coach. My number is {number}. Clean that desk, piggy."
+          "normie": "Rules. Three mornings. I call early. You answer, or you call me straight back. You call me Coach. My number is {number}. Good piggy.",
+          "mogger": "Rules. Three mornings. I call early. You answer, or you call me straight back. You call me Coach. My number is {number}. Good boy. Piggy.",
+          "truecel": "Rules. Three mornings. I call early. You answer, or you call me straight back. You call me Coach. My number is {number}. Clean that desk, piggy."
         }
       },
       "no": {
@@ -37248,9 +37248,9 @@
       },
       "quit": "Twice. We’re done. I don’t train quitters.",
       "missedVm": {
-        "normie": "Coach here. You didn’t pick up. Ring me back today, piggy, or it counts as a miss.",
-        "mogger": "Coach here. You didn’t pick up, pretty boy. Ring me back today or it costs you.",
-        "truecel": "Coach. You didn’t pick up. Probably asleep in the crumbs. Ring me back today or it counts."
+        "normie": "Coach here. You didn’t pick up. Call me back today, piggy, or it counts as a miss.",
+        "mogger": "Coach here. You didn’t pick up, pretty boy. Call me back today or it costs you.",
+        "truecel": "Coach. You didn’t pick up. Probably asleep in the crumbs. Call me back today or it counts."
       },
       "down": {
         "push": "⬇ DOWN",
@@ -37362,29 +37362,29 @@
       },
       "ring": {
         "pitch": {
-          "normie": "You rang me? Brave. I’ve seen your photos. That little belly. I’m a trainer. I could train you, or I could punish you, and with me it’s the same thing. Want in?",
-          "mogger": "You rang me first? Pretty boy. I bet nobody has ever told you what to do. I’m a trainer. I could train you, or I could punish you, and with me it’s the same thing. Want in?",
-          "truecel": "You rang me? From the sty? Okay. I’m a trainer. I could fix you, or I could just enjoy you, and with me it’s the same thing. Want in?"
+          "normie": "You called me? Brave. I’ve seen your photos. That little belly. I’m a trainer. I could train you, or I could punish you, and with me it’s the same thing. Want in?",
+          "mogger": "You called me first? Pretty boy. I bet nobody has ever told you what to do. I’m a trainer. I could train you, or I could punish you, and with me it’s the same thing. Want in?",
+          "truecel": "You called me? From the sty? Okay. I’m a trainer. I could fix you, or I could just enjoy you, and with me it’s the same thing. Want in?"
         },
         "yes": {
-          "normie": "Rules. Three mornings. I ring early. You answer, or you ring me straight back. You call me Coach. Good piggy.",
-          "mogger": "Rules. Three mornings. I ring early. You answer, or you ring me straight back. You call me Coach. Good boy. Piggy.",
-          "truecel": "Rules. Three mornings. I ring early. You answer, or you ring me straight back. You call me Coach. Clean that desk, piggy."
+          "normie": "Rules. Three mornings. I call early. You answer, or you call me straight back. You call me Coach. Good piggy.",
+          "mogger": "Rules. Three mornings. I call early. You answer, or you call me straight back. You call me Coach. Good boy. Piggy.",
+          "truecel": "Rules. Three mornings. I call early. You answer, or you call me straight back. You call me Coach. Clean that desk, piggy."
         },
         "self": {
-          "normie": "You rang me first. Eager little piggy. I like eager.",
-          "mogger": "You rang me first. Nobody rings me first, pretty boy. I like it.",
-          "truecel": "You rang me first. Couldn’t sleep in the crumbs? Fine."
+          "normie": "You called me first. Eager little piggy. I like eager.",
+          "mogger": "You called me first. Nobody calls me first, pretty boy. I like it.",
+          "truecel": "You called me first. Couldn’t sleep in the crumbs? Fine."
         },
         "back": {
-          "normie": "Oh, now you ring. I rang you this morning, piggy. You made me wait, so it’s faster today.",
-          "mogger": "Oh, now you ring. You made me wait, pretty boy. Nobody makes me wait. Faster today.",
-          "truecel": "Oh, now you ring. Too busy in the sty to pick up? Faster today."
+          "normie": "Oh, now you call. I called you this morning, piggy. You made me wait, so it’s faster today.",
+          "mogger": "Oh, now you call. You made me wait, pretty boy. Nobody makes me wait. Faster today.",
+          "truecel": "Oh, now you call. Too busy in the sty to pick up? Faster today."
         },
-        "early": "Not yet. I ring you, early, when it’s time. Eat something green and go to sleep, piggy.",
+        "early": "Not yet. I call you, early, when it’s time. Eat something green and go to sleep, piggy.",
         "doneToday": "You already did today. Greedy piggy. Rest. Tomorrow.",
         "failedToday": "You already let me down once today. Tomorrow, early. Sleep.",
-        "hungUp": "You hung up on me this morning. You don’t get to ring me now. Tomorrow."
+        "hungUp": "You hung up on me this morning. You don’t get to call me now. Tomorrow."
       },
       "pre": {
         "oink": {
@@ -37439,15 +37439,15 @@
             "reply": {
               "normie": "Stop it. No. Okay. Say it again tomorrow.",
               "mogger": "Coming from you, that almost counts. Almost. Say it again.",
-              "truecel": "You’d say that to anyone who rang you. No. You wouldn’t, would you. Thank you."
+              "truecel": "You’d say that to anyone who called you. No. You wouldn’t, would you. Thank you."
             }
           },
           "turn": {
             "label": "Tell her it’s your turn to count",
             "player": "Tomorrow I count. You drop.",
             "reply": {
-              "normie": "You count for me? Nobody ever has. Fine. Tomorrow, I ring you. Don’t be nice to me. I’ll know if you’re lying.",
-              "mogger": "You, counting for me? Bossy. I didn’t know you had it in you. Tomorrow. I ring you.",
+              "normie": "You count for me? Nobody ever has. Fine. Tomorrow, I call you. Don’t be nice to me. I’ll know if you’re lying.",
+              "mogger": "You, counting for me? Bossy. I didn’t know you had it in you. Tomorrow. I call you.",
               "truecel": "You want to count for me. From your bed. Okay. Tomorrow. If you laugh at me I’ll know."
             }
           },
@@ -37494,7 +37494,7 @@
           "truecel": "Ten. I’m on the floor. You meant every one of them. I could hear it. Nobody has ever done that for me."
         },
         "hang": "You said you would. Never mind. Forget I said anything.",
-        "missedVm": "You were going to count for me. I waited on the gym floor like an idiot. Ring me if you still want to.",
+        "missedVm": "You were going to count for me. I waited on the gym floor like an idiot. Call me if you still want to.",
         "picture": {
           "normie": "Proof. Look what you did to me.",
           "mogger": "Proof. Don’t show anyone. Especially not the pretty girls.",
@@ -37669,7 +37669,7 @@
           "label": "Tell her Alice made you",
           "player": "It was Alice Beaumont. She makes me send them, word for word.",
           "join": "Alice. Of course it was. Tell her I want to write the next one. I have ideas. Most of them are about you.",
-          "pity": "Oh, you poor thing. She does this. I’m not angry with you. I am going to ring her, though."
+          "pity": "Oh, you poor thing. She does this. I’m not angry with you. I am going to call her, though."
         },
         "deny": {
           "label": "Say it was all you",
@@ -37684,9 +37684,9 @@
           "truecel": "She came to me wanting a pen. For you. I have no idea what you did, but I’m impressed."
         },
         "pity": {
-          "normie": "She rang me and called me a monster. Twenty minutes. I lay on the chaise and listened to every word. Best phone call of my year.",
-          "mogger": "She rang me to call me a monster, on your behalf. You inspire loyalty, pretty boy. Irritating.",
-          "truecel": "She rang me to call me a monster for what I did to you. Somebody defended you. Write that down somewhere."
+          "normie": "She called me and called me a monster. Twenty minutes. I lay on the chaise and listened to every word. Best phone call of my year.",
+          "mogger": "She called me to call me a monster, on your behalf. You inspire loyalty, pretty boy. Irritating.",
+          "truecel": "She called me to call me a monster for what I did to you. Somebody defended you. Write that down somewhere."
         },
         "deny": {
           "normie": "You kept my name out of it. Loyal. Wrong, but loyal. The whole club is reading your opener now, by the way.",
@@ -37794,9 +37794,9 @@
         },
         "player": "Your card says: {line}",
         "wrote": {
-          "normie": "Done. Tomorrow, at the luncheon. I’ll ring you from the table so you hear every word. I hate you a little.",
-          "mogger": "Done. Tomorrow, at the luncheon, pretty boy. I’ll ring you from the table. I hate you a little.",
-          "truecel": "Done. Tomorrow, at the luncheon. I’ll ring you from the table. If you laugh, I’ll know."
+          "normie": "Done. Tomorrow, at the luncheon. I’ll call you from the table so you hear every word. I hate you a little.",
+          "mogger": "Done. Tomorrow, at the luncheon, pretty boy. I’ll call you from the table. I hate you a little.",
+          "truecel": "Done. Tomorrow, at the luncheon. I’ll call you from the table. If you laugh, I’ll know."
         },
         "open": {
           "normie": "It’s me. I’m at the luncheon. The phone is face up by my water glass and twelve women are looking at me. I’m standing up. Here it is. {line} They’re staring. Say something.",
@@ -37819,7 +37819,7 @@
           "truecel": "Again? Okay. Standing. {line} Celeste has dropped her fork. Nobody has ever made me do anything twice. I need to lie down."
         },
         "hang": "You hung up. I read your card to twelve women and you hung up on me. Fine. Lesson learned.",
-        "missedVm": "I read your card at the luncheon and you didn’t pick up. I read it to a ringing phone. Ring me if you still care."
+        "missedVm": "I read your card at the luncheon and you didn’t pick up. I read it to a ringing phone. Call me if you still care."
       },
       "address": {
         "ask": {
@@ -39465,9 +39465,9 @@
           "player": {
             "twinset": "The cream twinset. Your pearls. Curtsy when you answer the phone.",
             "window": "Red lipstick. Stand at your window with the lamp on behind you. Don’t wave.",
-            "phrase": "When you ring me, say thank you, sir. Nothing else. Not one word more."
+            "phrase": "When you call me, say thank you, sir. Nothing else. Not one word more."
           },
-          "reply": "Written down. Every word. I’ll ring you tomorrow night when it’s done."
+          "reply": "Written down. Every word. I’ll call you tomorrow night when it’s done."
         },
         "call": {
           "open": {
@@ -39544,15 +39544,15 @@
         "title": "Match Point",
         "host": "MATCH-006",
         "hook": {
-          "mogger": "I need to tell you something and you’re not allowed to be smug about it. I’ve never let anyone tell me what to do. Not my father, not a coach, nobody. I want you to. Ring me, tell me where and how many, and I’ll do it to myself and count them out loud. My safeword is match point. Will you?",
+          "mogger": "I need to tell you something and you’re not allowed to be smug about it. I’ve never let anyone tell me what to do. Not my father, not a coach, nobody. I want you to. Call me, tell me where and how many, and I’ll do it to myself and count them out loud. My safeword is match point. Will you?",
           "normie": "Okay. This is hard to say. I’ve never once let anyone give me orders. I want you to. On the phone. You tell me where and how many, and I do it to myself, and count. If it’s too much I say match point and we stop. Would you?",
           "truecel": "Don’t make this weird. I’ve never let anyone tell me what to do, and I want to try it with someone who won’t matter. You tell me where and how many, on the phone, I do it and count. Match point means stop. Can you manage that?"
         },
         "yes": {
           "label": "Tell her you’ll call the count",
-          "player": "I’ll ring you. I’ll tell you where and how many.",
+          "player": "I’ll call you. I’ll tell you where and how many.",
           "reply": {
-            "mogger": "Tomorrow night, then. I’ll ring you. Be in charge. It suits you.",
+            "mogger": "Tomorrow night, then. I’ll call you. Be in charge. It suits you.",
             "normie": "Tomorrow night. I’ll ring. Match point if it’s too much. I trust you.",
             "truecel": "Tomorrow night. I’ll ring. Don’t be pathetic about it."
           }
@@ -39735,7 +39735,7 @@
       "br_success": {
         "mood": "good",
         "lines": [
-          "A federal inquiry into the Blue Ribbon Foundation. My mother rang me twice about it. She’s thrilled and pretending not to be.",
+          "A federal inquiry into the Blue Ribbon Foundation. My mother called me twice about it. She’s thrilled and pretending not to be.",
           "The Blue Ribbon Foundation is under federal investigation. Somebody handed them a file. Very brave or very stupid. Maybe both."
         ]
       },
@@ -42218,7 +42218,7 @@
             {
               "id": "lie",
               "label": "Promise to say she’s his accountant",
-              "player": "If she rings me, you’re his accountant.",
+              "player": "If she calls me, you’re his accountant.",
               "reply": [
                 "You’ll lie for me. Good. You lie beautifully, I can tell from here.",
                 "Come and see the canisters one day. You’d be the first."
@@ -42231,7 +42231,7 @@
             {
               "id": "truth",
               "label": "Tell her you’ll tell his wife the truth",
-              "player": "If she rings me, I’m telling her the truth.",
+              "player": "If she calls me, I’m telling her the truth.",
               "reply": [
                 "Then you’ve chosen her. How sweet. Goodbye."
               ],
@@ -42679,7 +42679,7 @@
           "warmth": 2,
           "lines": [
             "Don’t shout. The men on the strip wanted Lena’s boyfriend’s number, and I gave them yours.",
-            "One of them is going to ring you tonight. You just have to be him. Tall, jealous, works away. Can you do that?"
+            "One of them is going to call you tonight. You just have to be him. Tall, jealous, works away. Can you do that?"
           ],
           "choices": [
             {
@@ -42713,7 +42713,7 @@
             "agreed"
           ],
           "lines": [
-            "He rang you last night, didn’t he. What did you tell him?"
+            "He called you last night, didn’t he. What did you tell him?"
           ],
           "choices": [
             {
@@ -42837,7 +42837,7 @@
           "gap": 2,
           "lines": [
             "My dad rang. He’s heard about you. He rings every man I talk to and tells him to unmatch me.",
-            "He was a sergeant for thirty years. He’ll ring you. Be nice to him. Or don’t. I want to see what you do."
+            "He was a sergeant for thirty years. He’ll call you. Be nice to him. Or don’t. I want to see what you do."
           ],
           "choices": [
             {
@@ -43349,7 +43349,7 @@
             "MATCH-064:adeline"
           ],
           "lines": [
-            "A nurse rang me. Maya Serrano. She has my brother’s chart, under the other name, with the burns written up as gardening.",
+            "A nurse called me. Maya Serrano. She has my brother’s chart, under the other name, with the burns written up as gardening.",
             "She was very kind about it. I was very unkind back, and then I asked her what she wanted, the way the club taught me. She said nothing. Nobody has ever wanted nothing from me. I don’t know what to do with it."
           ],
           "note": "Maya Serrano gave Adeline Marsh her brother Caleb’s chart and asked for nothing."
@@ -43520,7 +43520,7 @@
           "day": 4,
           "gap": 1,
           "lines": [
-            "The dispatch logs never came. Doreen on the night desk rang me herself instead.",
+            "The dispatch logs never came. Doreen on the night desk called me herself instead.",
             "She said the same three nights my payphone men rang the station, they rang 911 first, and every call was put through to one sergeant. Lowry. Then she hung up very fast."
           ],
           "note": "Odette Price says Doreen on dispatch told her the three 911 calls from the weigh station payphone were all put through to Sergeant Lowry.",
@@ -44803,7 +44803,7 @@
               "player": "Give it to his sister, Adeline Marsh.",
               "reply": [
                 "The woman in the beautiful gloves who collected him. She tipped the orderly a hundred dollars.",
-                "Okay. I’ll ring her. I’ll be very kind about it, the way you’re kind to a woman about to be very unkind back."
+                "Okay. I’ll call her. I’ll be very kind about it, the way you’re kind to a woman about to be very unkind back."
               ],
               "set": [
                 "adeline"
@@ -44815,7 +44815,7 @@
               "label": "Tell her to ask the student group about him",
               "player": "Ask the students he sits with. They’ll know what he did.",
               "reply": [
-                "The ones at the back of his seminar. Okay. One of them has a nice voice on the phone. I’ll ring her."
+                "The ones at the back of his seminar. Okay. One of them has a nice voice on the phone. I’ll call her."
               ],
               "end": "burned",
               "fates": [
@@ -45116,7 +45116,7 @@
           "warmth": 1,
           "day": 2,
           "lines": [
-            "The video of me saving that little boy went round again today. Celeste Van Doren’s grandson. His mom filmed it for her followers and never said thank you. A hundred thousand views of my face.",
+            "The video of me saving that little boy went around again today. Celeste Van Doren’s grandson. His mom filmed it for her followers and never said thank you. A hundred thousand views of my face.",
             "Under it, ten thousand people saying what a brave mom. I’m about to type something."
           ],
           "choices": [
@@ -45987,7 +45987,7 @@
                   "news": {
                     "title": "THE OLD QUARTER PACKS THE CELLAR DOOR",
                     "summary": "Every act in the Quarter played one night to save the venue.",
-                    "body": "Every band, DJ and singer in the Old Quarter played the Cellar Door in a single night to pay off the venue’s loan, ahead of a deadline set by the casino’s bank. The line went round the block twice. The owner, Sable Marlow, worked the door herself in her goalkeeper gloves and let nobody in a suit through.",
+                    "body": "Every band, DJ and singer in the Old Quarter played the Cellar Door in a single night to pay off the venue’s loan, ahead of a deadline set by the casino’s bank. The line went around the block twice. The owner, Sable Marlow, worked the door herself in her goalkeeper gloves and let nobody in a suit through.",
                     "fallback": "local_ad",
                     "image": "tale_sable_old_quarter"
                   }
@@ -46060,7 +46060,7 @@
           "warmth": 1,
           "day": 2,
           "lines": [
-            "My sister came round. Estelle. She stood in front of the sunset painting I framed for her club and looked at it for a whole minute without blinking.",
+            "My sister came around. Estelle. She stood in front of the sunset painting I framed for her club and looked at it for a whole minute without blinking.",
             "I hid the original brief for that social club symbol behind the backing of that painting, with the envelope the cash came in. I never told her that."
           ],
           "choices": [
@@ -46301,7 +46301,7 @@
           "gap": 1,
           "lines": [
             "I noticed something and I don’t know who to tell, so I am telling you, which is foolish.",
-            "Lucia carries meals up to the flat over the Sisters’ charity shop every evening. Two trays. Nobody lives up there. One tray comes back empty."
+            "Lucia carries meals up to the apartment over the Sisters’ charity shop every evening. Two trays. Nobody lives up there. One tray comes back empty."
           ],
           "note": "Eliza Montoya says Lucia Romano carries two trays every evening up to the empty flat over the Sisters’ charity shop, and one comes back empty.",
           "choices": [

@@ -523,10 +523,18 @@
       other.classList.remove('on');
       slideTimers.push(api.later(advance,SLIDE_MS));
     }
+    // The first dance (8 November 2026): she shows you the steps, you copy them, and the card says how it went.
+    const DANCE_LINE={perfect:'Your first dance was perfect. Somebody’s aunt cried. So did you, a little.',ok:'Your first dance went fine. You only looked at your feet the whole time.',miss:'Your first dance went wrong in front of everyone. She laughed it off. The video will outlive you both.'};
+    let danced=null;
     function finishWedding(){
       const {id,preview}=showing;
       showing=null;clearTimers();
       show.classList.remove('visible');
+      danced=null;
+      if(!preview&&typeof window!=='undefined'&&window.runBeats){
+        window.runBeats([{qte:'sequence',key:'dance',caption:`The first dance. ${brideName(id).split(' ')[0]} shows you the steps once. Copy them. Everyone is filming.`}],{},c=>{danced=c.results?.dance||'ok';showVictory(id,preview);});
+        return;
+      }
       showVictory(id,preview);
     }
     function showVictory(id,preview){
@@ -536,7 +544,7 @@
       const backdrop=tb?data.thunderbirds.backdrop:data.art.victoryBackdrop;
       const review=tb&&!preview?data.thunderbirds.victory.underReview?.[api.world()?.blueRibbon?.outcome]:null; // the Ledger's verdict on the club you are marrying into (4 November 2026, the sense check)
       const frames=weddingFrames(id);
-      win.innerHTML=`<img class="backdrop" src="${esc(api.assetUrl(backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(api.assetUrl(frames[3]))}" alt="${esc(brideName(id))} on her wedding day"></div><h2>${esc(v.title)}</h2><p class="sub">${esc(v.subtitle)}</p><p class="line">${esc(fill(v.line,{name:brideName(id),day}))}</p>${review?`<p class="line">${esc(review)}</p>`:''}${!preview&&api.victoryNote?api.victoryNote():''}${preview?'<p class="note">Testing preview. Your run is unchanged.</p><button data-marriage-win="close">Close preview</button>':`<button data-marriage-win="new">${esc(v.newGame)}</button>`}</div>`;
+      win.innerHTML=`<img class="backdrop" src="${esc(api.assetUrl(backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(api.assetUrl(frames[3]))}" alt="${esc(brideName(id))} on her wedding day"></div><h2>${esc(v.title)}</h2><p class="sub">${esc(v.subtitle)}</p><p class="line">${esc(fill(v.line,{name:brideName(id),day}))}</p>${danced&&DANCE_LINE[danced]?`<p class="line">${esc(DANCE_LINE[danced])}</p>`:''}${review?`<p class="line">${esc(review)}</p>`:''}${!preview&&api.victoryNote?api.victoryNote():''}${preview?'<p class="note">Testing preview. Your run is unchanged.</p><button data-marriage-win="close">Close preview</button>':`<button data-marriage-win="new">${esc(v.newGame)}</button>`}</div>`;
       const portrait=win.querySelector?.('.frame img');
       const fallback=fallbackFrame(id,3);
       if(portrait&&fallback)portrait.onerror=()=>{portrait.onerror=null;portrait.src=api.assetUrl(fallback);}; // her own photo until her wedding portrait exists
@@ -584,7 +592,7 @@
       hasData:()=>!!data,
       // The five jewellers as Hinge cards (preview.html puts them in the swipe deck).
       jewellerCards:()=>!data?[]:JEWELLERS.map(id=>({id,name:data.jewellers[id].name,shop:data.jewellers[id].shop,role:data.jewellers[id].role,portrait:data.jewellers[id].portrait})),
-      // A jeweller who rings you about a stalled engagement sends the ring over (4 November 2026: the world steps in).
+      // A jeweller who calls you about a stalled engagement sends the ring over (4 November 2026: the world steps in).
       giftRing:id=>{const st=state();if(!st||!JEWELLERS.includes(id))return false;ensureNumbers(st);st.jewellers[id].met=true;return giveRing(st,id);},
       jewellerIds:()=>[...JEWELLERS],
       // You matched with her and asked for her number: her shop line goes in your Contacts.
@@ -596,7 +604,7 @@
         api.save();
         return st.numbers[id];
       },
-      // A Sister who rings you may ask one of today's two examination questions over the phone.
+      // A Sister who calls you may ask one of today's two examination questions over the phone.
       // It counts like one asked in the chat. Returns null if her examination hasn't started,
       // is passed, or today's questions are used up.
       // Every question she asks on the phone counts (4 November 2026): her call starts the examination

@@ -241,7 +241,7 @@
     }
     const flyerRead=st=>st.clues.some(c=>c.kind==='flyer'); // you've seen the flyer in the paper
     // What you know about a woman: her number (from the flyer, or she gave it you), whether you've
-    // matched on Hinge, and her name (a match shows it; so does ringing her).
+    // matched on Hinge, and her name (a match shows it; so does calling her).
     function knowsNumber(st,id){return (FLYER_NUMBERS.includes(id)&&flyerRead(st))||!!threadOf(id)?.number;}
     function knowsName(st,id){return id===VICTORIA||!!threadOf(id)||!!st.goths[id]?.named;}
     const placeClue=st=>st.clues.some(c=>PLACE_CLUES.includes(c.kind)); // something points at a chapel
@@ -1025,6 +1025,11 @@
       onMatch,onPaperOpened,onHeard,dialFlyer,likesYou,
       // A friend finds out which night the moon goes dark (a favour in preview.html). Returns the night, or null.
       tellNight:who=>{const st=sync();if(!st||!st.active||st.nightKnown||st.outcome||st.dead||st.riteDay===null)return null;learnNight(st,who);return relNights(st.riteDay);},
+      // Scout a chapel at night (8 November 2026, a story place in preview.html): unseen, you learn whether it is the place.
+      scoutable:()=>{const st=sync();if(!st||!st.active||st.outcome||st.dead||!st.clues.some(c=>c.kind==='flyer'))return [];return Object.keys(data.places).filter(k=>!st.clues.some(c=>c.source==='scout:'+k)).map(k=>({key:k,name:placeName(k)}));},
+      scout:(key,unseen)=>{const st=sync();if(!st||!st.active||st.outcome||st.dead||!data.places[key])return null;if(!unseen)return 'seen';
+        if(key===st.location){addClue(st,'chalk',`You scouted ${placeName(key)} at night: fresh chalk on the door and candle wax on the step. This is the place.`,'scout:'+key);return 'here';}
+        addClue(st,'never',`You scouted ${placeName(key)} at night: dust on the door and nothing in the sand. Not here.`,'scout:'+key);return 'not';},
       isCaseOpen:()=>caseOpen,
       isWon:()=>!!state()?.won,
       win:()=>({visible:!!win?.classList?.contains('visible'),html:win?.innerHTML||''}),
