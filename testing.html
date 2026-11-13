@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="e17a8e73fd">
+<html lang="en" data-build="9c03a56f01">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -989,11 +989,11 @@
     @media(max-width: 730px) { .workbench { display: flex; flex-direction: column; gap: 16px; padding: 17px; } aside { padding: 2px; } h1 { font-size: 32px; } .settings { margin-top: 12px; } .preview-area { padding-top: 0; } }
   </style>
   <!-- Task 2: Chapel at Midnight quest engine. The standalone build inlines it. -->
-  <script src="chapel_at_midnight.js?v=e17a8e73fd"></script>
+  <script src="chapel_at_midnight.js?v=9c03a56f01"></script>
   <!-- Marriage: the Sisters of Mercy (and the Bluebird wedding), the only victories. The standalone build inlines it. -->
-  <script src="marriage.js?v=e17a8e73fd"></script>
+  <script src="marriage.js?v=9c03a56f01"></script>
   <!-- Professor Vale: "The Professor Who Won't Disappear". The standalone build inlines it. -->
-  <script src="quests/professor-vale.js?v=e17a8e73fd"></script>
+  <script src="quests/professor-vale.js?v=9c03a56f01"></script>
 </head>
 <body>
   <main class="workbench">
@@ -1327,7 +1327,7 @@
     const questOn=id=>{const start=questStart(id);return start!==null&&world.day>=start;};
     function newWorld(seed){
       const text=String(seed);
-      return {version:3,seed:text,quests:pickQuests(text),contactsKnown:{},cupboard:{pos:{},seen:[],picked:[]},rngState:hashSeed(text),day:1,flags:{},clues:[],editions:[],seenArticles:[],bearOffered:false,bearDay:hashSeed(text+'|bearday')%3===0?3+hashSeed(text+'|bearday2')%6:null,honey:null,bearAffinity:0,bearChoice:'none',bearInvited:false,bearPrepared:false,bearDistracted:false,bearAwaitingResponse:false,bearMessageDay:null,blueRibbon:newBlueRibbonState(),falsePoliceReports:0,policeArrested:false,policeArrestPhase:null};
+      return {version:3,seed:text,wins:[],quests:pickQuests(text),contactsKnown:{},cupboard:{pos:{},seen:[],picked:[]},rngState:hashSeed(text),day:1,flags:{},clues:[],editions:[],seenArticles:[],bearOffered:false,bearDay:hashSeed(text+'|bearday')%3===0?3+hashSeed(text+'|bearday2')%6:null,honey:null,bearAffinity:0,bearChoice:'none',bearInvited:false,bearPrepared:false,bearDistracted:false,bearAwaitingResponse:false,bearMessageDay:null,blueRibbon:newBlueRibbonState(),falsePoliceReports:0,policeArrested:false,policeArrestPhase:null};
     }
     // Blue Ribbon Ledger progress lives inside world, so it travels with the
     // existing version-3 save. Older saves without it load a fresh case.
@@ -2801,6 +2801,41 @@
       }
     }
     const chatListed=thread=>!((thread.blocked||thread.left)&&Number.isInteger(thread.goneDay)&&thread.goneDay<world.day);
+    // ---- Which quests you follow, and who offers what (13 November 2026) ----
+    // A choice's quest, from its button: sq:pageant, mini:husband, vale, br, chapel, and so on.
+    function choiceQuest(html){
+      const pv=/data-pv-topic="/.test(html),br=/data-br-topic="/.test(html);if(pv)return 'vale';if(br)return 'br';
+      const m=/data-hinge-topic="([^"]+)"/.exec(html);if(!m)return null;
+      return questKeyOf(m[1]);
+    }
+    function questKeyOf(id){
+      const p=String(id).split(':');
+      if(['sq','sqt','sqs'].includes(p[0])&&p[1])return 'sq:'+p[1];
+      if(p[0]==='qh'&&p[1])return ['vale','chapel'].includes(p[1])?p[1]:'sq:'+p[1];
+      if(['mini','rq','fq','tale'].includes(p[0])&&p[1])return p[0]+':'+p[1];
+      if(['hal','fionn','caller','lpc','glow','leak','kessler','chapel','finale','gift','cover','sor','svc','st','cs','bf','sx','bq','gun'].includes(p[0]))return p[0]==='svc'?'svc:'+(p[1]||''):p[0];
+      return null;
+    }
+    // The same question anyone in town could ask (a story's opener, her hint, a case question, a phone line): spread
+    // across your matches. A thing only she has (her own story, a quest she is in, her family) is never spread.
+    function choiceGeneric(html,profile){
+      const r=/data-hinge-topic="sq:radio:q([^"]+)"/.exec(html); // a radio question: a lead only for the women whose side of town knows it
+      if(r){const Q=RADIO_QUESTIONS.find(q=>q.id===r[1]);return !Q||Q.faction!==profile?.factionId;}
+      const br=/data-br-topic="([^"]+)"/.exec(html); // the Ledger: an opening question is anyone's; a follow-up on what she already told you is hers
+      if(br){const t=(BR?.hingeTopics?.[profile?.factionId]||[]).find(x=>x.id===br[1]);return !!t&&!(t.requires||[]).length&&!t.needsWitness&&!t.needsScrap&&!t.needsLinks;}
+      const pv=/data-pv-topic="([^"]+)"/.exec(html);if(pv)return pv[1]==='pv_rumour'; // Professor Vale: only have-you-heard is anyone's
+      return /data-hinge-topic="(sq:[a-z]+:o|qh:|svc:|gun:)/.test(html);
+    }
+    function offersToday(){const o=world.offers;if(!o||o.day!==world.day||typeof o.keys!=='object')world.offers={day:world.day,keys:{}};return world.offers.keys;}
+    function offerCrowded(key,id){const by=offersToday()[key]||[];return !by.includes(id)&&by.length>=2;}
+    function offerNote(key,id){const k=offersToday(),by=k[key]||(k[key]=[]);if(!by.includes(id))by.push(id);}
+    // How much you follow a quest: the questions you asked about it, the latest counting most.
+    function questInterest(key){const i=key&&world.interest?.[key];if(!i)return 0;return i.n+(i.day===world.day?3:i.day>=world.day-2?1:0);}
+    function noteInterest(id){
+      const key=typeof id==='string'&&id.includes(':')?questKeyOf(id):id;if(!key||!world)return;
+      const all=world.interest&&typeof world.interest==='object'?world.interest:(world.interest={});
+      const i=all[key]||(all[key]={n:0,day:world.day});i.n=Math.min(99,i.n+1);i.day=world.day;
+    }
     function hingeOptionsFor(thread){
       if((thread.awaiting||thread.pending)&&dadChoices(thread).length)return dadChoices(thread).map(([id,label,risky])=>`<button class="hinge-chat-choice${risky?' risky':''}" data-hinge-topic="${id}">${esc(label)}</button>`).join(''); // her father said tonight: whatever she is doing
       if(thread.awaiting)return `<div class="story-tag">${thread.ghosted?'Seen · no response yet':'Message pending · check tomorrow'}</div>`;
@@ -2843,7 +2878,7 @@
       const choices=[];
       // Rank 0 is a story in progress (a quest, a room quest, her own story, the Ball): those buttons wear the case style
       // (gold, like the Ledger's and Vale's questions) so a player can tell a case from her small talk (4 November 2026, the sense check).
-      const add=(html,rank)=>choices.push({html:rank===0&&html.includes(' data-hinge-topic="')?html.replace(/class="hinge-chat-choice(?! case-choice)/g,'class="hinge-chat-choice case-choice'):html,rank,order:choices.length});
+      const add=(html,rank)=>choices.push({html:rank===0&&html.includes(' data-hinge-topic="')?html.replace(/class="hinge-chat-choice(?! case-choice)/g,'class="hinge-chat-choice case-choice'):html,rank,order:choices.length,key:choiceQuest(html),generic:choiceGeneric(html,profileNow)});
       if(marriageOptions?.html)add(marriageOptions.html,0); // Marriage
       if(chapelOptions?.html)add(chapelOptions.html,0); // Task 2
       for(const ask of gossipAsksFor(thread))add(`<button class="hinge-chat-choice" data-hinge-topic="gossip:${esc(ask.key)}">${esc(fillIn(GOSSIP_ASK_LABEL,{teller:firstName(hingeProfile(ask.by))}))}</button>`,1); // what someone told you about her
@@ -2891,12 +2926,18 @@
       // Always offered. After her first picture it becomes "Another one?".
       add(`<button class="hinge-chat-choice photo-choice" data-hinge-topic="photo">${esc(flirtAskLabel(thread,hingeProfile(thread.id),picturesSent(thread,hingeProfile(thread.id)).length>0))}</button>`,3);
       const done=doneForToday(thread); // a few questions a day: after that, only story events
-      const shown=(done?choices.filter(choice=>choice.rank===0&&!QUEST_ASK_HTML.test(choice.html)):[...choices]).sort((a,b)=>a.rank-b.rank||a.order-b.order).slice(0,MAX_CHAT_CHOICES).sort((a,b)=>a.order-b.order).map(choice=>choice.html);
+      for(const c of choices)if(c.generic&&c.key&&offerCrowded(c.key,thread.id))c.rank=Math.max(c.rank,6); // two other women are already asking about this today: hers first (13 November 2026)
+      choices.filter(c=>c.generic&&c.rank<6).sort((a,b)=>questInterest(b.key)-questInterest(a.key)||a.order-b.order).slice(GENERIC_ROOM).forEach(c=>{c.rank=6;}); // two town questions at most, the ones you follow: room for her own talk
+      const keep=(done?choices.filter(choice=>choice.rank===0&&!QUEST_ASK_HTML.test(choice.html)):[...choices]).sort((a,b)=>a.rank-b.rank||(a.rank<=1?questInterest(b.key)-questInterest(a.key):0)||a.order-b.order).slice(0,MAX_CHAT_CHOICES); // the quests you follow first
+      for(const c of keep)if(c.generic&&c.key)offerNote(c.key,thread.id);
+      const shown=keep.sort((a,b)=>a.order-b.order).map(choice=>choice.html);
       if(done)shown.push(`<div class="story-tag">${esc(talkKit()?.dayDoneNote||'She’s done talking for today. Try her again tomorrow.')}</div>`);
       if(thread.number)shown.push(`<div style="font:9px Verdana,sans-serif;color:#a8e8bc;text-align:center">Number saved: ${thread.number}</div>`);
       return shown.join('');
     }
-    const MAX_CHAT_CHOICES=4; // a conversation never shows more than four choices at once (five at most, preferably four; asking for a picture counts)
+    const MAX_CHAT_CHOICES=5; // a conversation shows at most five choices at once (13 November 2026: it was four); asking for a picture counts
+    var GENERIC_ROOM=2; // town questions (anyone could answer) per chat, at most
+    var CHATTER_MAX=2; // how many women bring up the same piece of news about you, on its one day
     // Questions a quest lets you ask her. Free while she's talking, gone once she's done for the day.
     const QUEST_ASK=/^(mini:|lpc:ask|hal:|leak:ask|caller:friend|fionn:(look|verse|run|g:))/;
     const QUEST_ASK_HTML=/data-hinge-topic="(mini:|lpc:ask|hal:|leak:ask|caller:friend|fionn:(look|verse|run|g:))/;
@@ -3048,6 +3089,7 @@
     }
     function chooseHingeTopic(id){
       guideShield();
+      try{noteInterest(id);}catch{} // the quests you follow come first (13 November 2026)
       const thread=hingeThreads.get(activeChatId),profile=hingeProfile(activeChatId);
       if(id==='dad:unmatch'&&thread&&profile&&!thread.blocked)return chooseDad(id,thread,profile); // her father: even while her reply is pending
       if((id.startsWith('bf:')||id.startsWith('st:')||id.startsWith('sx:')||id.startsWith('cs:'))&&thread&&profile&&!thread.pending&&!thread.awaiting&&!thread.blocked){thread.quiet=false;thread.fumbled=false;return starterChoose(id,thread,profile);} // the starting quest: never uses up the day, and she answers it even when she'd gone quiet
@@ -5190,11 +5232,12 @@
       const ready=[...hingeThreads.values()].filter(t=>{const p=hingeProfile(t.id);return p&&t.id!==bearHingeCard.id&&!skip.includes(t.id)&&!f.told.includes(t.id)&&eventReady(t)&&!t.followUp&&!t.blocked&&!t.unmatched&&!t.left&&!t.missing&&morningRoom(t);})
         .sort((a,b)=>hashSeed(world.seed+'|infamy|'+a.id+world.day)-hashSeed(world.seed+'|infamy|'+b.id+world.day));
       for(const t of ready){
-        if(sent>=2)break;
+        if(!Number.isInteger(f.msgDay))f.msgDay=world.day;
+        if(world.day!==f.msgDay||f.told.length>=CHATTER_MAX)break; // one day, one or two women (13 November 2026)
         lineSpeaker=t.id;
         t.log.push({who:'her',text:freshHers(t,kit.lines,world.seed+'|infamyline|'+t.id)});
         f.told.push(t.id);warmBy(t,kit.good?1:-1);talkState(t).unread=true;talkState(t).morningDay=world.day;sent++;
-        t.followUp={kind:'qtalk',id:kit.good?'infamy_good':'infamy_bad'}; // answer her
+        t.followUp={kind:'qtalk',day:world.day,id:kit.good?'infamy_good':'infamy_bad'}; // answer her
       }
     }
 
@@ -7561,19 +7604,20 @@
       const ready=[...hingeThreads.values()].filter(t=>{const p=hingeProfile(t.id);return p&&t.id!==bearHingeCard.id&&!f.told.includes(t.id)&&eventReady(t)&&!t.followUp&&!t.unmatched&&!t.left&&!t.missing&&warmthOf(t)>=0&&morningRoom(t);})
         .sort((a,b)=>hashSeed(world.seed+'|famous|'+a.id+world.day)-hashSeed(world.seed+'|famous|'+b.id+world.day));
       for(const t of ready){
-        if(sent>=(world.day===f.day?3:2))break;
+        if(!Number.isInteger(f.msgDay))f.msgDay=world.day; // the first morning it is in the paper, and only then
+        if(world.day!==f.msgDay||f.told.length>=CHATTER_MAX)break; // one day, one or two women (13 November 2026)
         lineSpeaker=t.id;
         t.log.push({who:'her',text:freshHers(t,deed.her,world.seed+'|fameline|'+t.id)});
         f.told.push(t.id);warmBy(t,1);talkState(t).unread=true;talkState(t).morningDay=world.day;sent++;
-        if(QTALK['fame_'+f.id])t.followUp={kind:'qtalk',id:'fame_'+f.id}; // answer her
+        if(QTALK['fame_'+f.id])t.followUp={kind:'qtalk',day:world.day,id:'fame_'+f.id}; // answer her
       }
     }
     // A new match while you're famous opens with it.
     function fameOnMatch(thread){
       if(!famous()||!thread||thread.awaiting)return;
-      const f=fameState();if(f.told.includes(thread.id))return;
+      const f=fameState();if(f.told.includes(thread.id)||f.told.length>=CHATTER_MAX||(Number.isInteger(f.msgDay)&&world.day!==f.msgDay))return; // one day, one or two women
       lineSpeaker=thread.id;thread.log.push({who:'her',text:freshHers(thread,FAME.deeds[f.id].her,world.seed+'|famematch|'+thread.id)});f.told.push(thread.id);
-      if(QTALK['fame_'+f.id]&&!thread.followUp)thread.followUp={kind:'qtalk',id:'fame_'+f.id};
+      if(QTALK['fame_'+f.id]&&!thread.followUp)thread.followUp={kind:'qtalk',day:world.day,id:'fame_'+f.id};
     }
     // ===== Mogger: her dad, and Theon =====
     // Two men who aren't on Hinge. They call you (their ids start x:) and you can't call them back.
@@ -8504,12 +8548,14 @@
       updateRunStatus('Game over.');
     }
     // The win, the morning after (questWin), and what the help system can offer.
-    function sqWin(){
+    function sqWin(){return sqWins()[0]||null;} // the first of them
+    function sqWins(){ // every story quest won, from the morning after (questWin picks one this run hasn't had)
+      const out=[];
       for(const id of SQ_IDS){
         const st=world?.sq?.[id];
-        if(st?.outcome==='won'&&SQ[id].win&&Number.isInteger(st.outcomeDay)&&world.day>st.outcomeDay)return {type:'q_'+id,bride:st.v?.bride||null,day:world.day};
+        if(st?.outcome==='won'&&SQ[id].win&&Number.isInteger(st.outcomeDay)&&world.day>st.outcomeDay)out.push({type:'q_'+id,bride:st.v?.bride||null,day:world.day});
       }
-      return null;
+      return out;
     }
     function sqHelpLead(){
       for(const id of SQ_IDS){
@@ -12857,7 +12903,7 @@
       lineSpeaker=profile.id;
       herLine(thread,event.lines[hashSeed(world.seed+'|town|'+due.key+'|'+thread.id)%event.lines.length]);
       st.musedDay=world.day;st.morningDay=world.day;
-      thread.followUp=QTALK[due.key]?{kind:'qtalk',id:due.key}:{kind:'tone',id:event.mood}; // answer her (quest talk), or react in your own tone
+      thread.followUp=QTALK[due.key]?{kind:'qtalk',day:world.day,id:due.key}:{kind:'tone',id:event.mood}; // answer her (quest talk), or react in your own tone
       t.told.push(due.key);
     }
     // ===== Quest talk (8 November 2026): they ask you about it, and you answer =====
@@ -12955,19 +13001,22 @@
       if(!world||world.victory||!revampOn())return false;
       const q=qtState();if(q.day!==world.day){q.day=world.day;q.n=0;}
       if(q.n>=3)return false;
-      const due=qtEvents().filter(ev=>(q.told[ev.key]||[]).length<(ev.win?1:2)&&world.day>ev.day&&world.day<=ev.day+4).sort((a,b)=>a.day-b.day)[0]; // from the morning after
+      const due=qtEvents().filter(ev=>(q.told[ev.key]||[]).length<(ev.win?1:CHATTER_MAX)&&world.day===ev.day+1).sort((a,b)=>a.day-b.day)[0]; // the morning after, and only then
       if(!due)return false;
       const K=QTALK[due.key],t=qtPick(due,K);if(!t)return false;
       const p=hingeProfile(t.id),asks=K.asks||[];if(!asks.length)return false;
       lineSpeaker=t.id;
       herLine(t,qtFill(due.key,asks[hashSeed(world.seed+'|qtask|'+due.key+t.id)%asks.length]));
       talkState(t).unread=true;
-      t.followUp={kind:'qtalk',id:due.key};
+      t.followUp={kind:'qtalk',day:world.day,id:due.key};
       (q.told[due.key]||(q.told[due.key]=[])).push(t.id);q.n++;
       if(sameDay)showGameNotice(`${firstName(p)} messaged you.`);
       return true;
     }
-    function qtalkNewDay(){qtDeliver(false);qtDeliver(false);} // the mornings after: up to two
+    function qtalkNewDay(){ // yesterday's unanswered questions about the news go away; then the morning after's, up to two
+      for(const t of hingeThreads.values())if(t.followUp?.kind==='qtalk'&&(!Number.isInteger(t.followUp.day)||t.followUp.day<world.day))t.followUp=null;
+      qtDeliver(false);qtDeliver(false);
+    }
     function qtalkSoon(){} // (8 November 2026) quest talk waits for the morning after, like everything else
     function qtalkChoices(follow){
       const K=QTALK[follow.id];
@@ -14838,7 +14887,7 @@
       const out={unlocked:Number.isInteger(o.unlocked)?Math.max(1,Math.min(LADDER.length,o.unlocked)):1,wins:{},won:[],ach:{},notes:[],fresh:null,allAccess:o.allAccess===true,taught:{},questsWon:[],played:{}};
       for(const k of ['hinge','match','day','paper','call','door'])if(o.taught?.[k]===true)out.taught[k]=true;
       for(const rung of LADDER){const n=o.wins?.[rung.id];if(Number.isInteger(n)&&n>0)out.wins[rung.id]=Math.min(9999,n);}
-      if(Array.isArray(o.won))out.won=o.won.filter(seed=>typeof seed==='string'&&seed.length<=80).slice(-40);
+      if(Array.isArray(o.won))out.won=o.won.filter(seed=>typeof seed==='string'&&seed.length<=120).slice(-40); // a run's seed, and since 8 November 2026 the seed and the kind of win
       for(const a of ACHIEVEMENTS){const e=o.ach?.[a.id];if(e&&typeof e==='object')out.ach[a.id]={day:Number.isInteger(e.day)?e.day:null,as:ladderIndex(e.as)>=0?e.as:null};}
       if(Array.isArray(o.notes))out.notes=o.notes.filter(n=>n&&typeof n.id==='string'&&/^n[0-9a-z]{1,20}$/.test(n.id)&&typeof n.text==='string').slice(0,NOTES_MAX).map(n=>({id:n.id,text:n.text.slice(0,NOTE_CHARS)}));
       if(ladderIndex(o.fresh)>=0&&!LADDER[ladderIndex(o.fresh)].soon)out.fresh=o.fresh;
@@ -14862,31 +14911,40 @@
       p.unlocked=i+1;saveProfile();checkAchievements();
     }
     function ladderPoints(){const p=playerProfile();return ACHIEVEMENTS.reduce((sum,a)=>sum+(p.ach[a.id]?a.points:0),0);}
-    // A win counts once per run (by its seed): the class you won as, and the next class unlocks.
-    function ladderCountWin(as,seed){
+    // Every win counts once (by its run's seed and the kind of win): the class you won as, and the next class unlocks.
+    // A run can win more than once now (8 November 2026), so each different win in it counts. Records from before
+    // that hold the bare seed, which stands for that run's first win.
+    function ladderCountWin(as,seed,type=null,first=true){
       const p=playerProfile(),i=ladderIndex(as);
       if(i<0)return null;
-      const next=LADDER[i+1]||null;
-      if(seed&&!p.won.includes(seed)){
-        p.won.push(seed);p.won=p.won.slice(-40);
+      const next=LADDER[i+1]||null,key=type?`${seed}|${type}`:seed;
+      if(seed&&!p.won.includes(key)&&!(first&&type&&p.won.includes(seed))){
+        p.won.push(key);p.won=p.won.slice(-40);
         p.wins[as]=(p.wins[as]||0)+1;
         if(next&&p.unlocked<i+2)p.unlocked=i+2; // kept for old records; every class is open anyway
         saveProfile();checkAchievements();
       }
       return {as,next};
     }
-    function ladderWin(){
+    function ladderWinKind(type){ // a wedding, the Chapel's date, the Looksmaxxer's and the Divorcé's own wins, or a quest won (4 November 2026)
+      if(['marriage','thunderbirds','date','stacey','divorce','denise'].includes(type))return true;
+      try{return !!QUEST_WINS[type];}catch{return false;} // read safely: this can run while the page is still loading
+    }
+    function ladderWin(){ // counts every win this run has had; returns the one on screen now
       const v=world?.victory;
-      const questWon=()=>{try{return !!QUEST_WINS[v.type];}catch{return false;}}; // read safely: this can run while the page is still loading
-      if(!v||!(['marriage','thunderbirds','date','stacey','divorce','denise'].includes(v.type)||questWon()))return null; // a wedding, the Chapel's date, the Looksmaxxer's and the Divorcé's own wins, or a quest won (4 November 2026)
-      return ladderCountWin(ladderIndex(selectedDifficulty)>=0?selectedDifficulty:'normie',String(world.seed||''));
+      if(v)recordWin(v);
+      const as=ladderIndex(selectedDifficulty)>=0?selectedDifficulty:'normie',seed=String(world?.seed||'');
+      let out=null;
+      (world?.wins||[]).forEach((w,i)=>{if(!ladderWinKind(w.type))return;const r=ladderCountWin(as,seed,w.type,i===0);if(v&&w.type===v.type)out=r;});
+      return out;
     }
     // The victory screen: what you unlocked, and what to play next.
     function victoryNote(){
-      const r=ladderWin();
-      if(!r)return '';
+      const r=ladderWin(),n=world?.wins?.length||0;
+      const count=n>1?`<p class="line">${esc(`That is win number ${n} this run.`)}</p>`:'';
+      if(!r)return count;
       const line=r.next&&!r.next.soon?`You won as a ${ladderName(r.as)}. Next, try a game as a ${r.next.name}.`:`You won as a ${ladderName(r.as)}.`;
-      return `<p class="ladder-next">${esc(line)}</p>`;
+      return `${count}<p class="ladder-next">${esc(line)}</p>`;
     }
     function checkAchievements(){
       if(!world)return [];
@@ -15756,18 +15814,19 @@
     };
     for(const id of SQ_IDS)if(SQ[id].win)QUEST_WINS['q_'+id]=SQ[id].win; // the story quests
     Object.assign(CLASS_WINS,QUEST_WINS);
-    function questWin(){
+    function questWin(){ // the first quest win this run hasn't had yet (a run can win several, 8 November 2026)
       const after=day=>Number.isInteger(day)&&world.day>day; // the morning after
+      const out=[];
       const pv=world.professorVale,vw={hero_police:'q_vale',back_row_forever:'q_backrow'}[pv?.ending];
-      if(vw&&after(pv.endingDay))return {type:vw,day:world.day};
+      if(vw&&after(pv.endingDay))out.push({type:vw,day:world.day});
       const br=world.blueRibbon;
-      if(questStart('br')!==null&&br?.outcome==='success'&&after(br.outcomeDay))return {type:'q_br',day:world.day};
+      if(questStart('br')!==null&&br?.outcome==='success'&&after(br.outcomeDay))out.push({type:'q_br',day:world.day});
       const co=world.coyote;
-      if(co?.stage==='saved'&&after(co.savedOn))return {type:'q_coyote',bride:co.victim,day:world.day};
+      if(co?.stage==='saved'&&after(co.savedOn))out.push({type:'q_coyote',bride:co.victim,day:world.day});
       const f=world.fionn;
-      if(['caught','sorted'].includes(f?.stage)&&after(f.endDay))return {type:'q_theon',day:world.day};
-      const sw=sqWin();if(sw)return sw; // the story quests
-      return null;
+      if(['caught','sorted'].includes(f?.stage)&&after(f.endDay))out.push({type:'q_theon',day:world.day});
+      out.push(...sqWins()); // the story quests
+      return out.find(v=>!hasWon(v.type))||null;
     }
     function questWinCheck(){
       if(!world||world.victory||$('fatal-overlay')?.classList.contains('visible'))return;
@@ -15780,6 +15839,7 @@
     function classWinCheck(){
       if(!world||world.victory)return;
       const s=sororityState(),pl=selectedDifficulty==='divorce'?denisePlan():null,gone=!!pl&&pl.stage==='clear'; // Denise dead, and nobody looking at you
+      if(hasWon('divorce')||(hasWon('denise')&&!s.yes)||(selectedDifficulty==='looksmaxxer'&&hasWon('stacey')))return; // this run has that win already (Denise first, then a cheerleader, is a second win)
       if(selectedDifficulty==='looksmaxxer'&&s.yes)world.victory={type:'stacey',bride:s.yes,day:world.day};
       else if(gone&&ms('envelope')?.stage==='hunting'){achToast(`${EX.name} is gone, but the man from the envelope is still looking for you.`);return;} // Kessler first
       else if(gone&&!(pl.owe>0))world.victory=s.yes?{type:'divorce',bride:s.yes,day:world.day}:{type:'denise',day:world.day}; // her death is the win: with the cheerleader if she has said yes, without her otherwise
@@ -15795,9 +15855,45 @@
       if(!w||!win)return;
       const her=v.bride?hingeProfile(v.bride):null,face=her?.gallery?.[0]||w.standin||SORORITY_STANDIN; // the denise win has no bride
       const image=w.onlyStacey&&her?.slug!=='stacey_vandermeer'?face:w.image; // the date picture is Stacey's: anyone else, her own photo
-      win.innerHTML=`<img class="backdrop" src="${esc(assetUrl(w.backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(assetUrl(image))}" alt="" onerror="this.onerror=null;this.src='${esc(assetUrl(face))}'"></div><h2>${esc(w.title.replace('{FIRST}',(firstName(her)||'SHE').toUpperCase()))}</h2><p class="sub">${esc(w.subtitle)}</p><p class="line">${esc(w.line.replace('{name}',her?.name||'She'))}</p>${QUEST_WINS[v.type]?'<p class="line">You won’t see this story again until you have won every quest.</p>':''}${victoryNote()}<button data-class-win="new">New game</button></div>`;
-      if(!win.dataset.classWin){win.dataset.classWin='1';win.addEventListener('click',event=>{if(event.target.closest?.('[data-class-win]')){win.classList.remove('visible');pickDifficulty();}});}
+      win.innerHTML=`<img class="backdrop" src="${esc(assetUrl(w.backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(assetUrl(image))}" alt="" onerror="this.onerror=null;this.src='${esc(assetUrl(face))}'"></div><h2>${esc(w.title.replace('{FIRST}',(firstName(her)||'SHE').toUpperCase()))}</h2><p class="sub">${esc(w.subtitle)}</p><p class="line">${esc(w.line.replace('{name}',her?.name||'She'))}</p>${QUEST_WINS[v.type]?'<p class="line">You won’t see this story again until you have won every quest.</p>':''}${victoryNote()}<button data-class-win="continue">Continue playing</button><button data-class-win="new">New game</button></div>`;
+      if(!win.dataset.classWin){win.dataset.classWin='1';win.addEventListener('click',event=>{const b=event.target.closest?.('[data-class-win]');if(!b)return;if(b.dataset.classWin==='continue'){continueRun();return;}win.classList.remove('visible');pickDifficulty();});}
       win.classList.add('visible');
+    }
+    // ---- Winning more than once (8 November 2026) ----
+    // Chris: every victory screen has Continue playing beside New game, and every win counts. A win goes into
+    // world.wins the moment it happens, once per kind (the same win never fires twice). world.victory is only the
+    // win on screen now: Continue playing records it, clears it and hides the screen, so the run goes on (calls,
+    // quests, the paper) and a different win later shows its own screen and counts again.
+    const WIN_TYPE=/^[a-z][a-z0-9_]{0,23}$/;
+    function sanitizeWins(raw,victory){ // saves from before this have no list: the win on screen is the first one
+      const out=[];
+      for(const w of Array.isArray(raw)?raw:[]){
+        if(!w||typeof w!=='object'||typeof w.type!=='string'||!WIN_TYPE.test(w.type)||out.some(o=>o.type===w.type))continue;
+        out.push({type:w.type,day:Number.isInteger(w.day)?w.day:null,bride:typeof w.bride==='string'&&w.bride.length<=40?w.bride:null,continued:w.continued===true});
+      }
+      if(victory&&typeof victory.type==='string'&&WIN_TYPE.test(victory.type)&&!out.some(o=>o.type===victory.type))out.push({type:victory.type,day:Number.isInteger(victory.day)?victory.day:null,bride:typeof victory.bride==='string'?victory.bride:null,continued:false});
+      return out.slice(0,40);
+    }
+    function recordWin(v){
+      if(!world||!v||typeof v.type!=='string')return false;
+      if(!Array.isArray(world.wins))world.wins=[];
+      if(world.wins.some(w=>w.type===v.type))return false;
+      world.wins.push({type:v.type,day:Number.isInteger(v.day)?v.day:world.day,bride:v.bride||null,continued:false});
+      return true;
+    }
+    function hasWon(type){return !!world&&(world.victory?.type===type||(Array.isArray(world.wins)&&world.wins.some(w=>w.type===type)));}
+    function winContinued(type){return !!world&&Array.isArray(world.wins)&&world.wins.some(w=>w.type===type&&w.continued);} // marriage.js and the Chapel ask on load
+    function continueRun(){
+      if(!world)return false;
+      const v=world.victory;
+      if(v){recordWin(v);const w=world.wins.find(o=>o.type===v.type);if(w)w.continued=true;}
+      delete world.victory;
+      for(const id of ['marriage-win','chapel-win'])$(id)?.classList.remove('visible');
+      saveRun(true);
+      const n=world.wins?.length||0;
+      updateRunStatus(`Day ${world.day}. ${n>1?`${n} wins this run,`:'One win this run,'} and the story goes on.`);
+      if(currentApp==='hinge')renderHinge();
+      return true;
     }
     // ---- Botched for good (5 November 2026) ----
     // A cheap job gone wrong deforms the Looksmaxxer for good: Tony's kitchen, the nail salon, Dr. Gus, the border clinic,
@@ -16439,10 +16535,13 @@
       ladderWin();checkAchievements(); // the class ladder and achievements
       noteQuestsWon(); // a quest won stays away from the next games until the ladder is done
       const v=world.victory;
-      if(v&&['marriage','thunderbirds'].includes(v.type))noteEnding('win:'+v.type,`You married ${hingeProfile(v.bride)?.name||'her'}.`);
-      if(v&&v.type==='date')noteEnding('win:date',`${hingeProfile(v.bride)?.name||'She'} picked you up at your door.`); // the Chapel's win (4 November 2026)
-      if(v&&CLASS_WINS[v.type])noteEnding('win:'+v.type,QUEST_WINS[v.type]?CLASS_WINS[v.type].title:v.type==='denise'?`${EX.name} is gone.`:`${hingeProfile(v.bride)?.name||'She'} said yes.`);
-      if(!v)questWinCheck(); // a quest that closed well wins the run, the morning after
+      if(v)recordWin(v);
+      for(const w of world.wins||[]){ // every win this run, the ones played on from as well (8 November 2026)
+        if(['marriage','thunderbirds'].includes(w.type))noteEnding('win:'+w.type,`You married ${hingeProfile(w.bride)?.name||'her'}.`);
+        if(w.type==='date')noteEnding('win:date',`${hingeProfile(w.bride)?.name||'She'} picked you up at your door.`); // the Chapel's win (4 November 2026)
+        if(CLASS_WINS[w.type])noteEnding('win:'+w.type,QUEST_WINS[w.type]?CLASS_WINS[w.type].title:w.type==='denise'?`${EX.name} is gone.`:`${hingeProfile(w.bride)?.name||'She'} said yes.`);
+      }
+      if(!v)questWinCheck(); // a quest that closed well wins, the morning after; one this run hasn't had yet
       const pv=world.professorVale,e=pv?.ending&&window.ProfessorVale?.DATA?.endings?.[pv.ending];
       if(e&&['complete','failure'].includes(e.kind))noteEnding('vale:'+pv.ending,'');
       const br=world.blueRibbon;
@@ -16620,9 +16719,9 @@
       const newsClip=event.target.closest('[data-news-clip]');
       if(newsClip){clipNewsScrap(newsClip.dataset.newsClip);return;}
       const caseTopic=event.target.closest('[data-br-topic]');
-      if(caseTopic){chooseBlueRibbonHingeTopic(caseTopic.dataset.brTopic);return;}
+      if(caseTopic){noteInterest('br');chooseBlueRibbonHingeTopic(caseTopic.dataset.brTopic);return;}
       const valeTopic=event.target.closest('[data-pv-topic]'); // Professor Vale
-      if(valeTopic){chooseValeHingeTopic(valeTopic.dataset.pvTopic);return;}
+      if(valeTopic){noteInterest('vale');chooseValeHingeTopic(valeTopic.dataset.pvTopic);return;}
       const callsTab=event.target.closest('[data-calls-view]');
       if(callsTab){callsView=callsTab.dataset.callsView;renderCalls();return;}
       const noteNumber=event.target.closest('[data-note-dial]');
@@ -18205,6 +18304,7 @@
         world.spurn=sanitizeSpurn(saved.world.spurn);world.arcs=sanitizeArcs(saved.world.arcs);world.minis=sanitizeMinis(saved.world.minis);world.rq=sanitizeRq(saved.world.rq);world.fq=sanitizeFq(saved.world.fq);world.pace=sanitizePace(saved.world.pace);world.townTalk=sanitizeTownTalk(saved.world.townTalk);world.coyote=sanitizeCoyote(saved.world.coyote);world.finale=sanitizeFinale(saved.world.finale);world.cupboard=sanitizeFloor(world.cupboard);world.personalNews=sanitizePersonalNews(saved.world.personalNews);world.hingeReview=Number.isInteger(saved.world.hingeReview)?saved.world.hingeReview:null;
         world.paperDay=Number.isInteger(saved.world.paperDay)?saved.world.paperDay:null;
         world.cls=sanitizeCls(saved.world.cls); // the Looksmaxxer and the Divorcé
+        world.wins=sanitizeWins(saved.world.wins,saved.world.victory); // every win this run (8 November 2026); an old save's win on screen is the first
         world.falsePoliceReports=Math.max(0,Math.min(MAX_FALSE_REPORTS,Math.trunc(Number(saved.world.falsePoliceReports)||0)));
         world.policeArrested=!!saved.world.policeArrested;
         world.policeArrestPhase=dayPhases.includes(saved.world.policeArrestPhase)?saved.world.policeArrestPhase:null;
@@ -18230,7 +18330,7 @@
           return [id,{id,topics:Array.isArray(raw.topics)?raw.topics.filter(t=>typeof t==='string'):[],number:validDemoNumber(raw.number)?raw.number:null,
             pending:false,fumbled:!!raw.fumbled,blocked:!!raw.blocked,photoRequests:Math.max(0,Number(raw.photoRequests)||0),photoRefusals:Math.max(0,Math.min(9,Math.trunc(Number(raw.photoRefusals))||0)),
             warmth:Number.isFinite(raw.warmth)?Math.max(-3,Math.min(5,Math.trunc(raw.warmth))):0,
-            followUp:raw.followUp&&['topic','question','news','day','tone','flirt','pic','tempt','thing','into','qtalk'].includes(raw.followUp.kind)&&(raw.followUp.kind!=='into'||['more','dodged'].includes(raw.followUp.id))&&typeof raw.followUp.id==='string'&&raw.followUp.id.length<200&&(raw.followUp.kind!=='tone'||['good','bad','odd','hello'].includes(raw.followUp.id))&&(raw.followUp.kind!=='flirt'||['0','1','2'].includes(raw.followUp.id))&&(raw.followUp.kind!=='pic'||['dress','pool','night','roll'].includes(raw.followUp.id))?{kind:raw.followUp.kind,id:raw.followUp.id,...(['S','Q','K'].includes(raw.followUp.shape)?{shape:raw.followUp.shape}:{})}:null,
+            followUp:raw.followUp&&['topic','question','news','day','tone','flirt','pic','tempt','thing','into','qtalk'].includes(raw.followUp.kind)&&(raw.followUp.kind!=='into'||['more','dodged'].includes(raw.followUp.id))&&typeof raw.followUp.id==='string'&&raw.followUp.id.length<200&&(raw.followUp.kind!=='tone'||['good','bad','odd','hello'].includes(raw.followUp.id))&&(raw.followUp.kind!=='flirt'||['0','1','2'].includes(raw.followUp.id))&&(raw.followUp.kind!=='pic'||['dress','pool','night','roll'].includes(raw.followUp.id))?{kind:raw.followUp.kind,id:raw.followUp.id,...(raw.followUp.kind==='qtalk'&&Number.isInteger(raw.followUp.day)?{day:raw.followUp.day}:{}),...(['S','Q','K'].includes(raw.followUp.shape)?{shape:raw.followUp.shape}:{})}:null,
             deeper:['love','faith','world'].includes(raw.deeper)?raw.deeper:null,talk:sanitizeTalk(raw.talk),
             awaiting:!!raw.awaiting,replyOnDay:Number.isInteger(raw.replyOnDay)?raw.replyOnDay:null,ghosted:!!raw.ghosted,unmatched:!!raw.unmatched,left:!!raw.left,missing:!!raw.missing,
             at:Number.isInteger(raw.at)?raw.at:0,seenLen:log.length,goneDay:Number.isInteger(raw.goneDay)?raw.goneDay:null,
@@ -18343,6 +18443,7 @@
       warmth:id=>warmthOf(hingeThreads.get(id)),warmBy:(id,delta)=>{const thread=hingeThreads.get(id);if(thread)warmBy(thread,delta);},serviceKnown,
       replyDelay:hingeReplyDelay,serviceTopics:serviceCallTopics,timePhase:()=>time.value,status:updateRunStatus,
       newNumber:unusedContactNumber,save:()=>saveRun(true),startNewRun:()=>pickDifficulty(),victoryNote:()=>victoryNote(), // the ladder's line on the win screen
+      continueRun:()=>continueRun(),winContinued:type=>winContinued(type), // Continue playing on the win screen (8 November 2026)
       chatDone:id=>{const thread=hingeThreads.get(id);return !!thread&&doneForToday(thread);}, // she's signed off for today
       // A flyer girl you rang comes up in your Hinge deck within the next few cards.
       toDeck:id=>deckSoon(id,'flyer'),
@@ -18374,6 +18475,7 @@
       disputeKnown:()=>disputeKnown(),recordClue, // the Sisters and the church: her aside before the first question, and Agnes Bellamy's memory of the bell
       replyDelay:hingeReplyDelay,status:updateRunStatus,newNumber:unusedContactNumber,
       save:()=>saveRun(true),startNewRun:()=>pickDifficulty(),victoryNote:()=>victoryNote(),blessed:()=>sistersBless(), // the priest is gone: no examination needed
+      continueRun:()=>continueRun(),winContinued:type=>winContinued(type), // Continue playing on the win screen (8 November 2026)
       rerender:()=>{if(currentApp==='hinge')renderHinge();else if(currentApp==='notes')renderNotes();else if(currentApp==='blackbook')renderBook();else if(currentApp==='journal')renderJournal();else if(currentApp==='bank')renderBank();if(cupboardIsOpen()&&['shelf','wedding'].includes(cupboardView))renderCupboard();},
       later:(callback,ms)=>window.setTimeout(callback,ms),cancel:id=>window.clearTimeout(id)
     }):null;

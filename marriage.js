@@ -474,6 +474,7 @@
         const control=event.target.closest&&event.target.closest('[data-marriage-win]');
         if(!control)return;
         if(control.dataset.marriageWin==='new')api.startNewRun();
+        else if(control.dataset.marriageWin==='continue'&&api.continueRun)api.continueRun(); // the run goes on, married (8 November 2026)
         else hideVictory();
       });
     }
@@ -544,7 +545,7 @@
       const backdrop=tb?data.thunderbirds.backdrop:data.art.victoryBackdrop;
       const review=tb&&!preview?data.thunderbirds.victory.underReview?.[api.world()?.blueRibbon?.outcome]:null; // the Ledger's verdict on the club you are marrying into (4 November 2026, the sense check)
       const frames=weddingFrames(id);
-      win.innerHTML=`<img class="backdrop" src="${esc(api.assetUrl(backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(api.assetUrl(frames[3]))}" alt="${esc(brideName(id))} on her wedding day"></div><h2>${esc(v.title)}</h2><p class="sub">${esc(v.subtitle)}</p><p class="line">${esc(fill(v.line,{name:brideName(id),day}))}</p>${danced&&DANCE_LINE[danced]?`<p class="line">${esc(DANCE_LINE[danced])}</p>`:''}${review?`<p class="line">${esc(review)}</p>`:''}${!preview&&api.victoryNote?api.victoryNote():''}${preview?'<p class="note">Testing preview. Your run is unchanged.</p><button data-marriage-win="close">Close preview</button>':`<button data-marriage-win="new">${esc(v.newGame)}</button>`}</div>`;
+      win.innerHTML=`<img class="backdrop" src="${esc(api.assetUrl(backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(api.assetUrl(frames[3]))}" alt="${esc(brideName(id))} on her wedding day"></div><h2>${esc(v.title)}</h2><p class="sub">${esc(v.subtitle)}</p><p class="line">${esc(fill(v.line,{name:brideName(id),day}))}</p>${danced&&DANCE_LINE[danced]?`<p class="line">${esc(DANCE_LINE[danced])}</p>`:''}${review?`<p class="line">${esc(review)}</p>`:''}${!preview&&api.victoryNote?api.victoryNote():''}${preview?'<p class="note">Testing preview. Your run is unchanged.</p><button data-marriage-win="close">Close preview</button>':`${api.continueRun?'<button data-marriage-win="continue">Continue playing</button>':''}<button data-marriage-win="new">${esc(v.newGame)}</button>`}</div>`;
       const portrait=win.querySelector?.('.frame img');
       const fallback=fallbackFrame(id,3);
       if(portrait&&fallback)portrait.onerror=()=>{portrait.onerror=null;portrait.src=api.assetUrl(fallback);}; // her own photo until her wedding portrait exists
@@ -569,12 +570,13 @@
       if(!data||!world)return;
       world.marriage=normalize(world.marriage);
       const st=state();
-      // The victory record and the marriage always agree.
-      if(st.married)world.victory={type:'marriage',bride:st.married.id,day:st.married.day};
-      else if(st.tb)world.victory={type:'thunderbirds',bride:st.tb.id,day:st.tb.day};
+      // The victory record and the marriage always agree, unless you played on after the wedding (8 November 2026).
+      const kind=st.married?'marriage':st.tb?'thunderbirds':null,on=!!kind&&!!api.winContinued?.(kind);
+      if(st.married&&!on)world.victory={type:'marriage',bride:st.married.id,day:st.married.day};
+      else if(st.tb&&!on)world.victory={type:'thunderbirds',bride:st.tb.id,day:st.tb.day};
       else if(world.victory&&['marriage','thunderbirds'].includes(world.victory.type))delete world.victory; // wins of other kinds (the class wins, the Chapel's date) are kept
       refreshDesk();
-      if(wed(st))showVictory(wed(st).id,false);
+      if(wed(st)&&!on)showVictory(wed(st).id,false);
     }
     // Testing menu: play a Sister's wedding and the victory screen without changing the run.
     let previewIndex=0;

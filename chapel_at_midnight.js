@@ -710,7 +710,7 @@
       if(!win)return;
       const id=st.dateFrom,profile=api.profile(id),v=data.date.victory;
       const portrait=profile?.gallery?.[0]?api.assetUrl(profile.gallery[0]):'';
-      win.innerHTML=`<img class="backdrop" src="${esc(api.assetUrl(v.backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(api.assetUrl(v.picture))}" alt="${esc(nameOf(id))} at your door"></div><h2>${esc(v.title)}</h2><p class="sub">${esc(fill(v.subtitle,{name:nameOf(id)}))}</p><p class="line">${esc(fill(v.line,{day:st.wonDay??today()}))}</p>${api.victoryNote?api.victoryNote():''}<button data-chapel-choice="new-game">${esc(v.newGame)}</button></div>`;
+      win.innerHTML=`<img class="backdrop" src="${esc(api.assetUrl(v.backdrop))}" alt=""><div class="veil"></div><div class="card"><div class="frame"><img src="${esc(api.assetUrl(v.picture))}" alt="${esc(nameOf(id))} at your door"></div><h2>${esc(v.title)}</h2><p class="sub">${esc(fill(v.subtitle,{name:nameOf(id)}))}</p><p class="line">${esc(fill(v.line,{day:st.wonDay??today()}))}</p>${api.victoryNote?api.victoryNote():''}${api.continueRun?'<button data-chapel-choice="continue">Continue playing</button>':''}<button data-chapel-choice="new-game">${esc(v.newGame)}</button></div>`;
       const img=win.querySelector?.('.frame img');
       if(img&&portrait)img.onerror=()=>{img.onerror=null;img.src=portrait;}; // her own photo until the picture at your door exists
       win.classList.add('visible');
@@ -966,6 +966,7 @@
         case 'm':sisterMoon(st,a);return;
         case 'd':dateAct(st,a,b);return;
         case 'new-game':if(st.won&&api.startNewRun)api.startNewRun();return;
+        case 'continue':if(st.won&&api.continueRun){hideWin();api.continueRun();}return; // the run goes on after the date (8 November 2026)
         case 'warn':if(canReachSisters(st))warn(st,a);break;
         default:return;
       }
@@ -993,7 +994,7 @@
       const st=state();
       syncTopics(st);
       if(st.dead){showDeath(st.deathKind||deathKind(st));return;}
-      if(st.won){api.world().victory={type:'date',bride:st.dateFrom,day:st.wonDay??today()};showWin(st);return;}
+      if(st.won&&!api.winContinued?.('date')){api.world().victory={type:'date',bride:st.dateFrom,day:st.wonDay??today()};showWin(st);return;} // unless you played on after it
       if(st.attackRunning||st.attackPending)startAttack(st.attackReason);
     }
     // Workbench shortcut: open the case today.
