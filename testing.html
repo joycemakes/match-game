@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="9c03a56f01">
+<html lang="en" data-build="8d1f756da2">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -989,11 +989,11 @@
     @media(max-width: 730px) { .workbench { display: flex; flex-direction: column; gap: 16px; padding: 17px; } aside { padding: 2px; } h1 { font-size: 32px; } .settings { margin-top: 12px; } .preview-area { padding-top: 0; } }
   </style>
   <!-- Task 2: Chapel at Midnight quest engine. The standalone build inlines it. -->
-  <script src="chapel_at_midnight.js?v=9c03a56f01"></script>
+  <script src="chapel_at_midnight.js?v=8d1f756da2"></script>
   <!-- Marriage: the Sisters of Mercy (and the Bluebird wedding), the only victories. The standalone build inlines it. -->
-  <script src="marriage.js?v=9c03a56f01"></script>
+  <script src="marriage.js?v=8d1f756da2"></script>
   <!-- Professor Vale: "The Professor Who Won't Disappear". The standalone build inlines it. -->
-  <script src="quests/professor-vale.js?v=9c03a56f01"></script>
+  <script src="quests/professor-vale.js?v=8d1f756da2"></script>
 </head>
 <body>
   <main class="workbench">
@@ -6566,7 +6566,7 @@
               {label:'Measure me again.',reply:'Trent: We did. That’s rather the point.'}]}
           ]},key:'detector'},
           {scene:[{image:'room-search.png',caption:'Then the receipts. A camera crew follows you home. Prove you are who you say. Show them something only the real you would have.'}]},
-          {mini:'spotit',key:'receipts',image:'room-search.png',caption:'Find your receipts in your own room, on camera: the photo of you as a kid, the gym card, the passport.'},
+          {mini:'spotit',key:'receipts',image:'room-search.png',hot:[{x:82,y:35.5,r:7},{x:4.5,y:57,r:7},{x:88,y:43.5,r:7}],caption:'Find your receipts in your own room, on camera: the photo of you as a kid, the gym card, the passport.'},
           {scene:[{image:'witness-screen.png',caption:'Back in the studio. Two of your matches have phoned in as witnesses.'},{image:'witness-screen.png',caption:'{w1}: He’s real. He sent me a voice note once. It was very boring. Very real.'},{image:'witness-screen.png',caption:'{w2}: I’ve never met him. I’d like to. Is that allowed on this show?'},{image:'verdict.png',sound:'crowd',caption:'Trent opens a gold envelope very, very slowly.'}]}
         ],
         // The tape catches the half inch; enough jumps of the needle (or no receipts) and he stamps you a liar.
@@ -6701,7 +6701,7 @@
         },
         beats:[
           {scene:[{image:'diner.png',caption:'Sundown. The diner on Main. You’re early. You wait outside so you won’t be early.'},{image:'booth.png',caption:'She’s there. She’s really there. She smiles at you, then at the booth behind you, then at you again.'},{image:'booth.png',caption:'You order what she orders. You tell her about your keyboard. She laughs in the right places. Slightly too right.'}]},
-          {mini:'spotit',key:'camera',image:'spot.png',caption:'Something is off. Find the phone camera pointed at you. Fast.'},
+          {mini:'spotit',key:'camera',image:'spot.png',hot:{x:75,y:34.5,r:9},caption:'Something is off. Find the phone camera pointed at you. Fast.'},
           {scene:[{image:'friends.png',sound:'laugh',caption:'The booth behind her. Three of her friends, a ring light and a phone on a stick. They’re live. Four thousand people are watching your date.'}]},
           {choose:{caption:'They see you see them. One of them waves. What do you do?',image:'friends.png',options:[
             {id:'along',label:'Play along',icon:'🙂',reply:'You wave back at the camera and keep talking about your keyboard. You are a good sport for forty minutes.'},
@@ -10170,10 +10170,18 @@
       const ms=b.ms||(easy?20000:11000);let wrong=0;
       const hit=()=>beatFinish(wrong===0?'perfect':'ok','FOUND IT');
       const miss=el=>{wrong++;playUiSound(170);el?.classList.add('wrong');if(!easy&&wrong>=2)beatFinish('miss','SPOTTED');}; // two wrong taps and they notice you
-      if(b.hot&&b.image){ // the picture: tap where it is
+      if(b.hot&&b.image){ // the picture: tap where it is (14 November 2026: measured on the picture itself, as drawn)
+        // b.hot is {x,y,r} or a list of them: x and y in percent of the picture's width and height, r in percent of
+        // its width. The picture fills the screen (object-fit: cover), so a tap is mapped back onto the picture.
+        const spots=[].concat(b.hot),bg=$('beat-bg');
         play.innerHTML='<div class="beat-hotarea"></div>';
-        play.querySelector('.beat-hotarea').onclick=e=>{const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;Math.hypot(x-b.hot.x,y-b.hot.y)<(b.hot.r||9)*(easy?1.5:1)?hit():miss();};
-      }else{
+        play.querySelector('.beat-hotarea').onclick=e=>{
+          const W=bg.naturalWidth||960,H=bg.naturalHeight||2080,r=bg.getBoundingClientRect(),s=Math.max(r.width/W,r.height/H);
+          const px=(e.clientX-r.left-(r.width-W*s)/2)/s,py=(e.clientY-r.top-(r.height-H*s)/2)/s;
+          spots.some(h=>Math.hypot(px-h.x/100*W,py-h.y/100*H)<(h.r||9)/100*W*(easy?1.5:1))?hit():miss();
+        };
+      }else if(!b.crowd&&!b.common){beatFinish('ok');return;} // nothing to find: never a grid of blanks
+      else{
         // a crowd: a mix of look-alikes (b.crowd) or one face (b.common); with b.peek the odd one looks like the rest
         // and only shows itself for a moment now and then, so you have to catch it (7 November 2026: it was too easy)
         const crowd=b.crowd||[b.common],n=b.count||16,odd=Math.floor(Math.random()*n),pick=Array.from({length:n},()=>Math.floor(Math.random()*crowd.length));
