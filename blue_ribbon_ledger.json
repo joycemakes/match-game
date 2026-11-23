@@ -237,7 +237,7 @@
       ],
       "hint": "The Foundation keeps the books. Insiders, or a careless office, might share a page.",
       "home": {
-        "x": 35,
+        "x": 36,
         "y": 5,
         "rot": 3
       },
@@ -347,7 +347,7 @@
       ],
       "hint": "Read the Day 2 Sunfall Daily in full and clip the gala photograph.",
       "home": {
-        "x": 4,
+        "x": 1,
         "y": 39,
         "rot": -3
       },
@@ -421,8 +421,8 @@
       ],
       "hint": "Police contacts, or a newspaper that already holds a copy.",
       "home": {
-        "x": 37,
-        "y": 41,
+        "x": 36,
+        "y": 59,
         "rot": 2
       },
       "artSize": [
@@ -718,7 +718,7 @@
         "requires": [
           "case"
         ],
-        "player": "You mentioned the gala. Did anything odd happen around Table 9?",
+        "player": "Did you see anything odd around Table 9 at the gala?",
         "reply": "Table 9 was the treasurer's table. I found this torn ticket when we cleared it. There was no name for that seat on the plan. Please don't tell the committee I sent it.",
         "scrap": "tb_gala_ticket",
         "suspicion": 8,

@@ -294,13 +294,14 @@
     "sister": {
       "label": "Ask when the next new moon is",
       "player": "Do you know when the next new moon is?",
-      "reply": "We keep a vigil on every new moon. The next one is {night}. Why do you ask?",
-      "replyDispute": "We keep a vigil on every new moon, whatever the chancery writes this season. The next one is {night}. Why do you ask?"
+      "reply": "We keep a vigil on every new moon. The next one is {night}.",
+      "replyDispute": "We keep a vigil on every new moon, whatever the chancery writes this season. The next one is {night}."
     },
     "clue": "{who} told you which night the moon goes dark."
   },
   "host": {
     "clue": "{who} told you who V.B. is: Victoria Blackwood.",
+    "heard": "{who} mentioned someone called Victoria.",
     "herself": "Victoria told you herself: the crescent flyers are hers."
   },
   "countdown": {

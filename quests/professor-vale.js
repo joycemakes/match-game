@@ -181,15 +181,21 @@
     },
     hints: {
       rule: 'Read the Sunfall Daily’s Vale stories, or ask the newsroom whether they’re connected.',
+      ruleEarly: 'Keep reading the paper. One set of failed brakes is not a case yet.',
       debate: 'Who is Vale inviting next, and when? Ring the University Office, or ask a Progressive match.',
+      bluebirdsHave: 'The Bluebirds have it. Stay out of it and watch the paper.',
       back_row: 'Ask a Progressive match about the protests, or ask the newsroom about campus groups.',
       vanessa: 'Who runs the Back Row? Ask a Progressive match, or wait for someone to call you.',
       car_plan: 'What exactly, and where? Rosa knows. Or piece it together: his diary, his car, the day after the Cofnas lecture.',
-      stop: 'Stop it before Day {A}: give Detective Graves a name and the plan, or warn a Bluebird match.'
+      stop: 'Stop it before Day {A}: give Detective Graves a name and the plan, or warn a Bluebird match.',
+      wire: 'Ring Vanessa. Graves is listening.',
+      graves: 'Ring Detective Graves. Give her a name and the plan.',
+      gravesHas: 'Graves has it. Stay out of it and watch the paper.'
     },
 
     lines: {
       opened: 'Something about Professor Vale’s accidents doesn’t add up. A case file is in your bedside cupboard.',
+      openedEarly: 'Something about Professor Vale’s brakes doesn’t add up. A case file is in your bedside cupboard.',
       autoOpened: 'The Sunfall Daily has run two Professor Vale accidents in a row. A case file is in your bedside cupboard.',
       newsLearned: { car: 'Noted: the brakes failed the day after Camille Paglia’s lecture.', fire: 'Noted: the fire came the day after the Houellebecq evening.', debate: 'Noted: Nathan Cofnas speaks at Founders’ Hall on Day {T}.' },
       ruleLearned: 'Two accidents, each the day after one of Vale’s guests came to campus. That isn’t luck.',
@@ -225,7 +231,7 @@
     },
 
     voicemails: {
-      rosa: { from: 'rosa', text: 'It’s Rosa. Rosa Gutierrez. You’ve been asking about the Back Row. I can’t text about it. Call me back on this number. Please don’t tell anyone it was me.' },
+      rosa: { from: 'rosa', text: 'It’s Rosa. Rosa Gutierrez. You’ve been asking about {rosaAbout}. I can’t text about it. Call me back on this number. Please don’t tell anyone it was me.' },
       vanessa: { from: 'vanessa', text: 'This is Vanessa Greer. You keep asking about Vale. So do we. Call me back. Don’t text.' },
       gravesArrest: { from: 'graves', text: 'Detective Graves. We had people at bay fourteen on Day {A}, and we got them with it in their hands. Somebody gave us a name and a day. Call me back on this line.' },
       alice: { from: 'alice', text: 'Alice Beaumont. Adrian is alive, sulking, and staying in our guest room. Somebody warned us, and I know it was you. The Bluebirds would like you as guest of honor at the gala ball. Do call.' },
@@ -233,7 +239,7 @@
       rosaPanic: { from: 'rosa', text: 'It’s Rosa. I can’t sleep. I keep thinking about walking into the police station. Please call me.' },
       valeBrick: { from: 'vale', text: '' },
       fakeGraves: { from: 'fake', text: '' },
-      valeVm1: { from: 'vale', text: 'Adrian Vale. Lorraine in the office says someone keeps asking about my car. If that’s you, call me back on this number. I’m curious. I’m always curious.' },
+      valeVm1: { from: 'vale', text: 'Adrian Vale. {valeHeard} If that’s you, call me back on this number. I’m curious. I’m always curious.' },
       valeVm2: { from: 'vale', text: 'Adrian again. They threw eggs. Organic. Tomorrow I read the complaints in my car, the way I always do. Call me if you’re still worried. You won’t. Nobody does.' },
       valeThanks: { from: 'vale', text: 'Adrian Vale. My car went up in bay fourteen with nobody in it. I took a cab, like you said. I don’t know how you knew and I don’t think I want to. Thank you. Don’t tell the faculty. They’ll be so disappointed.' }
     },
@@ -246,11 +252,12 @@
           player: 'Are you protesting Vale’s speakers? Someone said his accidents weren’t accidents.',
           reply: 'First Paglia, then Houellebecq, and now he’s bringing Nathan Cofnas to Founders’ Hall on Day {T}. We protest because those people shouldn’t get a university stage, not because we want anyone hurt. The brakes and the fire weren’t us. There’s a lot at the back of his lectures, the Back Row, who call our protests a hobby.',
           learn: ['back_row', 'debate'],
+          early: { player: 'Are you protesting Vale’s speakers? Someone said his brakes weren’t an accident.', reply: 'First Paglia, and now he’s bringing Nathan Cofnas to Founders’ Hall on Day {T}. We protest because those people shouldn’t get a university stage, not because we want anyone hurt. The brakes weren’t us. There’s a lot at the back of his lectures, the Back Row, who call our protests a hobby.' },
           as: {
             'MATCH-051': { reply: 'YES, I organized them! Paglia, Houellebecq, and now Cofnas at Founders’ Hall on Day {T}? We will be LOUD. Peaceful! With banners! I’d never hurt anyone, I just want Vale to stop inviting them. Do you want a banner? I have spare banners.', learn: ['jennifer', 'debate'] },
-            'MATCH-052': { reply: 'Petitions didn’t stop Paglia. Placards didn’t stop Houellebecq. They won’t stop Cofnas. A long pause. You keep asking about Vale. So do I. I’ll call you.', learn: ['back_row'], exposure: 10, effect: 'vanessaCalls' },
+            'MATCH-052': { reply: 'Petitions didn’t stop Paglia. Placards didn’t stop Houellebecq. They won’t stop Cofnas. The Back Row calls all of it a hobby, and the Back Row is right. A long pause. You keep asking about Vale. So do I. I’ll call you.', learn: ['back_row'], exposure: 10, effect: 'vanessaCalls' },
             'MATCH-053': { reply: 'I work for him. Research assistant. I keep his diary and I type up his speaker invitations. Every single one. Her next message takes a long time to arrive. Somebody has to.', learn: ['allison'], exposure: 10 },
-            'MATCH-054': { reply: 'I sit at the back of his lectures. That’s all. Then, a minute later: Not over text. I’ll call you.', learn: ['back_row'], effect: 'rosaCalls' }
+            'MATCH-054': { reply: 'I sit at the back of his lectures, with the ones who call the protests a hobby. The Back Row, they call themselves. That’s all. Then, a minute later: Not over text. I’ll call you.', learn: ['back_row'], effect: 'rosaCalls' }
           } },
         { id: 'pv_backrow', label: 'Ask who runs the Back Row', stage: ['open'], needs: ['back_row'], until: ['vanessa'],
           player: 'Who actually runs the Back Row?',
@@ -269,13 +276,15 @@
       police: [
         { id: 'pv_police', label: 'Ask whether the police believe Vale’s accidents', stage: ['open', 'resolved'],
           player: 'Does anyone at the station think Professor Vale’s accidents were accidents?',
+          early: { label: 'Ask whether the police believe Vale’s accident', player: 'Does anyone at the station think Professor Vale’s brakes just failed?' },
           reply: 'Detective Eleanor Graves doesn’t. If you know something real, ring the station and ask for her. She wants a name and a day, not a theory.', flag: 'gravesKnown',
           as: { 'MATCH-002': { reply: 'I don’t. If you ever know something real, I want a name and a day. Here’s my direct line.', effect: 'gravesLine' } } }
       ],
       fourth_estate: [
         { id: 'pv_press', label: 'Ask what the paper knows about Professor Vale', stage: ['open', 'resolved'],
           player: 'What does the paper actually know about Professor Vale’s accidents?',
-          reply: 'Off the record? The brakes went the day after Paglia, the fire the day after Houellebecq, and Cofnas is next. Our reporter thinks someone in his own department is leaking his diary.', learn: ['rule', 'diary_leak'] }
+          reply: 'Off the record? The brakes went the day after Paglia, the fire the day after Houellebecq, and Cofnas is next. Our reporter thinks someone in his own department is leaking his diary.', learn: ['rule', 'diary_leak'],
+          early: { player: 'What does the paper actually know about Professor Vale’s brakes?', reply: 'Off the record? The brakes went the day after Paglia, and Cofnas is next. Our reporter thinks someone in his own department is leaking his diary.', learn: ['diary_leak'] } }
       ],
       thunderbirds: [
         { id: 'pv_tb_vale', label: 'Ask how well the Bluebirds know Professor Vale', stage: ['open', 'resolved'],
@@ -295,12 +304,12 @@
       sisters_of_mercy: [
         { id: 'pv_rumour', label: 'Ask if she’s heard about Professor Vale', stage: ['open'],
           player: 'Have you heard what keeps happening to Professor Vale?',
-          reply: 'We pray for him. We pray for the people who hate him too. They need it more.' }
+          reply: 'We pray for him. We pray for the people who hate him too. They need it more. For facts, ring the newsroom.' }
       ],
       normie_girls: [
         { id: 'pv_rumour', label: 'Ask if she’s heard about Professor Vale', stage: ['open'],
           player: 'Have you heard what keeps happening to Professor Vale?',
-          reply: 'Isn’t he the one who keeps nearly dying? My cousin says it’s a curse.' }
+          reply: 'Isn’t he the one who keeps nearly dying? My cousin says it’s a curse. Ask someone at the paper.' }
       ]
     },
 
@@ -325,7 +334,7 @@
     vale: {
       name: 'Adrian Vale', portrait: 'assets/quests/professor/vale.png',
       call1: {
-        open: 'Is this the person who keeps ringing my department? Adrian Vale. Lorraine in the office says you ask about my car the way other people ask about the weather. I’m flattered. Nobody has worried about me since my mother. What do you want?',
+        open: '{valeOpen} I’m flattered. Nobody has worried about me since my mother. What do you want?',
         choices: { warn: 'Tell him someone wants him dead', fan: 'Tell him you admire his nerve', ask: 'Ask who he’s bringing next', hang: 'Hang up' },
         warn: 'Dead? My dear, half the faculty wants me dead. They’ve been trying for years, by committee. The brakes were old and the wiring in that house was older. Come and watch me not die at Founders’ Hall on Day {T}. Nathan Cofnas. Bring your fears, he’ll enjoy them.',
         fan: 'Nerve! Nobody says nerve anymore, they say harm. Thank you. Nathan Cofnas, Founders’ Hall, Day {T}. My assistant, Allison, sends out the invitations. She’ll put you on the list. She’s been terribly quiet lately. I think she disapproves of me. Everyone sensible does.',
@@ -333,7 +342,7 @@
       },
       call2: {
         known: 'It’s Adrian. They threw eggs. Organic eggs, which I think was the protest. Cofnas was magnificent and nobody listened. Tomorrow I go in early and read the complaints in my car, the way I always do. You sounded worried last time. Are you still worried?',
-        stranger: 'You don’t know me. Adrian Vale. Lorraine gave me this number and said you’d been worried about me. Tonight they threw eggs. Tomorrow I read the complaints in my car, the way I always do. Is there something you want to tell me?',
+        stranger: 'You don’t know me. Adrian Vale. {valeGave} gave me this number and said you’d been worried about me. Tonight they threw eggs. Tomorrow I read the complaints in my car, the way I always do. Is there something you want to tell me?',
         choices: { car: 'Tell him not to go near his car tomorrow', stay: 'Tell him to spend the night with the Bluebirds', luck: 'Wish him luck', hang: 'Hang up' },
         carYes: 'Not my car. A long breath. Fine. I’ll take a cab and read the complaints in the back of it, and the driver will hate me too. You’ll owe me an explanation.',
         carNo: 'Not my car? You sound like my insurer. Goodnight, whoever you are.',
@@ -460,7 +469,7 @@
           reply: 'Faculty parking lot, bay fourteen, the day after every one of his guests. He likes to come in and read the complaints. Why do you ask?', learn: ['car_bay'], exposure: 10 }
       ],
       'service:newsroom': [
-        { id: 'pv_n_link', label: 'Ask whether Vale’s brakes and the fire are connected', stage: ['open'], until: ['rule'],
+        { id: 'pv_n_link', label: 'Ask whether Vale’s accidents are connected', stage: ['open'], until: ['rule'], afterFire: true,
           reply: 'The brakes failed the day after Paglia. The fire came the day after Houellebecq. We can’t print a pattern without a source.', learn: ['rule'] },
         { id: 'pv_n_groups', label: 'Ask whether any campus group has threatened Vale', stage: ['open'], until: ['back_row'],
           reply: 'The organizers protesting his speakers are loud but harmless. There’s a smaller lot people call the Back Row. Nobody will go on record about them.', learn: ['back_row'], exposure: 5 }
@@ -712,6 +721,8 @@
       };
     }
 
+    const VM_WORDS = ['rosaAbout', 'valeHeard'];
+    const VM_OLD_WORDS = { rosa: { rosaAbout: 'the Back Row' }, valeVm1: { valeHeard: 'Lorraine in the office says someone keeps asking about my car.' } };
     function normalize(raw, seed) {
       const s = fresh(raw && typeof raw.seed === 'string' ? raw.seed : seed);
       if (!raw || typeof raw !== 'object' || Array.isArray(raw) || raw.v !== 2) return s;
@@ -730,7 +741,7 @@
           case 'numbers': s.numbers = {}; if (val && typeof val === 'object') for (const id of LINES) if (validNumber(val[id])) s.numbers[id] = val[id]; break;
           case 'asked': s.asked = {}; if (val && typeof val === 'object') for (const key of Object.keys(val).slice(0, 300)) if (key.length <= 60) s.asked[key] = strList(val[key], null, 40); break;
           case 'daily': s.daily = {}; if (val && typeof val === 'object') for (const key of ['rosa', 'assemble']) if (Number.isInteger(val[key])) s.daily[key] = val[key]; break;
-          case 'inbox': s.inbox = Array.isArray(val) ? val.filter(m => m && Number.isInteger(m.day) && D.voicemails[m.key]).slice(-30).map(m => ({ day: m.day, key: m.key })) : []; break;
+          case 'inbox': s.inbox = Array.isArray(val) ? val.filter(m => m && Number.isInteger(m.day) && D.voicemails[m.key]).slice(-30).map(m => { const o = { day: m.day, key: m.key }, w = {}; if (m.vars && typeof m.vars === 'object') for (const v of VM_WORDS) if (typeof m.vars[v] === 'string') w[v] = m.vars[v].slice(0, 160); if (Object.keys(w).length) o.vars = w; return o; }) : []; break;
           case 'offerState': s.offerState = ['none', 'waiting', 'stalled', 'joined', 'refused'].includes(val) ? val : 'none'; break;
           case 'tip': s.tip = val && PEOPLE.includes(val.name) && Number.isInteger(val.day) ? { name: val.name, day: val.day, withPlan: val.withPlan === true } : null; break;
           case 'favour': s.favour = { thunderbirds: !!(val && val.thunderbirds === true), police: !!(val && val.police === true) }; break;
@@ -761,7 +772,22 @@
     // ----- helpers -----
     const has = (s, f) => s.facts.includes(f);
     const flag = (s, f) => s.flags.includes(f);
-    const vars = (s, extra) => Object.assign({ T: s.debateDay, A: s.attackDay }, extra || {});
+    // Leads mode: nobody rings about something you never asked. Old mode keeps its lines.
+    const leadsMode = () => !!(opts && opts.leadsOn && opts.leadsOn());
+    const beforeFire = () => leadsMode() && !!opts.fireRun && !opts.fireRun(); // the paper has not run the fire yet: nobody talks about it
+    const askedAround = s => s.exposure > 0 || Object.values(s.asked).some(a => a && a.length);
+    const askedOffice = s => (s.asked['service:university'] || []).length > 0;
+    const askedCar = s => (s.asked['service:university'] || []).includes('pv_u_car');
+    const askedRow = s => Object.values(s.asked).some(a => (a || []).includes('pv_backrow'));
+    const heardVars = s => {
+      if (!leadsMode() || askedCar(s)) return { valeHeard: 'Lorraine in the office says someone keeps asking about my car.', valeOpen: 'Is this the person who keeps ringing my department? Adrian Vale. Lorraine in the office says you ask about my car the way other people ask about the weather.', valeGave: 'Lorraine', rosaAbout: !leadsMode() || askedRow(s) ? 'the Back Row' : 'Professor Vale' };
+      if (askedOffice(s)) return { valeHeard: 'Lorraine in the office says someone keeps asking about me.', valeOpen: 'Is this the person who keeps ringing my department? Adrian Vale. Lorraine in the office says you ask about me the way other people ask about the weather.', valeGave: 'Lorraine', rosaAbout: askedRow(s) ? 'the Back Row' : 'Professor Vale' };
+      return { valeHeard: 'A student of mine says someone keeps asking about me.', valeOpen: 'Is this the person who keeps asking about me? Adrian Vale. Word gets around a campus.', valeGave: 'A student of mine', rosaAbout: askedRow(s) ? 'the Back Row' : 'Professor Vale' };
+    };
+    const vars = (s, extra) => Object.assign({ T: s.debateDay, A: s.attackDay }, heardVars(s), extra || {});
+    // A voicemail keeps the words it was left with. A save from before they were kept has the words those builds always used.
+    const vmWordsNow = (s, key) => { const h = heardVars(s), w = {}; for (const v of VM_WORDS) if (String(D.voicemails[key].text).includes('{' + v + '}')) w[v] = h[v]; return w; };
+    const vmText = (s, m) => fill(D.voicemails[m.key].text, vars(s, Object.assign({}, VM_OLD_WORDS[m.key], m.vars)));
     function say(s, text, extra) {
       const t = fill(text, vars(s, extra));
       if (t) { s.log.push(t); if (s.log.length > 40) s.log.shift(); }
@@ -795,7 +821,8 @@
       if (key === 'valeBrick') D.voicemails.valeBrick.text = D.tricks.brickVm;
       if (key === 'fakeGraves') D.voicemails.fakeGraves.text = D.tricks.fake.vm;
       if (s.inbox.some(m => m.key === key)) return null;
-      s.inbox.push({ day, key });
+      const words = vmWordsNow(s, key);
+      s.inbox.push(Object.keys(words).length ? { day, key, vars: words } : { day, key });
       giveNumber(s, D.voicemails[key].from);
       return key;
     }
@@ -837,7 +864,7 @@
     // key: 'car' | 'fire' | 'campus' for the game's existing Vale stories, or a quest story's readKey.
     function onNewsRead(s, key, day) {
       if (s.ending) return null;
-      if (['car', 'fire', 'campus'].includes(key) && s.stage === 'dormant') { open(s, day); say(s, L.opened); }
+      if (['car', 'fire', 'campus'].includes(key) && s.stage === 'dormant') { open(s, day); say(s, beforeFire() ? L.openedEarly : L.opened); }
       if (key === 'classifieds' && s.stage === 'backrow') {
         const fresh = ['lenny', 'hendry', 'phones'].filter(id => !s.numbers[id]);
         fresh.forEach(id => giveNumber(s, id));
@@ -855,10 +882,11 @@
       return null;
     }
     // Somebody told you about Vale's accidents (not the paper): the case opens, and you know what she said.
-    function onHeard(s, day) {
+    function onHeard(s, day, only) {
       if (s.ending) return null;
-      if (s.stage === 'dormant') { open(s, day); say(s, L.opened); }
+      if (s.stage === 'dormant') { open(s, day); say(s, beforeFire() ? L.openedEarly : L.opened); }
       if (s.stage === 'dormant') return null;
+      if (only === 'car') return learn(s, 'car_story') ? ok(s, L.newsLearned.car) : null; // she told you about the brakes and nothing else
       const hadRule = has(s, 'rule'), a = learn(s, 'car_story'), b = learn(s, 'fire_story');
       if (!a && !b) return null;
       const r = ok(s, L.heard);
@@ -909,8 +937,8 @@
       }
       // People ring the player back.
       if (s.stage === 'open' && day <= s.attackDay) {
-        if (has(s, 'back_row') && !s.rosaBurned) vm('rosa');
-        if (has(s, 'back_row') && s.offerState === 'none') { s.offerState = 'waiting'; vm('vanessa'); }
+        if (has(s, 'back_row') && !s.rosaBurned && (!leadsMode() || askedAround(s))) vm('rosa');
+        if (has(s, 'back_row') && s.offerState === 'none' && (!leadsMode() || askedAround(s))) { s.offerState = 'waiting'; vm('vanessa'); }
         if (s.offerState === 'stalled' && day > s.stallDay + 1) { s.offerState = 'refused'; risk(s, 10, day); push('Vanessa stopped waiting for your answer.'); }
       }
 
@@ -995,6 +1023,7 @@
       if (t.needsFlag && !flag(s, t.needsFlag)) return false;
       if (t.needsAny && !t.needsAny.some(x => (x.startsWith('flag:') ? flag(s, x.slice(5)) : has(s, x.slice(5))))) return false;
       if (t.unlessNumber && s.numbers[t.unlessNumber]) return false;
+      if (t.afterFire && beforeFire()) return false;
       if (askedList && askedList.includes(t.id)) return false;
       return true;
     }
@@ -1014,7 +1043,7 @@
     function hingeTopics(s, profile) {
       if (!profile || s.ending) return [];
       const asked = s.asked[profile.id] || [];
-      const list = (D.hinge[profile.factionId] || []).filter(t => baseAvailable(s, t, asked)).map(t => ({ id: t.id, label: fill(t.label, vars(s)), confirm: false }));
+      const list = (D.hinge[profile.factionId] || []).filter(t => baseAvailable(s, t, asked)).map(t => ({ id: t.id, label: fill(beforeFire() && t.early && t.early.label || t.label, vars(s)), confirm: false }));
       const d = dateTopicFor(s, profile);
       if (d) list.push(d);
       return list;
@@ -1028,6 +1057,8 @@
       if (!base || !baseAvailable(s, base, asked)) return no(L.unavailable);
       s.asked[profile.id] = asked.concat(topicId);
       const t = Object.assign({}, base, (base.as && base.as[profile.id]) || {});
+      if (base.early && beforeFire() && !(base.as && base.as[profile.id] && base.as[profile.id].reply)) Object.assign(t, base.early);
+      if (base.early && base.early.player && beforeFire()) t.player = base.early.player; // your own line never counts a second accident, whoever you ask
       const plan = has(s, 'car_plan');
       applyEffects(s, t, day);
       const text = t.effect === 'warnThunderbirds' && plan && t.replyPlan ? t.replyPlan : t.reply;
@@ -1046,14 +1077,14 @@
     }
 
     // ----- phone lines -----
-    function contactForNumber(s, number) {
+    function contactForNumber(s, number, day) {
       const id = LINES.find(k => s.numbers[k] === number);
       if (!id) return null;
       const c = D.contacts[id];
-      return { id: 'pv:' + id, name: c.name, portrait: c.portrait, greeting: lineGreeting(s, id) };
+      return { id: 'pv:' + id, name: c.name, portrait: c.portrait, greeting: lineGreeting(s, id, day) };
     }
-    function lineGreeting(s, id) {
-      if (id === 'vanessa' && wireLive(s)) return D.wiretap.open;
+    function lineGreeting(s, id, day) {
+      if (id === 'vanessa' && wireLive(s, day)) return D.wiretap.open;
       if (id === 'vanessa' && s.wireBurned) return D.wiretap.hungUp;
       if (id === 'vanessa' && s.stage === 'open' && (s.offerState === 'waiting' || s.offerState === 'stalled')) return D.vanessaPitch;
       if (id === 'rosa' && s.rosaBurned) return D.rosaLines.burned;
@@ -1070,7 +1101,7 @@
       const add = (id, label) => out.push({ id, label, confirm: isFinal(id) });
       if (lineId.startsWith('service:')) {
         const asked = s.asked[lineId] || [];
-        for (const t of D.calls[lineId] || []) if (baseAvailable(s, t, asked)) add(t.id, fill(t.crossed ? D.tricks.crossed.label : t.label, vars(s)));
+        for (const t of D.calls[lineId] || []) if (baseAvailable(s, t, asked)) { add(t.id, fill(t.crossed ? D.tricks.crossed.label : t.label, vars(s))); if (t.exposure || t.crossed) out[out.length - 1].exposure = t.crossed ? 12 : t.exposure; }
         return out;
       }
       const key = lineId.slice(3);
@@ -1086,7 +1117,7 @@
             if (has(s, 'jennifer')) names.push('jennifer');
             if (has(s, 'back_row')) names.push('rebecca');
             if (s.numbers.rosa) names.push('rosa');
-            for (const n of names) if (!s.accused.includes(n)) add('tip_' + n, fill(label('tip'), { name: D.cast[n].name }));
+            if (!(leadsMode() && gravesHas(s))) for (const n of names) if (!s.accused.includes(n) && !(leadsMode() && n === 'vanessa' && wireLive(s, day) && !has(s, 'car_plan'))) add('tip_' + n, fill(label('tip'), { name: D.cast[n].name })); // Leads mode: she has her name and the plan, and another name could only cost you
           }
           if (s.stage === 'resolved' && s.arrestCall) { add('pv_g_tell', label('pv_g_tell')); add('pv_g_thanks', label('pv_g_thanks')); }
           if (s.stage === 'backrow' || (s.joinedDay !== null && s.silencedDay !== null)) add('pv_g_confess', label('pv_g_confess'));
@@ -1183,7 +1214,7 @@
             s.accused.push(n);
             if (D.cell.includes(n)) {
               if (s.cellAtLarge) { s.cellArrested = true; s.cellAtLarge = false; s.silencedDay = null; s.favour.police = true; news(s, day + 1, 'cell_arrested_late'); return ok(s, D.gravesLines.tipEvidence, { name: name(n) }); }
-              if (has(s, 'car_plan')) { s.tip = { name: n, day, withPlan: true }; s.gravesAsk = day; return ok(s, D.gravesLines.tipPlan + ' ' + D.tricks.how.open, { name: name(n) }); }
+              if (has(s, 'car_plan')) { if (leadsMode() && wireLive(s, day)) { s.wireDone = true; s.offerState = 'refused'; } s.tip = { name: n, day, withPlan: true }; s.gravesAsk = day; return ok(s, D.gravesLines.tipPlan + ' ' + D.tricks.how.open, { name: name(n) }); }
               if (n === 'vanessa' && s.numbers.vanessa && !s.wireDone && s.stage === 'open' && day < s.attackDay) { // call her, I'll listen
                 s.wireSet = day; s.wireStep = 0; s.wireSus = 0; s.wireGot = [];
                 s.accused = s.accused.filter(x => x !== 'vanessa');
@@ -1287,7 +1318,7 @@
     }
     function valeDue(s, day) {
       const phase = valePhase(s, day);
-      if (!phase || s.valeCallDay === day) return 0;
+      if (!phase || s.valeCallDay === day || (leadsMode() && !askedAround(s))) return 0;
       if (phase === 1) return !s.inbox.some(m => m.key === 'valeVm1') && day > s.openedDay && (s.exposure >= 8 || has(s, 'rule')) ? 1 : 0;
       return !s.inbox.some(m => m.key === 'valeVm2') ? 2 : 0;
     }
@@ -1394,6 +1425,12 @@
 
     // ----- the wiretap: ring Vanessa while Graves listens -----
     const wireLive = (s, day) => s.wireSet !== null && !s.wireDone && s.stage === 'open' && !s.attackResolved && (day === undefined || day < s.attackDay);
+    const gravesHas = s => !!(s.tip && s.tip.withPlan && D.cell.includes(s.tip.name)); // she has a name from the cell and the plan: the arrest is coming
+    // The winning move is open: you hold the plan and her number, and a name from the cell is on her menu.
+    function gravesCardLive(s, day) {
+      if (s.stage !== 'open' || s.attackResolved || !has(s, 'car_plan') || gravesHas(s) || !s.numbers.graves) return false;
+      return lineTopics(s, 'pv:graves', day).some(t => t.id.startsWith('tip_') && D.cell.includes(t.id.slice(4)));
+    }
     function wireChoice(s, k, day) {
       const step = D.wiretap.steps[s.wireStep], c = step && step.choices[k];
       if (!c || !wireLive(s, day)) return no(L.unavailable);
@@ -1446,7 +1483,7 @@
     }
 
     // One short hint for the case file: a nudge, never the answer.
-    function hintFor(s) {
+    function hintFor(s, day) {
       if (s.ending || s.stage === 'dormant' || s.stage === 'withdrawn' || s.stage === 'resolved' || s.attackResolved) return null;
       if (s.stage === 'backrow') {
         if (s.device !== 'none') return s.device === 'assembled' ? 'Vanessa will want to know.' : null;
@@ -1455,8 +1492,10 @@
         if (s.inv.phone === 'none') return 'Somebody in the classifieds sells phones.';
         return allItems(s) ? 'Your desk is waiting.' : null;
       }
-      if (wireLive(s)) return 'Graves is waiting for you to ring Vanessa.';
-      if (!has(s, 'rule')) return 'Two accidents. Look at what happened the day before each.';
+      if (leadsMode() && gravesHas(s)) return D.hints.gravesHas;
+      if (leadsMode() && gravesCardLive(s, day)) return 'A detective wants a name and a day.';
+      if (wireLive(s, day) && !(leadsMode() && has(s, 'car_plan'))) return 'Graves is waiting for you to ring Vanessa.';
+      if (!has(s, 'rule')) return beforeFire() ? 'His brakes failed the day after a guest lecture. Keep reading the paper.' : 'Two accidents. Look at what happened the day before each.';
       if (!has(s, 'debate')) return 'Who is Vale bringing to campus next?';
       if (!has(s, 'allison')) return 'Somebody keeps Vale’s diary.';
       if (!has(s, 'car_bay')) return 'Where does his car spend the day after?';
@@ -1566,7 +1605,11 @@
         meters.push({ id: 'rosaFear', label: 'Rosa’s nerves', value: s.rosaFear, danger: s.rosaFear >= TH.rosaWarn, hint: `At ${TH.rosaBreaks} she goes to the police. Call her to calm her, once a day.` });
       }
       const todo = [];
-      if (s.stage === 'open' && !s.attackResolved) {
+      if (leadsMode() && s.stage === 'open' && !s.attackResolved && gravesHas(s)) todo.push(D.hints.gravesHas);
+      else if (leadsMode() && s.stage === 'open' && !s.attackResolved && s.thunderbirdsWarned !== null) todo.push(D.hints.bluebirdsHave); // he is with the Beaumonts: nothing left to investigate
+      else if (s.stage === 'open' && !s.attackResolved) {
+        if (leadsMode() && gravesCardLive(s, day)) todo.push(D.hints.graves);
+        if (leadsMode() && wireLive(s, day) && !has(s, 'car_plan')) todo.push(D.hints.wire); // holding the plan, Graves's card wins and the call can only burn it
         if (!has(s, 'rule')) todo.push(D.hints.rule);
         if (!has(s, 'debate')) todo.push(D.hints.debate);
         if (!has(s, 'back_row')) todo.push(D.hints.back_row);
@@ -1603,13 +1646,13 @@
         meters, todo,
         facts: s.facts.map(f => fill(D.facts[f], vars(s))),
         people,
-        voicemails: s.inbox.slice().reverse().map(m => ({ day: m.day, from: D.contacts[D.voicemails[m.key].from].name, text: fill(D.voicemails[m.key].text, vars(s)) })),
+        voicemails: s.inbox.slice().reverse().map(m => ({ day: m.day, from: D.contacts[D.voicemails[m.key].from].name, text: vmText(s, m) })),
         numbers: knownLines(s),
         inventory: s.stage === 'backrow' ? ITEMS.map(i => ({ id: i, label: D.workbench.items[i].label, status: s.inv[i], image: D.workbench.items[i].image })) : [],
         device: s.device,
         actions: roomActions(s),
         visits: visitActions(s, day),
-        hint: hintFor(s),
+        hint: hintFor(s, day),
         campus: isProtect(s) || s.stage === 'withdrawn' ? D.university.word[campusTier(s)] : null,
         log: s.log.slice(-5),
         ending: endingInfo(s)
@@ -1647,7 +1690,7 @@
    *   seed()                  run seed
    */
   function mount(host) {
-    const E = createEngine(DATA, { newNumber: host.newNumber, bride: host.bride });
+    const E = createEngine(DATA, { newNumber: host.newNumber, bride: host.bride, leadsOn: host.leadsOn, fireRun: host.fireRun });
     const doc = typeof document !== 'undefined' ? document : null;
     const asset = p => (host.assetUrl ? host.assetUrl(p) : p);
     const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1821,7 +1864,7 @@
       return r;
     }
     function onNewsRead(key) { return after(E.onNewsRead(state(), key, day())); }
-    function onHeard() { return after(E.onHeard(state(), day())); }
+    function onHeard(only) { return after(E.onHeard(state(), day(), only)); }
     function newsFor(d) { return E.newsFor(state(), d === undefined ? day() : d); }
     // Hinge: extra topics for this woman's chat, and what happens when one is picked.
     function hingeTopics(profile) { return E.hingeTopics(state(), profile); }
@@ -1830,7 +1873,7 @@
     // or a quest number ('pv:rosa' and so on, from contactForNumber).
     function serviceTopics(lineId) { return E.lineTopics(state(), lineId, day()).map(t => Object.assign({ pv: true }, t)); }
     function chooseServiceTopic(lineId, topicId) { return after(E.chooseLine(state(), lineId, topicId, day())); }
-    function contactForNumber(number) { return E.contactForNumber(state(), String(number)); }
+    function contactForNumber(number) { return E.contactForNumber(state(), String(number), day()); }
 
     function injectCss() {
       if (!doc || doc.getElementById('pv-css')) return;
@@ -1895,7 +1938,7 @@ body>.pv-overlay{position:fixed}
       helpLead: () => E.helpLead(state()),
       helpGive: () => after(E.helpGive(state(), day())),
       helpText: key => DATA.help[key] || '',
-      caseCard: () => { const v = E.caseFile(state(), day()); return { title: DATA.title, status: v.routeName, alert: v.todo[0] || '' }; }
+      caseCard: () => { const v = E.caseFile(state(), day()), early = v.todo[0] === DATA.hints.rule && host.leadsOn && host.leadsOn() && host.fireRun && !host.fireRun(); return { title: DATA.title, status: v.routeName, alert: early ? DATA.hints.ruleEarly : v.todo[0] || '' }; }
     };
   }
 

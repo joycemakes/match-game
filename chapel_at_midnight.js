@@ -62,7 +62,6 @@
     @keyframes chapelDevour{0%{transform:scale(1);filter:brightness(1)}45%{transform:scale(1.12);filter:brightness(.6) hue-rotate(-20deg)}85%,100%{transform:scale(1.3);filter:brightness(0)}}
     .hinge-options{max-height:56%;overflow-y:auto}
     .hinge-chat-choice.chapel-choice{color:#4b2d63;background:#f6efff;border-color:#b79bd3}
-    .hinge-chat-choice.chapel-entry{color:#f5ecff;background:#3b2a52;border-color:#8f74b3}
     .chapel-case h3{margin-top:4px}
     .chapel-case h4{margin:14px 0 5px;font:bold 11px -apple-system,Arial,sans-serif;text-transform:uppercase;letter-spacing:.07em;color:#7b4f9c}
     .chapel-case p,.chapel-case li{font-size:calc(11px * var(--reading-scale));line-height:1.45;margin:4px 0;color:#333b48}
@@ -106,7 +105,6 @@
     let data=root.MATCH_CHAPEL_DATA||null;
     let caseOpen=false,attackTimers=[];
     let overlay=null,overlayImage=null,overlayCaption=null,fatalBackground=null,win=null;
-    const questMode=new Set();
     if(!data&&typeof root.fetch==='function'){
       // The linked-asset preview.html loads the JSON; the standalone build inlines it.
       const stamp=root.document?.documentElement?.getAttribute?.('data-build'); // online editions: this build's version
@@ -222,7 +220,7 @@
       const st=state();
       const chalk=st.chalkTrueFirst?[st.location,st.chalkOther]:[st.chalkOther,st.location];
       const vars={place:placeName(st.location),Place:cap(placeName(st.location)),PLACE:placeName(st.location).toUpperCase(),
-        rite:st.hostKnown?'Victoria Blackwood’s rite':'the Midnight Rite',Rite:st.hostKnown?'Victoria Blackwood’s rite':'The Midnight Rite',
+        rite:st.hostKnown?(api.world()?.leadsOn?'Victoria’s rite':'Victoria Blackwood’s rite'):'the Midnight Rite',Rite:st.hostKnown?(api.world()?.leadsOn?'Victoria’s rite':'Victoria Blackwood’s rite'):'The Midnight Rite',
         short:placeShort(st.location),chalkA:placeName(chalk[0]),chalkB:placeName(chalk[1]),
         warnedPlace:placeName(st.warned),riddle:data.places[st.location].riddle,
         fedup:nameOf(st.fedupId||holder(st,'fedup')),gossip:nameOf(holder(st,'gossip')),
@@ -263,7 +261,7 @@
       const thread=threadOf(id);
       if(!thread||thread.blocked||thread.fumbled||thread.quiet||thread.unmatched||thread.left)return false; // she has stopped replying: no countdown from her
       thread.awaiting=false;thread.ghosted=false;thread.replyOnDay=null;
-      thread.log.push({who:'her',text});
+      thread.log.push({who:'her',text:api.fresh?api.fresh(thread,text):text});
       return true;
     }
     function refresh(){if(caseOpen)renderCase();else api.rerender();}
@@ -278,7 +276,7 @@
       api.later(()=>{
         thread.pending=false;
         if(api.world().seed!==seed)return; // a new run started meanwhile
-        if(replyText)thread.log.push({who:'her',text:replyText});
+        if(replyText)thread.log.push({who:'her',text:api.fresh?api.fresh(thread,replyText):replyText});
         const st=state();
         if(st&&after)after(st,thread);
         refresh();
@@ -313,7 +311,7 @@
       const edition=(api.world().editions||[]).find(item=>item.day===today());
       if(edition)decorateEdition(edition);
       journal(st,how==='heard'?'She told you about a Midnight Rite flyer: one night only, on the next moonless night, signed V.B. You haven’t seen it yourself yet.':'A Midnight Rite flyer is in the paper: one night only, on the next moonless night. The host signs only as V.B.');
-      api.status('☾ A new case file is in your bedside cupboard: the Chapel at Midnight.');
+      if(how==='heard')api.status('☾ A new case file is in your bedside cupboard: the Midnight Rite.'); // Leads mode: only once somebody has told you
       return true;
     }
     // Hinge calls this after every match. Matching with Victoria starts her clock, but nothing is
@@ -386,6 +384,29 @@
       const g=gothState(st,id);
       return warmth(id)>=(roleOf(st,id)==='fedup'&&g.opened?1:rules().friendWarmth);
     }
+    // Leads: a goth who would not say where because she barely knows you, and still does not. Never a loyal one (warmth does not move her).
+    function whereCold(id){
+      const st=state(),profile=api.profile(id);
+      if(!st?.active||st.outcome||!profile||!isGoth(profile))return false;
+      if(st.goths?.[id]?.told||roleOf(st,id)==='loyal')return false;
+      return !friendNow(st,id);
+    }
+    function friendNow(st,id){return warmth(id)>=(roleOf(st,id)==='fedup'&&st.goths?.[id]?.opened?1:rules().friendWarmth);} // isFriend, for the bar: it reads and writes nothing
+    // Leads: asking her where would not get you the place, and it would get back to Victoria. The button stays; it is never gold, and no Lead names her for it.
+    function whereRisky(id){
+      const st=state(),profile=api.profile(id);
+      if(!st?.active||st.outcome||!profile)return false;
+      if(id===VICTORIA)return !threadOf(id)||warmth(id)<rules().victoriaWarmth;
+      if(!isGoth(profile))return false;
+      return roleOf(st,id)==='loyal'||!!threadOf(id)&&!friendNow(st,id);
+    }
+    function gothLoyal(id){const st=state(),profile=api.profile(id);return !!st?.active&&!st.outcome&&!!profile&&id!==VICTORIA&&isGoth(profile)&&roleOf(st,id)==='loyal';}
+    // Leads: she said no today only because she barely knew you, and now she knows you. Never a loyal one.
+    function warmedToday(st,id){
+      const g=st.goths?.[id];
+      return !!api.world().leadsOn&&!!g&&!g.told&&g.whereDay===today()&&roleOf(st,id)!=='loyal'&&isFriend(st,id);
+    }
+    function whereWarmed(id){const st=state();return !!st?.active&&!st.outcome&&!!api.profile(id)&&isGoth(api.profile(id))&&warmedToday(st,id);}
     // The wrong chapel a gossip rules out. The flyer gossip rules out the chapel the paper
     // got wrong, so her word and the chalk story together give the answer.
     function neverPlace(st,id){
@@ -398,7 +419,7 @@
       return GOTH_ACTS.filter(act=>{
         if(act==='moon')return !st.nightKnown&&!g.asked.includes('moon'); // until somebody has told you which night
         if(act!=='rite'&&!st.hostKnown)return false; // until somebody has told you whose rite it is
-        if(act==='where')return !g.told&&g.whereDay!==today();
+        if(act==='where')return !g.told&&(g.whereDay!==today()||warmedToday(st,id));
         if(act==='sisters'&&!st.warned)return false;
         return !g.asked.includes(act);
       });
@@ -488,21 +509,21 @@
         if(st.attackDueDay===null||st.attackDueDay>today()+1){st.attackDueDay=today()+1;st.attackReason='confront';}
         journal(st,'You told Victoria you know what she is planning.');
       };
-      converse(VICTORIA,line.player,fill(reply),after); // her lines can name the night ({night}, {Night})
+      converse(VICTORIA,act==='confront'&&api.venueSaid?.()===false?line.player.replace(' in that chapel',''):line.player,fill(reply),after); // her lines can name the night ({night}, {Night}); Leads mode: you do not name the venue before anybody has
     }
 
     // Someone tells you which night the moon goes dark: now the case file can count down.
     function learnNight(st,who){
       if(st.nightKnown)return;
       st.nightKnown=true;
-      addClue(st,'moon',fill(data.moon.clue,{who}));
+      addClue(st,'moon',api.world().leadsOn&&st.riteDay!==null?`${who} says the moon goes dark on Day ${st.riteDay}.`:fill(data.moon.clue,{who})); // Leads mode: the row states the night, as a day that does not go stale
       syncTopics(st);
     }
     // Someone tells you whose rite it is. Until then the case file knows only the initials on the flyer.
     function learnHost(st,who){
       if(st.hostKnown)return;
       st.hostKnown=true;
-      addClue(st,'host',who==='Victoria'?data.host.herself:fill(data.host.clue,{who}));
+      addClue(st,'host',who==='Victoria'?data.host.herself:fill(api.world().leadsOn&&data.host.heard||data.host.clue,{who})); // Leads mode: only what her line said
     }
     function sisterMoon(st,id){
       if(!isSister(api.profile(id))||isClosed(id)||st.outcome||st.nightKnown)return;
@@ -788,34 +809,30 @@
     }
     // Returns {html, only}. With only=true the quest choices replace the
     // ordinary small-talk topics, keeping the list short on small phones.
-    function optionsFor(thread){
-      const st=sync();
+    // peek: read the state as it is, without catching up (Hinge's chat offers only read; opening a chat catches up).
+    function optionsFor(thread,peek=false){
+      const st=peek?state():sync();
       if(!st||!st.active||st.dead||!thread)return null;
       const id=thread.id,profile=api.profile(id);
       const kind=id===VICTORIA?'victoria':isGoth(profile)?'goth':isSister(profile)?'sister':null;
       if(!kind||isClosed(id))return null;
       const mark=kind==='sister'?'✝':'☾';
-      let choices=[],entry='';
+      let choices=[];
       if(st.outcome){
         if(kind==='sister'||st.won)return null;
         const date=dateChoices(st,id);
         if(!date.length)return {html:'<div class="story-tag">The night of the rite is over.</div>',only:false};
         choices=date.map(act=>button(`d:${id}:${act}`,data.date.actions[act].label));
-        entry=data.date.entry;
       }else if(kind==='victoria'){
         choices=victoriaChoices(st).map(act=>button(`v:${act}`,data.victoria.actions[act].label));
-        entry=st.hostKnown?'Talk about her Midnight Rite':data.victoria.actions.flyers.entry;
       }else if(kind==='goth'){
         choices=gothChoices(st,id).map(act=>button(`g:${id}:${act}`,data.gothActions[act].label));
-        entry=st.hostKnown?'Talk about Victoria’s rite':'Talk about the Midnight Rite';
       }else{
         // A Sister takes the place only once you have both halves: which night, and a chapel to name.
         choices=[...(st.nightKnown?[]:[button(`m:${id}`,data.moon.sister.label,{mark})]),...(ready(st)?PLACES.map(place=>button(`s:${id}:${place}`,fill(data.sisterTalk.label,{short:placeShort(place)}),{mark})):[])];
-        entry=fill(data.sisterTalk.entry);
       }
       if(!choices.length)return null;
-      if(!questMode.has(id))return {html:button(`qmode:${id}:on`,entry,{mark,extra:'chapel-entry'}),only:false};
-      return {html:choices.join('')+button(`qmode:${id}:off`,'Back to small talk',{mark:'‹'}),only:true};
+      return {html:choices.join(''),only:false}; // gold lane steps, no menu inside the chat
     }
 
     // ---------- case page (shown in the bedside cupboard) ----------
@@ -851,21 +868,22 @@
       return `<div class="chapel-person"><b>${esc(name)}</b>${tags.length?` <small>(${tags.join(', ')})</small>`:''} ${canMessage?`<button class="chapel-btn" data-chapel-choice="msg:${id}">Message</button>`:''}${call}<small>${esc(status)}</small></div>`;
     }
     // One short hint: a nudge from what you've heard, never the answer, never about danger.
+    const venueAsk=()=>api.venueSaid?.()===false?'where':'which chapel'; // Leads mode: nobody has said chapel yet
     function hintFor(st){
       if(st.outcome||st.dead||st.warned)return null;
       const kinds=new Set(st.clues.map(c=>c.kind));
       const moon='Somebody who keeps track of the moon would know which night.';
-      if(kinds.has('riddle')||kinds.has('victoria'))return !st.nightKnown?`You know where to look. ${moon}`:canReachSisters(st)?'The Sisters can’t keep watch everywhere.':'A Sister of Mercy can put you in touch.';
+      if(kinds.has('riddle')||kinds.has('victoria'))return !st.nightKnown?`You know where to look. ${moon}`:canReachSisters(st)?'The Sisters can’t keep watch everywhere.':api.noSisters?.()?'The paper runs St. Brigid’s number.':'A Sister of Mercy can put you in touch.';
       if(kinds.has('never')&&kinds.has('chalk'))return st.nightKnown?'Two clues, three chapels.':`Two clues, three chapels. ${moon}`;
       if(kinds.has('never')||kinds.has('chalk'))return st.nightKnown?'That rules one chapel out. Somebody else knows more.':`That rules one chapel out. ${moon}`;
-      if(!st.nightKnown)return 'The Sisters will need two things from you: which chapel, and which night.';
+      if(!st.nightKnown)return `The Sisters will need two things from you: ${venueAsk()}, and which night.`;
       return flyerRead(st)?'The girls on the flyer know more than the flyer does.':'The goth crowd knows more than it lets on.';
     }
     function statusText(st){
       if(st.dead)return 'The case is closed.';
       if(st.outcome)return `${st.resultText} Case closed.`;
       const told=st.warned?` The Sisters will keep watch at ${placeName(st.warned)}.`:'';
-      const rite=st.hostKnown?'Victoria Blackwood’s Midnight Rite':'The Midnight Rite';
+      const rite=st.hostKnown?(api.world()?.leadsOn?'Victoria’s Midnight Rite':'Victoria Blackwood’s Midnight Rite'):'The Midnight Rite';
       if(!st.nightKnown)return `${rite} is on the next moonless night. Nobody has told you which night, or where.${told}`;
       return `${rite} is ${relNights(st.riteDay)}. Nobody will say where.${told}`;
     }
@@ -877,16 +895,16 @@
       else{
         const now=st.warned?`<p>The Sisters will keep watch at <b>${esc(placeName(st.warned))}</b> on the night.</p>`:'<p>You haven’t told the Sisters anything yet.</p>';
         // Word can only be sent once you have both halves: which night, and a chapel to name.
-        const send=!ready(st)?'<p>They will need to know which chapel, and which night.</p>':canReachSisters(st)?
+        const send=!ready(st)?`<p>They will need to know ${venueAsk()}, and which night.</p>`:canReachSisters(st)?
           `<p><b>${st.warned?'Change your answer':'Send word: the rite is at'}</b></p><div class="chapel-row">${PLACES.map(place=>`<button class="chapel-btn ${st.warned===place?'on':''}" data-chapel-choice="warn:${place}">${esc(placeShort(place))}</button>`).join('')}</div>`:
-          '<p>You need a way to reach them. Any Sister of Mercy will give you St. Brigid’s number if you ask her.</p>';
+          (api.noSisters?.()?'<p>You need a way to reach them. The paper runs St. Brigid’s number.</p>':'<p>You need a way to reach them. Any Sister of Mercy will give you St. Brigid’s number if you ask her.</p>');
         sisters=now+send;
       }
       if(api.disputeKnown?.()&&data.sisterTalk.history)sisters=`<p>${esc(data.sisterTalk.history)}</p>`+sisters; // the Watch's history (SISTERS_AND_THE_CHURCH.md), once you know about the review
       // The three chapels are listed once something points at a chapel at all.
       const lore=api.disputeKnown?.(); // the chapels' histories (SISTERS_AND_THE_CHURCH.md), once you know about the review
       const where=placeClue(st)?`<p>It will be in one of the city’s three old chapels.</p>${list(PLACES.map(place=>data.places[place].guide+(lore&&data.places[place].lore?' '+data.places[place].lore:'')))}`:'<p>Nobody will say where.</p>';
-      return `<div class="chapel-case"><button class="profile-back chapel-back" data-chapel-choice="close-case">‹ Cupboard</button><h3>☾ The Chapel at Midnight</h3><p class="chapel-status">${esc(statusText(st))}</p>${hintFor(st)?`<p class="chapel-hint">Hint: ${esc(hintFor(st))}</p>`:''}`+
+      return `<div class="chapel-case"><button class="profile-back chapel-back" data-chapel-choice="close-case">‹ Cupboard</button><h3>☾ ${esc(api.venueSaid?.()===false?'The Midnight Rite':'The Chapel at Midnight')}</h3><p class="chapel-status">${esc(statusText(st))}</p>${hintFor(st)?`<p class="chapel-hint">Hint: ${esc(hintFor(st))}</p>`:''}`+
         `<h4>Where?</h4><div class="paper">${where}</div>`+
         `<h4>What you’ve heard</h4><div class="paper">${heard}</div>`+
         `<h4>The Sisters of Mercy</h4><div class="paper">${sisters}</div>`+
@@ -952,14 +970,10 @@
       if(!st)return;
       const [kind,a,b]=String(action).split(':');
       if(st.dead&&kind!=='close-case')return;
-      // A woman who has signed off for the day answers no more questions about the rite until tomorrow.
-      const asked=kind==='v'?VICTORIA:['g','s','m','d'].includes(kind)||(kind==='qmode'&&b==='on')?a:null;
-      if(asked&&api.chatDone?.(asked)){questMode.delete(asked);api.rerender();return;}
       switch(kind){
         case 'open-case':caseOpen=true;renderCase();return;
         case 'close-case':caseOpen=false;if(api.closeCase)api.closeCase();else api.openApp('notes');return;
         case 'msg':if(st.active)message(st,a);return;
-        case 'qmode':if(b==='on')questMode.add(a);else questMode.delete(a);api.rerender();return;
         case 'g':gothAct(st,a,b);return;
         case 'v':victoriaAct(st,a);return;
         case 's':sisterAct(st,a,b);return;
@@ -976,12 +990,12 @@
     // ---------- run lifecycle ----------
     function reset(){
       clearTimers();hideOverlay();hideWin();restoreFatalBackground();
-      caseOpen=false;questMode.clear();
+      caseOpen=false;
       ensureServiceTopics(false);
     }
     function afterLoad(){
       clearTimers();hideOverlay();hideWin();restoreFatalBackground();
-      caseOpen=false;questMode.clear();
+      caseOpen=false;
       const world=api.world();
       if(!data||!world)return;
       // The old, longer quest had Victoria message you unasked. Now you must match with her
@@ -1023,7 +1037,7 @@
     return {
       statusLine:()=>{const st=sync();return st?statusText(st):'';},
       onNewDay,afterDayStart,decorateEdition,optionsFor,choose,notesEntry,renderCase,afterLoad,reset,previewNow,previewAttack,
-      onMatch,onPaperOpened,onHeard,dialFlyer,likesYou,
+      onMatch,onPaperOpened,onHeard,dialFlyer,likesYou,whereCold,whereWarmed,whereRisky,gothLoyal,
       // A friend finds out which night the moon goes dark (a favour in preview.html). Returns the night, or null.
       tellNight:who=>{const st=sync();if(!st||!st.active||st.nightKnown||st.outcome||st.dead||st.riteDay===null)return null;learnNight(st,who);return relNights(st.riteDay);},
       // Scout a chapel at night (8 November 2026, a story place in preview.html): unseen, you learn whether it is the place.
@@ -1041,5 +1055,5 @@
     };
   }
 
-  root.MATCH_CHAPEL_ENGINE={create,attackFrame,LIGHTING,STAGES,ids:{VICTORIA,FLYER_GOTHS,PLACES}};
+  root.MATCH_CHAPEL_ENGINE={create,attackFrame,LIGHTING,STAGES,ids:{VICTORIA,FLYER_GOTHS,PLACES,PLACE_CLUES}}; // PLACE_CLUES: the clues that point at a chapel (the Leads read them: a Sister takes it only with the night and one of these)
 })(typeof window!=='undefined'?window:globalThis);
